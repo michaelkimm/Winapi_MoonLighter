@@ -96,6 +96,9 @@
     <ClCompile Include="MyFunc\MyGdiplus.cpp">
       <Filter>MyFunc</Filter>
     </ClCompile>
+    <ClCompile Include="Object\Stage.cpp">
+      <Filter>Object\StaticObject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -160,6 +163,9 @@
     </ClInclude>
     <ClInclude Include="MyFunc\MyGdiplus.h">
       <Filter>MyFunc</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Stage.h">
+      <Filter>Object\StaticObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

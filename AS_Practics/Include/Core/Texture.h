@@ -21,6 +21,7 @@ private:
 	HBITMAP hBitmap_;
 	BITMAP bitmap_;
 	HBITMAP hOldBitmap_;
+	HBITMAP hDoubleBufferImage_;
 
 private:
 	CTexture();
@@ -34,7 +35,7 @@ public:
 	HDC				GetDC() const		{ return hMemDC_; }
 
 
-	bool SetTexture(HINSTANCE _hInst, HDC& _hdc, const wchar_t* _file_name);
+	bool SetTexture(HINSTANCE _hInst, HDC& _hdc, const wchar_t* _file_name, const string& _str_path_key = TEXTURE_PATH);
 	void Render(HDC _hdc, float _time);
 };
 

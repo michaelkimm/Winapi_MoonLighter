@@ -1,9 +1,12 @@
 #include "Scene.h"
 #include "Layer.h"
+#include "..\Core\Core.h"
 
 CScene::CScene()
 {
-	CLayer* pt_layer = CreateLayer("Default");
+	CLayer* pt_layer = CreateLayer("Background", 0);
+	pt_layer = CreateLayer("Monster", 1);
+	pt_layer = CreateLayer("Player", 2);
 	pt_layer = CreateLayer("UI", INT_MAX);
 }
 

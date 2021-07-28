@@ -11,12 +11,23 @@ CSourceManager::CSourceManager()
 CSourceManager::~CSourceManager()
 {
 	SafeReleaseMap(source_map_);
+	SAFE_RELEASE(back_buffer_);
+}
+
+CTexture * CSourceManager::GetBackBuffer() const
+{
+	back_buffer_->AddRef();
+	return back_buffer_;
 }
 
 bool CSourceManager::Init(HINSTANCE _hInst, HDC& _hdc)
 {
 	hInst_ = _hInst;
 	hdc_ = _hdc;
+
+	// 백 버퍼를 불러온다.
+	back_buffer_ = LoadTexture("back_buffer", _T("back_white.bmp"));
+
 	return true;
 }
 
@@ -31,7 +42,7 @@ class CTexture* CSourceManager::LoadTexture(const string& _str_key, const wchar_
 	_pt_texture = new CTexture();	// ref_cnt = 1;
 
 	// 파일이 없는 경우
-	if (!_pt_texture->SetTexture(hInst_, hdc_, _file_name))
+	if (!_pt_texture->SetTexture(hInst_, hdc_, _file_name, _str_path_key))
 	{
 		SAFE_RELEASE(_pt_texture)
 		return NULL;

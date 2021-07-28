@@ -3,6 +3,7 @@
 #include "..\Core\Timer.h"
 #include "PathManager.h"
 #include "SourceManager.h"
+#include "Texture.h"
 
 DEFINE_SINGLETON(CCore)
 bool CCore::loop_ = true;
@@ -135,8 +136,19 @@ void CCore::Collision(float _time)
 
 void CCore::Render(float _time)
 {
-	// 씬 매니저에서 랜더
-	CSceneManager::Instance()->Render(hdc_, _time);
+	// 더블 버퍼링
+	
+	// 빈 흰색 도화지 그리기
+	CTexture* back_buffer = CSourceManager::Instance()->GetBackBuffer();
+	// Rectangle(back_buffer->GetDC(), 0, 0, back_buffer->GetWidth(), back_buffer->GetHeight());
+
+	// 컨텐츠 그리기
+	CSceneManager::Instance()->Render(back_buffer->GetDC(), _time);
+
+	// 흰색 도화지에 그려진걸 옮기기
+	BitBlt(hdc_, 0, 0, back_buffer->GetWidth(), back_buffer->GetHeight(), back_buffer->GetDC(), 0, 0, SRCCOPY);
+	
+	SAFE_RELEASE(back_buffer);
 }
 
 

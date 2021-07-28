@@ -15,6 +15,9 @@ void CObject::SetTexture(const string & _str_key, const wchar_t * _pFileName, co
 {
 	SAFE_RELEASE(texture_);
 	texture_ = CSourceManager::Instance()->LoadTexture(_str_key, _pFileName, _str_path_key);
+
+	// 텍스처 정할 때 사이즈도 맞춰 설정
+	SetSize(texture_->GetWidth(), texture_->GetHeight());
 }
 
 CObject::CObject()	:
