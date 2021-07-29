@@ -16,7 +16,7 @@ CTexture::~CTexture()
 	DeleteObject(hDoubleBufferImage_);
 }
 
-bool CTexture::SetTexture(HINSTANCE _hInst, HDC& _hdc, const wchar_t * _file_name, const string& _str_path_key)
+bool CTexture::SetTexture(HINSTANCE _hInst, HDC& _hdc, const wchar_t * _file_name, const string& _str_path_key, const COLORREF& _color_key)
 {
 	const wchar_t* texture_path = CPathManager::Instance()->FindPath(_str_path_key);
 
@@ -32,6 +32,9 @@ bool CTexture::SetTexture(HINSTANCE _hInst, HDC& _hdc, const wchar_t * _file_nam
 	// img_ = Image::FromFile(path_.c_str());
 	hBitmap_ = (HBITMAP)LoadImageW(_hInst, path_.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 	GetObject(hBitmap_, sizeof(BITMAP), &bitmap_);
+
+	// 칼라키 설정
+	SetColorKey(_color_key);
 
 	//// 예외 처리
 	//if (!img_)

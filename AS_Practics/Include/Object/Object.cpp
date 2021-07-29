@@ -1,6 +1,7 @@
 #include "Object.h"
 #include "..\Core\Texture.h"
 #include "..\Core\SourceManager.h"
+#include "..\Core\CameraManager.h"
 
 void CObject::SetTexture(CTexture * _t)
 {
@@ -11,13 +12,22 @@ void CObject::SetTexture(CTexture * _t)
 		texture_->AddRef();
 }
 
-void CObject::SetTexture(const string & _str_key, const wchar_t * _pFileName, const string & _str_path_key)
+void CObject::SetTexture(const string & _str_key, const wchar_t * _pFileName, const string & _str_path_key, const Color& _color_key)
 {
 	SAFE_RELEASE(texture_);
 	texture_ = CSourceManager::Instance()->LoadTexture(_str_key, _pFileName, _str_path_key);
 
+	float world_w = texture_->GetWidth();
+	float world_h = texture_->GetHeight();
+
 	// 텍스처 정할 때 사이즈도 맞춰 설정
-	SetSize(texture_->GetWidth(), texture_->GetHeight());
+	SetSize(world_w, world_h);
+}
+
+CTexture * CObject::GetTexture() const
+{
+	texture_->AddRef();
+	return texture_;
 }
 
 CObject::CObject()	:
@@ -64,8 +74,14 @@ void CObject::Render(HDC _hdc, float _time)
 	{
 		if (texture_->GetDC() == NULL)
 			return;
+
+		MY_POSE pose_in_cam = pose_ - CCameraManager::Instance()->GetPose();	 // 카메라 기준 상대 좌표
+
 		// BitBlt(_hdc, pose_.x, pose_.y, size_.x, size_.y, texture_->GetDC(), 0, 0, SRCCOPY);
-		TransparentBlt(_hdc, pose_.x, pose_.y, size_.x, size_.y, texture_->GetDC(), 0, 0, texture_->GetWidth(), texture_->GetHeight(), RGB(255, 0, 255));
+		TransparentBlt(_hdc, pose_in_cam.x, pose_in_cam.y, size_.x, size_.y, texture_->GetDC(), 0, 0, texture_->GetWidth(), texture_->GetHeight(), texture_->GetColorKey());
+		// 오브젝트의 카메라 상에서 위치 = 스테이지 위치 - 윈도우 위치
 		
+		cout << "pose_ : (" << pose_.x << ", " << pose_.y << ")\n";
+		cout << "pose_in_cam : (" << pose_in_cam.x << ", " << pose_in_cam.y << ")\n\n\n";
 	}
 }

@@ -4,6 +4,7 @@
 #include "PathManager.h"
 #include "SourceManager.h"
 #include "Texture.h"
+#include "CameraManager.h"
 
 DEFINE_SINGLETON(CCore)
 bool CCore::loop_ = true;
@@ -33,8 +34,10 @@ CCore::~CCore()
 	//  path 관리자 파괴
 	CPathManager::DestroyInst();
 
-	ReleaseDC(hWnd_, hdc_);
+	// 카메라 관리자 파괴
+	CCameraManager::DestroyInst();
 
+	ReleaseDC(hWnd_, hdc_);
 }
 
 bool CCore::Init(HINSTANCE _hInst)
@@ -72,6 +75,10 @@ bool CCore::Init(HINSTANCE _hInst)
 
 	// 창 생성
 	if (!CSceneManager::Instance()->Init())
+		return false;
+
+	// 카메라 관리자 생성
+	if (!CCameraManager::Instance()->Init())
 		return false;
 	
 	return true;
@@ -117,11 +124,15 @@ void CCore::Logic()
 void CCore::Input(float _time)
 {
 	CSceneManager::Instance()->Input(_time);
+	CCameraManager::Instance()->Input(_time);
+
 }
 
 void CCore::Update(float _time)
 {
 	CSceneManager::Instance()->Update(_time);
+	CCameraManager::Instance()->Update(_time);
+
 }
 
 void CCore::LateUpdate(float _time)

@@ -3,6 +3,7 @@
 #include "..\Object\Player.h"
 #include "..\Object\Monster.h"
 #include "..\Core\SourceManager.h"
+#include "..\Core\CameraManager.h"
 #include "..\Object\Stage.h"
 
 
@@ -35,7 +36,10 @@ bool CInGameScene::Init()
 
 	// 텍스처 & 물체 size 설정
 	pt_stage->SetTexture("Background", _T("3000.bmp"), TEXTURE_PATH);
-	if (pt_stage->GetTexture() == NULL) return false;
+
+	// 배경 사이즈 정해질 때 카메라 내 월드 사이즈도 설정
+	MY_SIZE stage_size = pt_stage->GetSize();
+	CCameraManager::Instance()->SetWorldSize(stage_size.x, stage_size.y);
 
 	SAFE_RELEASE(pt_stage);
 
@@ -56,8 +60,9 @@ bool CInGameScene::Init()
 
 	// 텍스처 & 물체 size 설정
 	pt_player->SetTexture(PLAYER_TAG, _T("sigong.bmp"), TEXTURE_PATH);
-	if (pt_player->GetTexture() == NULL)
-		return false;
+
+	// 플레이어에 카메라 고정
+	CCameraManager::Instance()->SetMaster(pt_player);
 
 	// CreateObj해서 레이어에 추가까지 하면 참조 카운트가 2개가 된다. 따라서 1개로 만들기 위해 pt_layer 해제
 	SAFE_RELEASE(pt_player);
@@ -68,13 +73,13 @@ bool CInGameScene::Init()
 
 	// ---------------------------------------------------------------------- : >> 몬스터 추가
 
-	// 오브젝트를 추가할 레이어를 찾는다.
-	pt_layer = FindLayer("Monster");
-	if (pt_layer == NULL) return false;
+	//// 오브젝트를 추가할 레이어를 찾는다.
+	//pt_layer = FindLayer("Monster");
+	//if (pt_layer == NULL) return false;
 
-	class CMonster* pt_monster = CObject::CreateObj<CMonster>("Monster", pt_layer);
-	
-	SAFE_RELEASE(pt_monster);
+	//class CMonster* pt_monster = CObject::CreateObj<CMonster>("Monster", pt_layer);
+	//
+	//SAFE_RELEASE(pt_monster);
 
 	// ---------------------------------------------------------------------- : <<
 

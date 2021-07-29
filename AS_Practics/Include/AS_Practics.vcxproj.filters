@@ -99,6 +99,9 @@
     <ClCompile Include="Object\Stage.cpp">
       <Filter>Object\StaticObject</Filter>
     </ClCompile>
+    <ClCompile Include="Core\CameraManager.cpp">
+      <Filter>Core\Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -166,6 +169,9 @@
     </ClInclude>
     <ClInclude Include="Object\Stage.h">
       <Filter>Object\StaticObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\CameraManager.h">
+      <Filter>Core\Source</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

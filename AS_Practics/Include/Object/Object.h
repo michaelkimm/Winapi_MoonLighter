@@ -11,7 +11,7 @@ class CObject
 {
 protected:
 	string	str_tag_;
-	MY_POSE pose_;
+	MY_POSE pose_;	// Àý´ë ÁÂÇ¥
 	MY_SIZE size_;
 	MY_POSE pivot_;
 
@@ -27,14 +27,15 @@ public:
 	void SetSize(int _x, int _y)		{ size_ = MY_SIZE(_x, _y); }
 	void SetPivot(MY_POSE& _pivot)		{ pivot_ = _pivot; }
 	void SetTexture(class CTexture* _t);
-	void SetTexture(const string& _str_key, const wchar_t* _pFileName = NULL, const string& _str_path_key = TEXTURE_PATH);
+	void SetTexture(const string& _str_key, const wchar_t* _pFileName = NULL, const string& _str_path_key = TEXTURE_PATH,
+							const Color& _color_key = Color(255, 0, 255));
 
 
 	string GetTag() const { return str_tag_; }
 	MY_POSE GetPose() const { return pose_; }
 	MY_SIZE GetSize() const { return size_; }
 	MY_POSE GetPivot() const { return pivot_; }
-	CTexture* GetTexture() const { return texture_; }
+	CTexture* GetTexture() const;
 
 protected:
 	class CScene* scene_;

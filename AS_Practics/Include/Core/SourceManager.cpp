@@ -31,7 +31,7 @@ bool CSourceManager::Init(HINSTANCE _hInst, HDC& _hdc)
 	return true;
 }
 
-class CTexture* CSourceManager::LoadTexture(const string& _str_key, const wchar_t* _file_name, const string& _str_path_key)
+class CTexture* CSourceManager::LoadTexture(const string& _str_key, const wchar_t* _file_name, const string& _str_path_key, const COLORREF& _color_key)
 {
 	class CTexture* _pt_texture = FindTexture(_str_key);
 
@@ -42,7 +42,7 @@ class CTexture* CSourceManager::LoadTexture(const string& _str_key, const wchar_
 	_pt_texture = new CTexture();	// ref_cnt = 1;
 
 	// 파일이 없는 경우
-	if (!_pt_texture->SetTexture(hInst_, hdc_, _file_name, _str_path_key))
+	if (!_pt_texture->SetTexture(hInst_, hdc_, _file_name, _str_path_key, _color_key))
 	{
 		SAFE_RELEASE(_pt_texture)
 		return NULL;
@@ -51,7 +51,7 @@ class CTexture* CSourceManager::LoadTexture(const string& _str_key, const wchar_
 	// 있으면 텍스쳐 객체를 만들아서 source_map에 추가
 	source_map_.insert(make_pair(_str_key, _pt_texture));
 
-	//// 텍스처 포인터 파괴 전 Safe Releasse
+	// 텍스처 포인터 돌주기 때문에 참조 카운트 증가
 	_pt_texture->AddRef();
 
 	return _pt_texture;

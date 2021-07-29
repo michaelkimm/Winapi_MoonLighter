@@ -31,6 +31,21 @@ using namespace Gdiplus;
 
 // << :
 
+
+// : >> 디버깅용 콘솔창
+#include <stdio.h>
+#include <iostream>
+
+#ifdef UNICODE
+#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
+#else
+#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
+#endif
+
+static int cnt = 0;
+// <<
+
+
 template <typename T>
 void SafeReleaseList(T& obj)
 {
