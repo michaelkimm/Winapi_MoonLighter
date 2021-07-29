@@ -7,6 +7,12 @@
 #define TEXTURE_PATH "texture_path"
 #define PLAYER_TAG "player"
 
+// : >> Texture name
+#define WATER1 "water1"
+#define WATER2 "water2"
+#define SAND1 "sand1"
+// <<
+
 #define SAFE_DELETE(p)			if(p)	{ delete p; p = NULL; }
 #define SAFE_DELETE_ARRAY(p)	if(p)	{ delete[] p; p = NULL; }
 #define SAFE_RELEASE(p)			if(p)	{ p->Release(); p = NULL; }

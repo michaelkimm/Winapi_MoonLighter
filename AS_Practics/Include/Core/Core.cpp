@@ -140,11 +140,6 @@ void CCore::Update(float _time)
 {
 	CSceneManager::Instance()->Update(_time);
 	// CCameraManager::Instance()->Update(_time);
-
-	MY_POSE tmp_po = CInputManager::Instance()->GetMousePose();
-
-	if (CInputManager::Instance()->GetKeyA())
-		cout << "A ´Ù¿î!\n";
 }
 
 void CCore::LateUpdate(float _time)
@@ -209,6 +204,9 @@ LRESULT CCore::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		EndPaint(hWnd, &ps);
 	}
 	break;
+	case WM_MOUSEMOVE:
+		CInputManager::Instance()->SetMousePose(lParam);
+		break;
 	case WM_LBUTTONDOWN:
 		CInputManager::Instance()->MouseInput(LBUTTON_DOWN, lParam);
 		break;

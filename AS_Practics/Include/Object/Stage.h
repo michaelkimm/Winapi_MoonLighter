@@ -18,6 +18,8 @@ private:
 	int tile_width_;
 	int tile_height_;
 
+	TILE_NAME tile_edit_name_;
+
 public:
 	bool CreateTile(int _num_x, int _num_y, int _size_x, int _size_y, 
 						const string& _texture_key, const wchar_t* _file_name, const string& _root_str);
@@ -36,6 +38,7 @@ public:
 	~CStage();
 
 	virtual bool Init();
+	virtual void Input(float _time);
 	virtual void Update(float _time);
 	virtual void LateUpdate(float _time);
 	virtual void Collision(float _time);

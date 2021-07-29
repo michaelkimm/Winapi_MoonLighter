@@ -25,6 +25,14 @@ enum TILE_OPTION
 	TILE_TRANSPORT
 };
 
+// Tile name
+enum TILE_NAME
+{
+	TILE_WATER1,
+	TILE_WATER2,
+	TILE_SAND1
+};
+
 // Mouse option
 enum MOUSE_STATE
 {

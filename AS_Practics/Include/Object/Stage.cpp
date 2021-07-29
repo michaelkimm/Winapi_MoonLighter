@@ -2,6 +2,7 @@
 #include "Tile.h"
 #include "..\Core\Texture.h"
 #include "..\Core\CameraManager.h"
+#include "..\Core\InputManager.h"
 
 bool CStage::CreateTile(int _num_x, int _num_y, int _size_x, int _size_y, 
 							const string & _texture_key, const wchar_t * _file_name, const string & _root_str)
@@ -48,7 +49,51 @@ CStage::~CStage()
 bool CStage::Init()
 {
 	SetPose(0.f, 0.f);
+	tile_edit_name_ = TILE_WATER1;
 	return true;
+}
+
+void CStage::Input(float _time)
+{
+	// 타일 이름 설정
+	if (CInputManager::Instance()->GetKey1())
+		tile_edit_name_ = TILE_WATER1;
+	else if (CInputManager::Instance()->GetKey2())
+		tile_edit_name_ = TILE_WATER2;
+	else if (CInputManager::Instance()->GetKey3())
+		tile_edit_name_ = TILE_SAND1;
+
+	// : >> 클릭한 곳의 타일 정보를 알아오기
+	if (CInputManager::Instance()->GetMouseLeftDown())
+	{
+		// 카메라 내 마우스 클릭한 곳 좌표
+		MY_POSE m_pose = CInputManager::Instance()->GetMousePose();
+
+		// 마우스 클릭한 곳의 절대 좌표
+		m_pose += CCameraManager::Instance()->GetPose();
+
+		// 2차원 타일 집합 내, 해당 타일 위치(타일 크기 고려)
+		m_pose /= tile_vec_[0]->GetSize();
+
+		int idx = floor(m_pose.y) * tile_x_num_ + floor(m_pose.x);
+
+		// 특정 레이어 & 특정 상태일 때, 해당 타일 내 텍스쳐만 교환할 수 있어야함
+		switch (tile_edit_name_)
+		{
+		case TILE_WATER1:
+			if (!tile_vec_[idx]->SetTexture(WATER1, _T("water1.bmp"), TEXTURE_PATH))
+				cout << "tile set texture 실패!\n";
+			break;
+		case TILE_WATER2:
+			if (!tile_vec_[idx]->SetTexture(WATER2, _T("water2.bmp"), TEXTURE_PATH))
+				cout << "tile set texture 실패!\n";
+			break;
+		case TILE_SAND1:
+			if (!tile_vec_[idx]->SetTexture(SAND1, _T("sand1.bmp"), TEXTURE_PATH))
+				cout << "tile set texture 실패!\n";
+			break;
+		}
+	}
 }
 
 void CStage::Update(float _time)

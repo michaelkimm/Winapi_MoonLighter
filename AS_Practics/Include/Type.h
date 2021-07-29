@@ -202,6 +202,20 @@ typedef struct _POSITION
 		pos.y = y * num;
 		return pos;
 	}
+
+	// ---------------------------------------- ³ª´°¼À
+
+	void operator/=(const _POSITION& p)
+	{
+		x = x / p.x;
+		y = y / p.y;
+	}
+
+	void operator/=(float num)
+	{
+		x = x / num;
+		y = y / num;
+	}
 }MY_POSE, *MY_PT_POSE, MY_SIZE, *MY_PT_SIZE;
 
 #endif

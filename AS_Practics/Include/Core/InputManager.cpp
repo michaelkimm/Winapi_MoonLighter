@@ -10,14 +10,14 @@ CInputManager::~CInputManager()
 {
 }
 
+void CInputManager::SetMousePose(LPARAM _lParam)
+{
+	mouse_pose_ = MY_POSE(GET_X_LPARAM(_lParam), GET_Y_LPARAM(_lParam));
+}
+
 bool CInputManager::Init()
 {
-	// 상태 초기화
-	key_a_ = false;
-	key_w_ = false;
-	key_d_ = false;
-	key_s_ = false;
-
+	KeyBoardStateReset();
 	MouseStateReset();
 
 	return true;
@@ -25,17 +25,30 @@ bool CInputManager::Init()
 
 void CInputManager::KeyBoardInput(float _time)
 {
-	// 상태 초기화
-	key_a_ = false;
-	key_w_ = false;
-	key_d_ = false;
-	key_s_ = false;
+	KeyBoardStateReset();
 
 	// 상태 업데이트
 	key_a_ = (GetKeyState(0x41) & 0x8000);
 	key_w_ = (GetKeyState(0x57) & 0x8000);
 	key_d_ = (GetKeyState(0x44) & 0x8000);
 	key_s_ = (GetKeyState(0x53) & 0x8000);
+
+	key_1_ = (GetKeyState(0x31) & 0x8000);
+	key_2_ = (GetKeyState(0x32) & 0x8000);
+	key_3_ = (GetKeyState(0x33) & 0x8000);
+}
+
+void CInputManager::KeyBoardStateReset()
+{
+	// 상태 초기화
+	key_a_ = false;
+	key_w_ = false;
+	key_d_ = false;
+	key_s_ = false;
+
+	key_1_ = false;
+	key_2_ = false;
+	key_3_ = false;
 }
 
 void CInputManager::MouseInput(MOUSE_STATE _state,LPARAM _lParam)
@@ -58,15 +71,18 @@ void CInputManager::MouseInput(MOUSE_STATE _state,LPARAM _lParam)
 	default:
 		break;
 	}
-	mouse_pose_ = MY_POSE(GET_X_LPARAM(_lParam), GET_Y_LPARAM(_lParam));
+
+	SetMousePose(_lParam);
 }
 
 void CInputManager::MouseStateReset()
 {
 	// 상태 초기화
-	mouse_left_down_ = false;
+	if (mouse_left_up_)
+		mouse_left_down_ = false;
 	mouse_left_up_ = false;
-	mouse_right_down_ = false;
+	if (mouse_right_up_)
+		mouse_right_down_ = false;
 	mouse_right_up_ = false;
 	
 	mouse_pose_ = MY_POSE{ 0.f, 0.f };

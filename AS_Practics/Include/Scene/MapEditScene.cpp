@@ -30,7 +30,7 @@ bool CMapEditScene::Init()
 	// CStage 클래스 오브젝트를 생성해서 pt_layer에 넣는다. 태그 = "stage" 
 	CStage* pt_stage = CObject::CreateObj<CStage>("stage", pt_layer);
 
-	if (!pt_stage->CreateTile(100, 100, 16, 16, "water1", _T("water1.bmp"), TEXTURE_PATH))
+	if (!pt_stage->CreateTile(100, 100, 16, 16, WATER1, _T("water1.bmp"), TEXTURE_PATH))
 	{
 		SAFE_RELEASE(pt_stage);
 		return false;
