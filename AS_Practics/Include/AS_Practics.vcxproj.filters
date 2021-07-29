@@ -99,8 +99,17 @@
     <ClCompile Include="Object\Stage.cpp">
       <Filter>Object\StaticObject</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\MapEditScene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\Tile.cpp">
+      <Filter>Object\StaticObject</Filter>
+    </ClCompile>
     <ClCompile Include="Core\CameraManager.cpp">
-      <Filter>Core\Source</Filter>
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\InputManager.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -170,8 +179,17 @@
     <ClInclude Include="Object\Stage.h">
       <Filter>Object\StaticObject</Filter>
     </ClInclude>
+    <ClInclude Include="Scene\MapEditScene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Tile.h">
+      <Filter>Object\StaticObject</Filter>
+    </ClInclude>
     <ClInclude Include="Core\CameraManager.h">
-      <Filter>Core\Source</Filter>
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\InputManager.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -5,6 +5,7 @@
 #include "SourceManager.h"
 #include "Texture.h"
 #include "CameraManager.h"
+#include "InputManager.h"
 
 DEFINE_SINGLETON(CCore)
 bool CCore::loop_ = true;
@@ -36,6 +37,9 @@ CCore::~CCore()
 
 	// 카메라 관리자 파괴
 	CCameraManager::DestroyInst();
+
+	// 입력 관리자 파괴
+	CInputManager::DestroyInst();
 
 	ReleaseDC(hWnd_, hdc_);
 }
@@ -81,6 +85,9 @@ bool CCore::Init(HINSTANCE _hInst)
 	if (!CCameraManager::Instance()->Init())
 		return false;
 	
+	if (!CInputManager::Instance()->Init())
+		return false;
+
 	return true;
 }
 
@@ -100,10 +107,8 @@ int CCore::Run()
 				DispatchMessage(&msg);
 			}
 		}
-		else
-		{
-			Logic();
-		}
+
+		Logic();
 	}
 	return (int)msg.wParam;
 }
@@ -119,20 +124,27 @@ void CCore::Logic()
 	LateUpdate(delta_time);
 	Collision(delta_time);
 	Render(delta_time);
+
+	// 마우스 입력 초기화
+	CInputManager::Instance()->MouseStateReset();
 }
 
 void CCore::Input(float _time)
 {
 	CSceneManager::Instance()->Input(_time);
-	CCameraManager::Instance()->Input(_time);
-
+	// CCameraManager::Instance()->Input(_time);
+	CInputManager::Instance()->KeyBoardInput(_time);
 }
 
 void CCore::Update(float _time)
 {
 	CSceneManager::Instance()->Update(_time);
-	CCameraManager::Instance()->Update(_time);
+	// CCameraManager::Instance()->Update(_time);
 
+	MY_POSE tmp_po = CInputManager::Instance()->GetMousePose();
+
+	if (CInputManager::Instance()->GetKeyA())
+		cout << "A 다운!\n";
 }
 
 void CCore::LateUpdate(float _time)
@@ -197,8 +209,19 @@ LRESULT CCore::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		EndPaint(hWnd, &ps);
 	}
 	break;
+	case WM_LBUTTONDOWN:
+		CInputManager::Instance()->MouseInput(LBUTTON_DOWN, lParam);
+		break;
+	case WM_LBUTTONUP:
+		CInputManager::Instance()->MouseInput(LBUTTON_UP, lParam);
+		break;
+	case WM_RBUTTONDOWN:
+		CInputManager::Instance()->MouseInput(RBUTTON_DOWN, lParam);
+		break;
+	case WM_RBUTTONUP:
+		CInputManager::Instance()->MouseInput(RBUTTON_UP, lParam);
+		break;
 	case WM_DESTROY:
-
 		PostQuitMessage(0);
 		break;
 	default:

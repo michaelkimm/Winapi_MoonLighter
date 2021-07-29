@@ -1,5 +1,6 @@
  #include "SceneManager.h"
 #include "InGameScene.h"
+#include "MapEditScene.h"
 
 DEFINE_SINGLETON(CSceneManager)
 
@@ -17,7 +18,8 @@ CSceneManager::~CSceneManager()
 bool CSceneManager::Init()
 {
 	// CInGameScene 타입으로 현재 씬을 만든다.
-	CreateScene<CInGameScene>(SC_CURRENT);
+	// CreateScene<CInGameScene>(SC_CURRENT);
+	CreateScene<CMapEditScene>(SC_CURRENT);
 	return true;
 }
 

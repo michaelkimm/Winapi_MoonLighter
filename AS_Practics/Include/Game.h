@@ -2,6 +2,10 @@
 
 
 #include <Windows.h>
+
+// GET_X_LPARAM
+#include <windowsx.h>
+
 #include <iostream>
 #include <list>
 #include <vector>

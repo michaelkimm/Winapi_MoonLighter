@@ -159,6 +159,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core\CameraManager.cpp" />
+    <ClCompile Include="Core\InputManager.cpp" />
     <ClCompile Include="Core\SourceManager.cpp" />
     <ClCompile Include="Core\Core.cpp" />
     <ClCompile Include="Core\PathManager.cpp" />
@@ -173,13 +174,16 @@
     <ClCompile Include="Object\Player.cpp" />
     <ClCompile Include="Object\Stage.cpp" />
     <ClCompile Include="Object\StaticObj.cpp" />
+    <ClCompile Include="Object\Tile.cpp" />
     <ClCompile Include="Scene\InGameScene.cpp" />
     <ClCompile Include="Scene\Layer.cpp" />
+    <ClCompile Include="Scene\MapEditScene.cpp" />
     <ClCompile Include="Scene\Scene.cpp" />
     <ClCompile Include="Scene\SceneManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\CameraManager.h" />
+    <ClInclude Include="Core\InputManager.h" />
     <ClInclude Include="Core\SourceManager.h" />
     <ClInclude Include="Core\Core.h" />
     <ClInclude Include="Core\PathManager.h" />
@@ -196,9 +200,11 @@
     <ClInclude Include="Object\Player.h" />
     <ClInclude Include="Object\Stage.h" />
     <ClInclude Include="Object\StaticObj.h" />
+    <ClInclude Include="Object\Tile.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Scene\InGameScene.h" />
     <ClInclude Include="Scene\Layer.h" />
+    <ClInclude Include="Scene\MapEditScene.h" />
     <ClInclude Include="Scene\Scene.h" />
     <ClInclude Include="Scene\SceneManager.h" />
     <ClInclude Include="Type.h" />

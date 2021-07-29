@@ -17,5 +17,21 @@ enum MOVE_DIR
 	MD_FRONT
 };
 
+// Tile option
+enum TILE_OPTION
+{
+	TILE_NONE,
+	TILE_NOMOVE,
+	TILE_TRANSPORT
+};
+
+// Mouse option
+enum MOUSE_STATE
+{
+	LBUTTON_DOWN,
+	LBUTTON_UP,
+	RBUTTON_DOWN,
+	RBUTTON_UP,
+};
 
 #endif

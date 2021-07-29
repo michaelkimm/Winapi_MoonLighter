@@ -31,9 +31,9 @@ bool CSourceManager::Init(HINSTANCE _hInst, HDC& _hdc)
 	return true;
 }
 
-class CTexture* CSourceManager::LoadTexture(const string& _str_key, const wchar_t* _file_name, const string& _str_path_key, const COLORREF& _color_key)
+class CTexture* CSourceManager::LoadTexture(const string& _texture_key, const wchar_t* _file_name, const string& _str_path_key, const COLORREF& _color_key)
 {
-	class CTexture* _pt_texture = FindTexture(_str_key);
+	class CTexture* _pt_texture = FindTexture(_texture_key);
 
 	// 이미 있는지 확인
 	if (_pt_texture)
@@ -49,7 +49,7 @@ class CTexture* CSourceManager::LoadTexture(const string& _str_key, const wchar_
 	}
 
 	// 있으면 텍스쳐 객체를 만들아서 source_map에 추가
-	source_map_.insert(make_pair(_str_key, _pt_texture));
+	source_map_.insert(make_pair(_texture_key, _pt_texture));
 
 	// 텍스처 포인터 돌주기 때문에 참조 카운트 증가
 	_pt_texture->AddRef();
@@ -58,9 +58,9 @@ class CTexture* CSourceManager::LoadTexture(const string& _str_key, const wchar_
 }
 
 
-CTexture* CSourceManager::FindTexture(const string& _str_key)
+CTexture* CSourceManager::FindTexture(const string& _texture_key)
 {
-	unordered_map<string, class CTexture*>::iterator iter = source_map_.find(_str_key);
+	unordered_map<string, class CTexture*>::iterator iter = source_map_.find(_texture_key);
 
 	if (iter == source_map_.end())
 		return NULL;

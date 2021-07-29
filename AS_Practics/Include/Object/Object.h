@@ -26,8 +26,8 @@ public:
 	void SetSize(float _x, float _y)	{ size_ = MY_SIZE(_x, _y); }
 	void SetSize(int _x, int _y)		{ size_ = MY_SIZE(_x, _y); }
 	void SetPivot(MY_POSE& _pivot)		{ pivot_ = _pivot; }
-	void SetTexture(class CTexture* _t);
-	void SetTexture(const string& _str_key, const wchar_t* _pFileName = NULL, const string& _str_path_key = TEXTURE_PATH,
+	bool SetTexture(class CTexture* _t);
+	bool SetTexture(const string& _texture_key, const wchar_t* _pFileName = NULL, const string& _str_path_key = TEXTURE_PATH,
 							const Color& _color_key = Color(255, 0, 255));
 
 
@@ -77,7 +77,7 @@ public:
 			_layer->AddObj(pt_obj);
 		}
 
-		// pt_obj->SetTag(_str_tag);
+		pt_obj->SetTag(_str_tag);
 
 		return pt_obj;
 	}
