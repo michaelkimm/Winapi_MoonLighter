@@ -9,6 +9,9 @@ class CInputManager
 {
 	DECLARE_SINGLETON(CInputManager)
 private:
+
+	HWND hWnd_;
+
 	bool key_a_;
 	bool key_w_;
 	bool key_d_;
@@ -44,11 +47,15 @@ public:
 	void SetMousePose(LPARAM _lparam);
 
 public:
-	bool Init();
+	bool Init(HWND _hWnd);
+
 	void KeyBoardInput(float _time);
 	void KeyBoardStateReset();
+
+	void MouseInput(float _time);
 	void MouseInput(MOUSE_STATE _state, LPARAM _lparam);
 	void MouseStateReset();
+
 	void Update(float _time);
 };
 

@@ -85,7 +85,7 @@ bool CCore::Init(HINSTANCE _hInst)
 	if (!CCameraManager::Instance()->Init())
 		return false;
 	
-	if (!CInputManager::Instance()->Init())
+	if (!CInputManager::Instance()->Init(hWnd_))
 		return false;
 
 	return true;
@@ -107,8 +107,10 @@ int CCore::Run()
 				DispatchMessage(&msg);
 			}
 		}
-
-		Logic();
+		else
+		{
+			Logic();
+		}
 	}
 	return (int)msg.wParam;
 }
@@ -126,20 +128,20 @@ void CCore::Logic()
 	Render(delta_time);
 
 	// 마우스 입력 초기화
-	CInputManager::Instance()->MouseStateReset();
+	// CInputManager::Instance()->MouseStateReset();
 }
 
 void CCore::Input(float _time)
 {
 	CSceneManager::Instance()->Input(_time);
-	// CCameraManager::Instance()->Input(_time);
 	CInputManager::Instance()->KeyBoardInput(_time);
+	CInputManager::Instance()->MouseInput(_time);
 }
 
 void CCore::Update(float _time)
 {
 	CSceneManager::Instance()->Update(_time);
-	// CCameraManager::Instance()->Update(_time);
+	CCameraManager::Instance()->Update(_time);
 }
 
 void CCore::LateUpdate(float _time)
@@ -204,7 +206,7 @@ LRESULT CCore::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		EndPaint(hWnd, &ps);
 	}
 	break;
-	case WM_MOUSEMOVE:
+	/*case WM_MOUSEMOVE:
 		CInputManager::Instance()->SetMousePose(lParam);
 		break;
 	case WM_LBUTTONDOWN:
@@ -218,7 +220,7 @@ LRESULT CCore::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_RBUTTONUP:
 		CInputManager::Instance()->MouseInput(RBUTTON_UP, lParam);
-		break;
+		break;*/
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;

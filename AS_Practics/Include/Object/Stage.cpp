@@ -12,6 +12,10 @@ bool CStage::CreateTile(int _num_x, int _num_y, int _size_x, int _size_y,
 	tile_width_ = _size_x;
 	tile_height_ = _size_y;
 
+	// 사이즈 설정
+	size_.x = tile_width_ * tile_x_num_;
+	size_.y = tile_height_ * tile_y_num_;
+
 	for (int i = 0; i < _num_y; i++)
 	{
 		for (int j = 0; j < _num_x; j++)
@@ -69,13 +73,23 @@ void CStage::Input(float _time)
 		// 카메라 내 마우스 클릭한 곳 좌표
 		MY_POSE m_pose = CInputManager::Instance()->GetMousePose();
 
+		// cout << "mouspose: (" << m_pose.x << ", " << m_pose.y << endl;
+
 		// 마우스 클릭한 곳의 절대 좌표
 		m_pose += CCameraManager::Instance()->GetPose();
+		cout << "카메라 pose: (" << CCameraManager::Instance()->GetPose().x << ", " << CCameraManager::Instance()->GetPose().y << endl;
+		cout << "절대좌표 mouspose: (" << m_pose.x << ", " << m_pose.y << endl;
 
 		// 2차원 타일 집합 내, 해당 타일 위치(타일 크기 고려)
 		m_pose /= tile_vec_[0]->GetSize();
 
+		// cout << "tile_pose: (" << m_pose.x << ", " << m_pose.y << endl;
+
 		int idx = floor(m_pose.y) * tile_x_num_ + floor(m_pose.x);
+		if (idx >= tile_vec_.size())
+		{
+			cout << "벡터 range 바깥! idx: (" << idx << endl;
+		}
 
 		// 특정 레이어 & 특정 상태일 때, 해당 타일 내 텍스쳐만 교환할 수 있어야함
 		switch (tile_edit_name_)
@@ -113,14 +127,14 @@ void CStage::Collision(float _time)
 
 void CStage::Render(HDC _hdc, float _time)
 {
+	MY_POSE cam_size = CCameraManager::Instance()->GetWndSize();
+	MY_POSE cam_pose = CCameraManager::Instance()->GetPose();
+
 	// CStaticObj::Render(_hdc, _time);
 	if (texture_)
 	{
 		if (texture_->GetDC() == NULL)
 			return;
-
-		MY_POSE cam_size = CCameraManager::Instance()->GetWndSize();
-		MY_POSE cam_pose = CCameraManager::Instance()->GetPose();
 
 		// BitBlt(_hdc, pose_.x, pose_.y, size_.x, size_.y, texture_->GetDC(), 0, 0, SRCCOPY);
 		// TransparentBlt(_hdc, 0, 0, size_.x, size_.y, texture_->GetDC(), cam_pose.x, cam_pose.y, texture_->GetWidth(), texture_->GetHeight(), RGB(255, 0, 255));
@@ -131,12 +145,22 @@ void CStage::Render(HDC _hdc, float _time)
 		// cout << "cam_pose_ : (" << cam_pose.x << ", " << cam_pose.y << ")\n";
 	}
 
+	HDC hMemDC = CreateCompatibleDC(_hdc);
+	HBITMAP hOldBitmap;
+	HBITMAP hDoubleBufferImage_ = CreateCompatibleBitmap(_hdc, cam_size.x, cam_size.y);
+
+	hOldBitmap = (HBITMAP)SelectObject(hMemDC, hDoubleBufferImage_);
+
 	for (int i = 0; i < tile_y_num_; i++)
 	{
 		for (int j = 0; j < tile_x_num_; j++)
 		{
-			tile_vec_[i * tile_x_num_ + j]->Render(_hdc, _time);
+			tile_vec_[i * tile_x_num_ + j]->Render(hMemDC, _time);
 		}
 	}
 	
+	BitBlt(_hdc, pose_.x, pose_.y, size_.x, size_.y, hMemDC, cam_pose.x, cam_pose.y, SRCCOPY);
+
+	SelectObject(hMemDC, hOldBitmap);
+	DeleteDC(hMemDC);
 }

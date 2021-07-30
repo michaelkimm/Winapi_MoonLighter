@@ -1,4 +1,5 @@
 #include "CameraManager.h"
+#include "InputManager.h"
 #include "Core.h"
 #include "..\Object\Object.h"
 
@@ -74,22 +75,99 @@ MY_SIZE CCameraManager::GetWorldSize() const
 	return world_size_;
 }
 
+
+void CCameraManager::Move(float _x, float _y)
+{
+	pose_.x += _x;
+	pose_.y += _y;
+}
+
+void CCameraManager::Move(float _x, float _y, float _dt)
+{
+	pose_.x += _x * _dt;
+	pose_.y += _y * _dt;
+}
+
+void CCameraManager::MoveX(float _x)
+{
+	pose_.x += _x;
+}
+
+void CCameraManager::MoveX(float _x, float _dt)
+{
+	pose_.x += _x * _dt;
+}
+
+void CCameraManager::MoveXFromSpeed(float _dt, MOVE_DIR _dir)
+{
+	pose_.x += speed_ * _dt * _dir;
+}
+
+void CCameraManager::MoveY(float _y)
+{
+	pose_.y += _y;
+}
+
+void CCameraManager::MoveY(float _y, float _dt)
+{
+	pose_.y += _y * _dt;
+}
+
+void CCameraManager::MoveYFromSpeed(float _dt, MOVE_DIR _dir)
+{
+	pose_.y += speed_ * _dt * _dir;
+}
+
+void CCameraManager::Move(const MY_POSE & _move)
+{
+	pose_ += _move;
+}
+
+void CCameraManager::Move(const MY_POSE & _move, float _dt)
+{
+	pose_ += _move * _dt;
+}
+
+
 bool CCameraManager::Init()
 {
 	pose_.x = 0.f;
 	pose_.y = 0.f;
 	wnd_size_.x = CCore::Instance()->GetResolution().w;
 	wnd_size_.y = CCore::Instance()->GetResolution().h;
+	speed_ = 500.f;
 	return true;
 }
 
 void CCameraManager::Input(float _time)
 {
+	if (master_ == NULL)
+	{
+		if (CInputManager::Instance()->GetKeyA())
+		{
+			MoveXFromSpeed(_time, MD_BACK);
+		}
+		if (CInputManager::Instance()->GetKeyW())
+		{
+			MoveYFromSpeed(_time, MD_BACK);
+		}
+		if (CInputManager::Instance()->GetKeyD())
+		{
+			MoveXFromSpeed(_time, MD_FRONT);
+		}
+		if (CInputManager::Instance()->GetKeyS())
+		{
+			MoveYFromSpeed(_time, MD_FRONT);
+		}
+	}
 }
 
 void CCameraManager::Update(float _time)
 {
-	MY_POSE tmp_pose = master_->GetPose() - (wnd_size_ * 0.5f);
+	MY_POSE tmp_pose = pose_;
+
+	if (master_ != NULL)
+		tmp_pose = master_->GetPose() - (wnd_size_ * 0.5f);
 	
 	// 카메라가 플레이어를 정중앙에 둘 경우
 
@@ -118,6 +196,7 @@ void CCameraManager::Update(float _time)
 	}
 
 	pose_ = tmp_pose;
+	cout << "카메리 매니져 내 pose_: (" << pose_.x << ", " << pose_.y << ")\n";
 }
 
 void CCameraManager::LateUpdate(float _time)

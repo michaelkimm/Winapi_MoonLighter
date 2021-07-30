@@ -32,6 +32,27 @@ public:
 	MY_SIZE GetWorldSize() const;
 	CObject* GetMaster() const;
 
+private:
+	float speed_;
+
+public:
+	void SetSpeed(float _speed) { speed_ = _speed; }
+	float GetSpeed() { return speed_; }
+
+public:
+	void Move(float _x, float _y);
+	void Move(float _x, float _y, float _dt);
+
+	void MoveX(float _x);
+	void MoveX(float _x, float _dt);
+	void MoveXFromSpeed(float _dt, MOVE_DIR _dir);
+
+	void MoveY(float _y);
+	void MoveY(float _y, float _dt);
+	void MoveYFromSpeed(float _dt, MOVE_DIR _dir);
+
+	void Move(const MY_POSE& _move);
+	void Move(const MY_POSE& _move, float _dt);
 
 public:
 	bool Init();

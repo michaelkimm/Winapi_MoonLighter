@@ -15,10 +15,12 @@ void CInputManager::SetMousePose(LPARAM _lParam)
 	mouse_pose_ = MY_POSE(GET_X_LPARAM(_lParam), GET_Y_LPARAM(_lParam));
 }
 
-bool CInputManager::Init()
+bool CInputManager::Init(HWND _hWnd)
 {
 	KeyBoardStateReset();
 	MouseStateReset();
+
+	hWnd_ = _hWnd;
 
 	return true;
 }
@@ -51,6 +53,21 @@ void CInputManager::KeyBoardStateReset()
 	key_3_ = false;
 }
 
+void CInputManager::MouseInput(float _time)
+{
+	MouseStateReset();
+
+	// 상태 업데이트
+	mouse_left_down_ = (GetKeyState(VK_LBUTTON) & 0x8000);
+	mouse_right_down_ = (GetKeyState(VK_RBUTTON) & 0x8000);
+
+	POINT tmp_pt;
+	GetCursorPos(&tmp_pt);
+	ScreenToClient(hWnd_, &tmp_pt);
+
+	mouse_pose_ = tmp_pt;
+}
+
 void CInputManager::MouseInput(MOUSE_STATE _state,LPARAM _lParam)
 {
 	// 상태 업데이트
@@ -78,12 +95,18 @@ void CInputManager::MouseInput(MOUSE_STATE _state,LPARAM _lParam)
 void CInputManager::MouseStateReset()
 {
 	// 상태 초기화
-	if (mouse_left_up_)
+	/*if (mouse_left_up_)
 		mouse_left_down_ = false;
 	mouse_left_up_ = false;
 	if (mouse_right_up_)
 		mouse_right_down_ = false;
+	mouse_right_up_ = false;*/
+
+	mouse_left_down_ = false;
+	mouse_left_up_ = false;
+	mouse_right_down_ = false;
 	mouse_right_up_ = false;
+
 	
 	mouse_pose_ = MY_POSE{ 0.f, 0.f };
 }

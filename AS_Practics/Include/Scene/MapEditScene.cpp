@@ -36,6 +36,10 @@ bool CMapEditScene::Init()
 		return false;
 	}
 
+	// 배경 사이즈 정해질 때 카메라 내 월드 사이즈도 설정
+	MY_SIZE stage_size = pt_stage->GetSize();
+	CCameraManager::Instance()->SetWorldSize(stage_size.x, stage_size.y);
+
 	SAFE_RELEASE(pt_stage);
 
 	// ---------------------------------------------------------------------- : <<
@@ -48,6 +52,7 @@ bool CMapEditScene::Init()
 void CMapEditScene::Input(float _time)
 {
 	CScene::Input(_time);
+	CCameraManager::Instance()->Input(_time);
 }
 
 void CMapEditScene::Update(float _time)
