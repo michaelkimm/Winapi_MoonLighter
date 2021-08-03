@@ -23,6 +23,9 @@ private:
 public:
 	bool CreateTile(const MY_POSE& _start_pose, int _num_x, int _num_y, int _size_x, int _size_y, 
 						const string& _texture_key, const wchar_t* _file_name, const string& _root_str);
+	bool CreateTileImg(const MY_POSE& _start_pose, int _size_x, int _size_y,
+						const string& _texture_key, const wchar_t* _file_name, const string& _root_str);
+
 	void ChangeTile(int _idx, CTile* _t);
 	void SetTileXNum(int _x_num) { tile_x_num_ = _x_num; }
 	void SetTileYNum(int _y_num) { tile_y_num_ = _y_num; }

@@ -43,6 +43,45 @@ bool CStage::CreateTile(const MY_POSE& _start_pose, int _num_x, int _num_y, int 
 	return true;
 }
 
+
+bool CStage::CreateTileImg(const MY_POSE& _start_pose, int _size_x, int _size_y,
+								const string& _texture_key, const wchar_t* _file_name, const string& _root_str)
+{
+	// 스테이지의 텍스쳐에 전체 파일의 img를 넣기
+	CObject::SetTexture(_texture_key, _file_name, TEXTURE_PATH);
+
+	tile_x_num_ = texture_->GetWidth() / _size_x;
+	tile_y_num_ = texture_->GetHeight() / _size_y;
+	tile_width_ = _size_x;
+	tile_height_ = _size_y;
+	
+	// 사이즈 설정
+	size_.x = texture_->GetWidth();
+	size_.y = texture_->GetHeight();
+
+	// 위치 설정
+	for (int i = 0; i < tile_y_num_; i++)
+	{
+		for (int j = 0; j < tile_x_num_; j++)
+		{
+			CTile* pt_tile = CObject::CreateObj<CTile>(_texture_key, layer_);
+			if (pt_tile == NULL) return false;
+
+			// 텍스처 설정 (Img도 적용 가능)
+			// img, 사이즈 설정
+			if (!pt_tile->SetTileTexture(j, i, 16, 16, _texture_key, _file_name, TEXTURE_PATH))
+				return false;
+
+			// 타일의 절대 위치 설정
+			pt_tile->SetPose(_start_pose.x + j * _size_x, _start_pose.y + i * _size_y);
+			tile_vec_.push_back(pt_tile);
+
+			SAFE_RELEASE(pt_tile);
+		}
+	}
+	return true;
+}
+
 void CStage::ChangeTile(int _idx, CTile* _t)
 {
 	_t->AddRef();

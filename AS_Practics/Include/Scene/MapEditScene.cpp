@@ -64,6 +64,12 @@ bool CMapEditScene::Init(HWND _hWnd)
 		return false;
 	}
 
+	/*if (!pt_stage->CreateTileImg(pose_, 16, 16, SV_BEACH_SUMMER, _T("SV_Beach_Summer.png"), TEXTURE_PATH))
+	{
+		SAFE_RELEASE(pt_stage);
+		return false;
+	}*/
+
 	// 배경 사이즈 정해질 때 카메라 내 월드 사이즈도 설정
 	MY_SIZE stage_size = pt_stage->GetSize();
 	SetWorldSize(stage_size);

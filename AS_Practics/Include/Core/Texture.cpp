@@ -71,7 +71,53 @@ bool CTexture::SetTexture(HINSTANCE _hInst, HDC& _hdc, const wchar_t * _file_nam
 	hOldBitmap_ = (HBITMAP)SelectObject(hMemDC_, hBitmap_);
 
 	return true;
-	}
+}
+
+
+bool CTexture::SetTextureImg(const wchar_t* _file_name, const string& _str_path_key = TEXTURE_PATH,
+	const COLORREF& _color_key = RGB(255, 0, 255))
+{
+	const wchar_t* texture_path = CPathManager::Instance()->FindPath(_str_path_key);
+
+	// 텍스쳐 path가 없으면 리턴	
+	if (texture_path == NULL)
+		return false;
+
+	// 텍스쳐 path, 이름 삽입
+	wstring path_ = texture_path;
+	path_ += _file_name;
+
+	// 이미지 삽입
+	img_ = Image::FromFile(path_.c_str());
+
+	// 칼라키 설정
+	SetColorKey(_color_key);
+
+	// 예외 처리
+	if (!img_)
+		return false;
+
+	// 칼라키 범위 설정
+	imgAttr_.SetColorKey(color_key, color_key);
+	
+	// 너비 & 높이 설정
+	w_ = img_->GetWidth();
+	h_ = img_->GetHeight();
+
+	return true;
+}
+
+bool CTexture::SetImgInfo(Image* _pt_img, int _srcx, int _srcy, int _srcwidth, int _srcheight, const COLORREF& _color_key)
+{
+	img_ = _pt_img;
+	x_ = _srcx;
+	y_ = _srcy;
+	w_ = _srcwidth;
+	h_ = _srcheight;
+	imgAttr_.SetColorKey(_color_key, _color_key);
+	return true;
+}
+
 
 void CTexture::Render(HDC _hdc, float _time)
 {

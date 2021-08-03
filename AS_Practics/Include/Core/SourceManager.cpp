@@ -41,14 +41,21 @@ class CTexture* CSourceManager::LoadTexture(const string& _texture_key, const wc
 
 	_pt_texture = new CTexture();	// ref_cnt = 1;
 
-	// 파일이 없는 경우
-	if (!_pt_texture->SetTexture(hInst_, hdc_, _file_name, _str_path_key, _color_key))
+	//// 파일이 없는 경우
+	//if (!_pt_texture->SetTexture(hInst_, hdc_, _file_name, _str_path_key, _color_key))
+	//{
+	//	SAFE_RELEASE(_pt_texture)
+	//	return NULL;
+	//}
+
+	// 파일이 경로에 없는 경우
+	if (!_pt_texture->SetTextureImg(_file_name, _str_path_key, _color_key))
 	{
-		SAFE_RELEASE(_pt_texture)
+		SAFE_RELEASE(_pt_texture);
 		return NULL;
 	}
 
-	// 있으면 텍스쳐 객체를 만들아서 source_map에 추가
+	// 파일이 경로에 있는 경우, 텍스쳐 객체를 만들어서 source_map에 추가
 	source_map_.insert(make_pair(_texture_key, _pt_texture));
 
 	// 텍스처 포인터 돌주기 때문에 참조 카운트 증가

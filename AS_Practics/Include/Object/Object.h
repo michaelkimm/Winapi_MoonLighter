@@ -30,7 +30,6 @@ public:
 	bool SetTexture(const string& _texture_key, const wchar_t* _pFileName = NULL, const string& _str_path_key = TEXTURE_PATH,
 							const Color& _color_key = Color(255, 0, 255));
 
-
 	string GetTag() const { return str_tag_; }
 	MY_POSE GetPose() const { return pose_; }
 	MY_SIZE GetSize() const { return size_; }

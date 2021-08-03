@@ -51,7 +51,13 @@ bool CAssistScene::Init(HWND _hWnd)
 	// 타일 시작 점은 씬의 pose.
 	CStage* pt_stage = CObject::CreateObj<CStage>("stage", pt_layer);
 
-	if (!pt_stage->CreateTile(pose_, 20, 20, 16, 16, SAND1, _T("sand1.bmp"), TEXTURE_PATH))
+	/*if (!pt_stage->CreateTile(pose_, 20, 20, 16, 16, SAND1, _T("sand1.bmp"), TEXTURE_PATH))
+	{
+		SAFE_RELEASE(pt_stage);
+		return false;
+	}*/
+
+	if (!pt_stage->CreateTileImg(pose_, 16, 16, SV_BEACH_SUMMER, _T("SV_Beach_Summer.png"), TEXTURE_PATH))
 	{
 		SAFE_RELEASE(pt_stage);
 		return false;
