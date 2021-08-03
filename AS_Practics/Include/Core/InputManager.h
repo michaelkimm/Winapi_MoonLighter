@@ -21,6 +21,7 @@ private:
 	bool key_2_;
 	bool key_3_;
 
+	bool past_mouse_left_down_;
 	bool mouse_left_down_;
 	bool mouse_left_up_;
 	bool mouse_right_down_;
@@ -29,6 +30,7 @@ private:
 	MY_POSE mouse_pose_;
 
 public:
+	HWND GetHwnd() const { return hWnd_; }
 	bool GetKeyA() const { return key_a_; }
 	bool GetKeyW() const { return key_w_; }
 	bool GetKeyD() const { return key_d_; }
@@ -38,12 +40,15 @@ public:
 	bool GetKey2() const { return key_2_; }
 	bool GetKey3() const { return key_3_; }
 
+	bool GetPastMouseLeftDown() const { return past_mouse_left_down_; }
 	bool GetMouseLeftDown() const	{ return mouse_left_down_; }
 	bool GetMouseLeftUp() const		{ return mouse_left_up_; }
 	bool GetMouseRightDown() const	{ return mouse_right_down_; }
 	bool GetMouseRightUp() const	{ return mouse_right_up_; }
 
 	MY_POSE GetMousePose() const { return mouse_pose_; }
+
+	void SetHwnd(HWND _hWnd) { hWnd_ = _hWnd; }
 	void SetMousePose(LPARAM _lparam);
 
 public:

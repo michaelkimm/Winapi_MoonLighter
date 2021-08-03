@@ -3,8 +3,10 @@
 #include "..\Core\Texture.h"
 #include "..\Core\CameraManager.h"
 #include "..\Core\InputManager.h"
+#include "..\Core\TfManager.h"
+#include "..\Scene\SceneManager.h"
 
-bool CStage::CreateTile(int _num_x, int _num_y, int _size_x, int _size_y, 
+bool CStage::CreateTile(const MY_POSE& _start_pose, int _num_x, int _num_y, int _size_x, int _size_y,
 							const string & _texture_key, const wchar_t * _file_name, const string & _root_str)
 {
 	tile_x_num_ = _num_x;
@@ -20,7 +22,7 @@ bool CStage::CreateTile(int _num_x, int _num_y, int _size_x, int _size_y,
 	{
 		for (int j = 0; j < _num_x; j++)
 		{
-			CTile* pt_tile = CObject::CreateObj<CTile>("water1", layer_);
+			CTile* pt_tile = CObject::CreateObj<CTile>(_texture_key, layer_);
 			if (pt_tile == NULL) return false;
 
 			// 텍스처 설정
@@ -31,7 +33,7 @@ bool CStage::CreateTile(int _num_x, int _num_y, int _size_x, int _size_y,
 			pt_tile->SetSize(_size_x, _size_y);
 
 			// 위치 설정
-			pt_tile->SetPose(j * _size_x, i * _size_y);
+			pt_tile->SetPose(_start_pose.x + j * _size_x, _start_pose.y + i * _size_y);
 
 			tile_vec_.push_back(pt_tile);
 
@@ -41,23 +43,27 @@ bool CStage::CreateTile(int _num_x, int _num_y, int _size_x, int _size_y,
 	return true;
 }
 
-CStage::CStage()
+void CStage::ChangeTile(int _idx, CTile* _t)
 {
+	_t->AddRef();
+
+	CTexture* tmp_texture = _t->GetTexture();
+
+	tile_vec_[_idx]->SetTexture(tmp_texture);
+	tile_vec_[_idx]->SetOption(_t->GetOption());
+
+	SAFE_RELEASE(tmp_texture);
+	SAFE_RELEASE(_t);
 }
 
-CStage::~CStage()
-{
-	SafeReleaseList(tile_vec_);
+CTile* CStage::GetTile(int _idx) const
+{ 
+	tile_vec_[_idx]->AddRef();
+	return tile_vec_[_idx]; 
 }
 
-bool CStage::Init()
-{
-	SetPose(0.f, 0.f);
-	tile_edit_name_ = TILE_WATER1;
-	return true;
-}
 
-void CStage::Input(float _time)
+void CStage::MapEditSceneInput()
 {
 	// 타일 이름 설정
 	if (CInputManager::Instance()->GetKey1())
@@ -72,13 +78,14 @@ void CStage::Input(float _time)
 	{
 		// 카메라 내 마우스 클릭한 곳 좌표
 		MY_POSE m_pose = CInputManager::Instance()->GetMousePose();
+		// cout << "\n\n\n마우스 절대좌표 mouspose: (" << m_pose.x << ", " << m_pose.y << endl;
 
 		// cout << "mouspose: (" << m_pose.x << ", " << m_pose.y << endl;
 
 		// 마우스 클릭한 곳의 절대 좌표
 		m_pose += CCameraManager::Instance()->GetPose();
-		cout << "카메라 pose: (" << CCameraManager::Instance()->GetPose().x << ", " << CCameraManager::Instance()->GetPose().y << endl;
-		cout << "절대좌표 mouspose: (" << m_pose.x << ", " << m_pose.y << endl;
+		// cout << "카메라 pose: (" << CCameraManager::Instance()->GetPose().x << ", " << CCameraManager::Instance()->GetPose().y << endl;
+		// cout << "절대좌표 mouspose: (" << m_pose.x << ", " << m_pose.y << endl;
 
 		// 2차원 타일 집합 내, 해당 타일 위치(타일 크기 고려)
 		m_pose /= tile_vec_[0]->GetSize();
@@ -86,7 +93,7 @@ void CStage::Input(float _time)
 		// cout << "tile_pose: (" << m_pose.x << ", " << m_pose.y << endl;
 
 		int idx = floor(m_pose.y) * tile_x_num_ + floor(m_pose.x);
-		if (idx >= tile_vec_.size())
+		if (idx >= (int)tile_vec_.size())
 		{
 			cout << "벡터 range 바깥! idx: (" << idx << endl;
 		}
@@ -110,6 +117,45 @@ void CStage::Input(float _time)
 	}
 }
 
+void CStage::AssistSceneInput()
+{
+}
+
+CStage::CStage()
+{
+}
+
+CStage::~CStage()
+{
+	SafeReleaseList(tile_vec_);
+}
+
+bool CStage::Init()
+{
+	// MY_SIZE wnd_pose = CTfManager::Instance()->GetTf("TileSet_proc");
+	// SetPose(wnd_pose.x, wnd_pose.y);
+	SetPose(0.f, 0.f);
+
+	tile_edit_name_ = TILE_WATER1;
+	return true;
+}
+
+void CStage::Input(float _time)
+{
+	// 현재 오브젝트가 속해있는 씬이 map edit scene일 경우 아래 알고리즘 실행
+	HWND this_scene = scene_->GetHwnd();
+	if (this_scene == CSceneManager::Instance()->GetHwnd(MAP_EDIT_SCENE))
+	{
+		// CStage::MapEditSceneInput();
+	}
+	
+	// 현재 오브젝트가 속해있는 씬이 assist scene일 경우 아래 알고리즘 실행
+	else if (this_scene == CSceneManager::Instance()->GetHwnd(ASSIST_SCENE))
+	{
+		CStage::AssistSceneInput();
+	}
+}
+
 void CStage::Update(float _time)
 {
 	CStaticObj::Update(_time);
@@ -127,8 +173,8 @@ void CStage::Collision(float _time)
 
 void CStage::Render(HDC _hdc, float _time)
 {
-	MY_POSE cam_size = CCameraManager::Instance()->GetWndSize();
-	MY_POSE cam_pose = CCameraManager::Instance()->GetPose();
+	MY_POSE cam_size = scene_->camera_->GetWndSize();
+	MY_POSE cam_pose = scene_->camera_->GetPose();
 
 	// CStaticObj::Render(_hdc, _time);
 	if (texture_)
@@ -158,7 +204,7 @@ void CStage::Render(HDC _hdc, float _time)
 			tile_vec_[i * tile_x_num_ + j]->Render(hMemDC, _time);
 		}
 	}
-	
+	// cout << "BitBlt cam_pose: (" << cam_pose.x << ", " << cam_pose.y << ")\n";
 	BitBlt(_hdc, pose_.x, pose_.y, size_.x, size_.y, hMemDC, cam_pose.x, cam_pose.y, SRCCOPY);
 
 	SelectObject(hMemDC, hOldBitmap);

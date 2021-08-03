@@ -43,6 +43,9 @@
     <Filter Include="MyFunc">
       <UniqueIdentifier>{a2d1ec80-085c-43b2-a73a-cedff5602b95}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scene\MapTool">
+      <UniqueIdentifier>{d6edff9b-1c5f-484d-9c44-6c1098b6dc3e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -99,9 +102,6 @@
     <ClCompile Include="Object\Stage.cpp">
       <Filter>Object\StaticObject</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\MapEditScene.cpp">
-      <Filter>Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Object\Tile.cpp">
       <Filter>Object\StaticObject</Filter>
     </ClCompile>
@@ -110,6 +110,21 @@
     </ClCompile>
     <ClCompile Include="Core\InputManager.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Camera.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\TfManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\AssistScene.cpp">
+      <Filter>Scene\MapTool</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\MapEditScene.cpp">
+      <Filter>Scene\MapTool</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\MapToolScene.cpp">
+      <Filter>Scene\MapTool</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -179,9 +194,6 @@
     <ClInclude Include="Object\Stage.h">
       <Filter>Object\StaticObject</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\MapEditScene.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
     <ClInclude Include="Object\Tile.h">
       <Filter>Object\StaticObject</Filter>
     </ClInclude>
@@ -190,6 +202,21 @@
     </ClInclude>
     <ClInclude Include="Core\InputManager.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Camera.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\TfManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\AssistScene.h">
+      <Filter>Scene\MapTool</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\MapEditScene.h">
+      <Filter>Scene\MapTool</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\MapToolScene.h">
+      <Filter>Scene\MapTool</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

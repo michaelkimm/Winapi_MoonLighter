@@ -1,13 +1,16 @@
 #include "Scene.h"
 #include "Layer.h"
 #include "..\Core\Core.h"
+#include "..\Core\InputManager.h"
 
 CScene::CScene()
 {
 	CLayer* pt_layer = CreateLayer("Background", 0);
-	pt_layer = CreateLayer("Monster", 1);
-	pt_layer = CreateLayer("Player", 2);
-	pt_layer = CreateLayer("UI", INT_MAX);
+	pt_layer = CreateLayer("Monster", 10);
+	pt_layer = CreateLayer("Player", 20);
+	pt_layer = CreateLayer("UI", INT_MAX - 1);
+	pt_layer = CreateLayer("Assist_scene_mouse_rect", INT_MAX);
+	camera_ = new CCamera();
 }
 
 CScene::~CScene()
@@ -16,13 +19,19 @@ CScene::~CScene()
 	SafeDeleteList(layer_list_);
 }
 
-bool CScene::Init()
+bool CScene::Init(HWND _hWnd)
 {
 	return true;
 }
 
 void CScene::Input(float _time)
 {
+	// 씬의 카메라 업데이트
+	if (CInputManager::Instance()->GetHwnd() != hWnd_)
+		return;
+
+	camera_->Input(_time);
+
 	list<CLayer*>::iterator iter;
 	list<CLayer*>::iterator iter_end = layer_list_.end();
 
@@ -34,6 +43,9 @@ void CScene::Input(float _time)
 
 void CScene::Update(float _time)
 {
+	// 씬의 카메라 업데이트
+	camera_->Update(_time);
+
 	list<CLayer*>::iterator iter;
 	list<CLayer*>::iterator iter_end = layer_list_.end();
 
@@ -45,6 +57,9 @@ void CScene::Update(float _time)
 
 void CScene::LateUpdate(float _time)
 {
+	// 씬의 카메라 업데이트
+	camera_->LateUpdate(_time);
+
 	list<CLayer*>::iterator iter;
 	list<CLayer*>::iterator iter_end = layer_list_.end();
 
@@ -56,6 +71,9 @@ void CScene::LateUpdate(float _time)
 
 void CScene::Collision(float _time)
 {
+	// 씬의 카메라 업데이트
+	camera_->Collision(_time);
+
 	list<CLayer*>::iterator iter;
 	list<CLayer*>::iterator iter_end = layer_list_.end();
 

@@ -1,3 +1,4 @@
+#include "..\Scene\SceneManager.h"
 #include "CameraManager.h"
 #include "InputManager.h"
 #include "Core.h"
@@ -54,6 +55,18 @@ void CCameraManager::SetWorldSize(float w, float y)
 	world_size_ = MY_SIZE(w, y);
 }
 
+void CCameraManager::SetHwnd(HWND _hWnd)
+{
+	hWnd_ = _hWnd;
+
+	RECT tmp_rect;
+
+	// HWND 정하면 그에 맞는 월드 사이즈 조정
+	GetClientRect(hWnd_, &tmp_rect);
+	SetWndSize(tmp_rect.right, tmp_rect.bottom);
+
+}
+
 MY_POSE CCameraManager::GetPose() const
 {
 	return pose_;
@@ -73,6 +86,11 @@ CObject * CCameraManager::GetMaster() const
 MY_SIZE CCameraManager::GetWorldSize() const
 {
 	return world_size_;
+}
+
+HWND CCameraManager::GetHwnd() const
+{
+	return hWnd_;
 }
 
 

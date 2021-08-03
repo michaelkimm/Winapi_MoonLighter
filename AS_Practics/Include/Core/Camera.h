@@ -1,14 +1,12 @@
 #pragma once
-#ifndef CCAMERAMANAGER_H_
-#define CCAMERAMANAGER_H_
+#ifndef CCAMERA_H_
+#define CCAMERA_H_
 
 #include "..\Game.h"
-#include "..\Object\Object.h"
 
-class CCameraManager
+class CCamera
 {
-	DECLARE_SINGLETON(CCameraManager)
-	
+	// friend class CCameraManager;
 private:
 	MY_POSE pose_;			// 카메라 절대 좌표
 	MY_SIZE wnd_size_;
@@ -20,7 +18,7 @@ private:
 	class CObject* master_;
 
 public:
-	
+
 	void SetPose(const MY_SIZE& _size);
 	void SetPose(float x, float y);
 	void SetWndSize(const MY_SIZE& _size);
@@ -58,14 +56,19 @@ public:
 	void Move(const MY_POSE& _move);
 	void Move(const MY_POSE& _move, float _dt);
 
+
 public:
-	bool Init();
+	CCamera();
+	~CCamera();
+
+public:
+	bool Init(MY_SIZE _pose, MY_SIZE _wnd_size, MY_SIZE _world_size, float _speed);
 	void Input(float _time);
 	void Update(float _time);
 	void LateUpdate(float _time);
 	void Collision(float _time);
 	void Render(HDC _hdc, float _time);
-
 };
+
 
 #endif

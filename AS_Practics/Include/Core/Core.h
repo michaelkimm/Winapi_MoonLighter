@@ -16,9 +16,13 @@ private:
 	HWND			hWnd_;
 	HDC				hdc_;
 	MY_RESOLUTION	wnd_rs_;
+	WNDCLASSEXW		wcex_;
 	
 public:
-	MY_RESOLUTION GetResolution() const { return wnd_rs_; }
+	HINSTANCE		GetHInstance() const	{ return hInst_; }
+	HWND			GetHWnd() const			{ return hWnd_; }
+	MY_RESOLUTION	GetResolution() const	{ return wnd_rs_; }
+	WNDCLASSEXW		GetWcex() const			{ return wcex_; }
 
 public:
 	bool	Init(HINSTANCE);
@@ -30,12 +34,28 @@ private:
 	void	LateUpdate(float _time);
 	void	Collision(float _time);
 	void	Render(float _time);
+
 private:
 	// 외부에 보여줄 필요 없음
 	ATOM MyRegisterClass();
 	BOOL Create();
 
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+private:
+	bool map_edit_mode_;
+	MY_POSE pose_;
+
+public:
+	void SetMapEditMode(bool _m) { map_edit_mode_ = _m; }
+	void SetPose(MY_POSE _p) { pose_ = _p; }
+	void SetPose(float _x, float _y) { pose_ = MY_POSE(_x, _y); }
+
+	bool GetMapEditMode() const { return map_edit_mode_; }
+
+private:
+	HWND ChildHwnd_[2];
+	static LRESULT CALLBACK TileSetProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 };
 
 #endif // !CCORE_H_

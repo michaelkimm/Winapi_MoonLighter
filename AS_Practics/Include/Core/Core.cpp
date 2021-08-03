@@ -6,6 +6,7 @@
 #include "Texture.h"
 #include "CameraManager.h"
 #include "InputManager.h"
+#include "TfManager.h"
 
 DEFINE_SINGLETON(CCore)
 bool CCore::loop_ = true;
@@ -16,7 +17,7 @@ CCore::CCore()
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	
 	// 메모리 릭 일어난 곳으로 이동 시켜주는 함수
-	// _CrtSetBreakAlloc(576);
+	// _CrtSetBreakAlloc(215);
 }
 CCore::~CCore()
 {
@@ -36,7 +37,7 @@ CCore::~CCore()
 	CPathManager::DestroyInst();
 
 	// 카메라 관리자 파괴
-	CCameraManager::DestroyInst();
+	// CCameraManager::DestroyInst();
 
 	// 입력 관리자 파괴
 	CInputManager::DestroyInst();
@@ -46,6 +47,10 @@ CCore::~CCore()
 
 bool CCore::Init(HINSTANCE _hInst)
 {
+	map_edit_mode_ = false;
+
+	pose_ = MY_POSE(0.f, 0.f);
+
 	hInst_ = _hInst;
 
 	// 창 클래스를 만든다.
@@ -77,13 +82,13 @@ bool CCore::Init(HINSTANCE _hInst)
 	if (!CSourceManager::Instance()->Init(hInst_, hdc_))
 		return false;
 
-	// 창 생성
+	// 창 관리자 초기화
 	if (!CSceneManager::Instance()->Init())
 		return false;
 
 	// 카메라 관리자 생성
-	if (!CCameraManager::Instance()->Init())
-		return false;
+	// if (!CCameraManager::Instance()->Init())
+	// 	return false;
 	
 	if (!CInputManager::Instance()->Init(hWnd_))
 		return false;
@@ -117,8 +122,8 @@ int CCore::Run()
 
 void CCore::Logic()
 {
+	// 타이머 dt 얻기
 	CTimer::Instance()->Update();
-
 	float delta_time = CTimer::Instance()->GetDeltaTime();
 
 	Input(delta_time);
@@ -127,21 +132,22 @@ void CCore::Logic()
 	Collision(delta_time);
 	Render(delta_time);
 
-	// 마우스 입력 초기화
-	// CInputManager::Instance()->MouseStateReset();
+	/*MY_POSE WndProc_tf = CTfManager::Instance()->GetTf("WndProc");
+	MY_POSE TileSetProc_tf = CTfManager::Instance()->GetTf("TileSetProc");
+	cout << "WndProc_tf - TileSetProc_tf: (" << TileSetProc_tf.x << ", " << TileSetProc_tf.y << ")" << endl;*/
 }
 
 void CCore::Input(float _time)
 {
-	CSceneManager::Instance()->Input(_time);
 	CInputManager::Instance()->KeyBoardInput(_time);
 	CInputManager::Instance()->MouseInput(_time);
+	CSceneManager::Instance()->Input(_time);
 }
 
 void CCore::Update(float _time)
 {
 	CSceneManager::Instance()->Update(_time);
-	CCameraManager::Instance()->Update(_time);
+	// CCameraManager::Instance()->Update(_time);
 }
 
 void CCore::LateUpdate(float _time)
@@ -156,6 +162,16 @@ void CCore::Collision(float _time)
 
 void CCore::Render(float _time)
 {
+	RECT map_edit_size{ 0, 0, 0, 0 };
+	int mx = 0;
+	int my = 0;
+	if (map_edit_mode_)
+	{
+		GetClientRect(ChildHwnd_[0], &map_edit_size);
+		cout << "map_edit_size: (" << map_edit_size.left << ", " << map_edit_size.top << ", " << map_edit_size.right << ", " << map_edit_size.bottom << ")\n";
+		mx = map_edit_size.right + 5;
+		my = map_edit_size.top;
+	}
 	// 더블 버퍼링
 	
 	// 빈 흰색 도화지 그리기
@@ -166,38 +182,63 @@ void CCore::Render(float _time)
 	CSceneManager::Instance()->Render(back_buffer->GetDC(), _time);
 
 	// 흰색 도화지에 그려진걸 옮기기
-	BitBlt(hdc_, 0, 0, back_buffer->GetWidth(), back_buffer->GetHeight(), back_buffer->GetDC(), 0, 0, SRCCOPY);
-	
+	BitBlt(hdc_, 0, 0, back_buffer->GetWidth() - mx, back_buffer->GetHeight() - my, back_buffer->GetDC(), 0, 0, SRCCOPY);
+
 	SAFE_RELEASE(back_buffer);
 }
 
 
 ATOM CCore::MyRegisterClass()
 {
-	WNDCLASSEXW wcex;
+	wcex_.cbSize = sizeof(WNDCLASSEX);
 
-	wcex.cbSize = sizeof(WNDCLASSEX);
+	wcex_.style = CS_HREDRAW | CS_VREDRAW;
+	wcex_.lpfnWndProc = WndProc;
+	wcex_.cbClsExtra = 0;
+	wcex_.cbWndExtra = 0;
+	wcex_.hInstance = hInst_;
+	wcex_.hIcon = LoadIcon(hInst_, MAKEINTRESOURCE(IDI_ICON1));
+	wcex_.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	wcex_.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+	wcex_.lpszMenuName = MAKEINTRESOURCEW(IDI_ICON1);
+	wcex_.lpszClassName = L"AS21prac";
+	wcex_.hIconSm = LoadIcon(wcex_.hInstance, MAKEINTRESOURCE(IDI_ICON1));
+	RegisterClassExW(&wcex_);
 
-	wcex.style = CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc = WndProc;
-	wcex.cbClsExtra = 0;
-	wcex.cbWndExtra = 0;
-	wcex.hInstance = hInst_;
-	wcex.hIcon = LoadIcon(hInst_, MAKEINTRESOURCE(IDI_ICON1));
-	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-	wcex.lpszMenuName = MAKEINTRESOURCEW(IDI_ICON1);
-	wcex.lpszClassName = L"AS21prac";
-	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_ICON1));
+	wcex_.lpfnWndProc = TileSetProc;
+	wcex_.lpszMenuName = NULL;
+	wcex_.lpszClassName = L"TileSet";
+	RegisterClassExW(&wcex_);
 
-	return RegisterClassExW(&wcex);
+	return NULL;
 }
 
 LRESULT CCore::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
-	
+	case WM_CREATE:
+		// 윈도우 핸들 Init
+		CSceneManager::Instance()->LoadHwnd(INGAME_SCENE, hWnd);
+		CSceneManager::Instance()->LoadHwnd(MAP_EDIT_SCENE, hWnd);
+
+		//// 윈도우 위치 데이터 업데이트 for Tf
+		//RECT tmp_rect;
+		//GetWindowRect(hWnd, &tmp_rect);
+
+		//POINT tmp_point;
+		//tmp_point = POINT{ tmp_rect.left, tmp_rect.top };
+		//ScreenToClient(hWnd, &tmp_point);
+		//cout << "tmp_point: (" << tmp_point.x << ", " << tmp_point.y << ")\n";
+
+		//CTfManager::Instance()->LoadTf("WndProc", MY_POSE(tmp_rect.left, tmp_rect.top));
+
+		break;
+
+	case WM_MOUSEMOVE:
+		CInputManager::Instance()->SetHwnd(hWnd);
+		break;
+
 	case WM_PAINT:
 	{
 		PAINTSTRUCT ps;
@@ -206,30 +247,68 @@ LRESULT CCore::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		EndPaint(hWnd, &ps);
 	}
 	break;
-	/*case WM_MOUSEMOVE:
-		CInputManager::Instance()->SetMousePose(lParam);
-		break;
-	case WM_LBUTTONDOWN:
-		CInputManager::Instance()->MouseInput(LBUTTON_DOWN, lParam);
-		break;
-	case WM_LBUTTONUP:
-		CInputManager::Instance()->MouseInput(LBUTTON_UP, lParam);
-		break;
-	case WM_RBUTTONDOWN:
-		CInputManager::Instance()->MouseInput(RBUTTON_DOWN, lParam);
-		break;
-	case WM_RBUTTONUP:
-		CInputManager::Instance()->MouseInput(RBUTTON_UP, lParam);
-		break;*/
+
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
+
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
 	return 0;
 }
 
+
+
+LRESULT CCore::TileSetProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message)
+	{
+	case WM_CREATE:
+		// 윈도우 핸들 Init
+		CSceneManager::Instance()->LoadHwnd(ASSIST_SCENE, hWnd);
+
+		SetTimer(hWnd, 123, 20, NULL);
+		// 윈도우 위치 데이터 업데이트 for Tf
+		/*RECT tmp_rect;
+		GetWindowRect(hWnd, &tmp_rect);
+
+		POINT tmp_point;
+		tmp_point = POINT{ tmp_rect.left, tmp_rect.top };
+		ScreenToClient(hWnd, &tmp_point);
+		cout << "tmp_point: (" << tmp_point.x << ", " << tmp_point.y << ")\n";*/
+
+		// CTfManager::Instance()->LoadTf("TileSetProc", MY_POSE(tmp_rect.left, tmp_rect.top));
+		break;
+	case WM_TIMER:
+		InvalidateRect(hWnd, NULL, false);
+		break;
+	case WM_PAINT:
+	{
+		PAINTSTRUCT ps;
+		HDC hdc = BeginPaint(hWnd, &ps);
+
+		// 컨텐츠 그리기
+		CSceneManager::Instance()->pt_assist_scene_->Render(hdc, 0);
+
+		EndPaint(hWnd, &ps);
+	}
+	break;
+
+	case WM_MOUSEMOVE:
+		CInputManager::Instance()->SetHwnd(hWnd);
+		break;
+
+	case WM_DESTROY:
+		KillTimer(hWnd ,123);
+		PostQuitMessage(0);
+		break;
+
+	default:
+		return DefWindowProc(hWnd, message, wParam, lParam);
+	}
+	return 0;
+}
 
 BOOL CCore::Create()
 {
@@ -251,6 +330,37 @@ BOOL CCore::Create()
 
 	ShowWindow(hWnd_, SW_SHOW);
 	UpdateWindow(hWnd_);
+
+	
+	// child 윈도우 생성
+	RECT rectView;
+	GetClientRect(hWnd_, &rectView);
+
+	// 부모 윈도우 사이즈를 배경 사이즈로 설정
+	CCameraManager::Instance()->SetWorldSize(rectView.right, rectView.bottom);
+
+	// 가로 알파 간견
+	int dx = 1;
+	float size_coef = 0.4;
+	float size_x = rectView.right * size_coef;
+	float size_y = rectView.bottom;
+
+	ChildHwnd_[0] = CreateWindowEx(
+		WS_EX_CLIENTEDGE,
+		_T("TileSet"),
+		NULL,
+		WS_CHILD | WS_VISIBLE,
+		rectView.right - size_x + dx,
+		0,
+		size_x - dx,
+		size_y,
+		CCore::Instance()->GetHWnd(),
+		NULL,
+		CCore::Instance()->GetHInstance(),
+		NULL
+	);
+
+	CTfManager::Instance()->LoadTf("TileSetProc", MY_POSE{ rectView.right - size_x + dx, 0.f });
 
 	return TRUE;
 }

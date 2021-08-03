@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "..\Core\SourceManager.h"
+#include "..\Core\InputManager.h"
 
 CPlayer::CPlayer()
 {
@@ -29,22 +30,22 @@ void CPlayer::Input(float _time)
 {
 	CMoveObj::Input(_time);
 
-	if (GetAsyncKeyState('W') & 0x8000)
+	if (CInputManager::Instance()->GetKeyW())
 	{
 		MoveYFromSpeed(_time, MD_BACK);
 	}
 
-	if (GetAsyncKeyState('S') & 0x8000)
+	if (CInputManager::Instance()->GetKeyS())
 	{
 		MoveYFromSpeed(_time, MD_FRONT);
 	}
 
-	if (GetAsyncKeyState('A') & 0x8000)
+	if (CInputManager::Instance()->GetKeyA())
 	{
 		MoveXFromSpeed(_time, MD_BACK);
 	}
 
-	if (GetAsyncKeyState('D') & 0x8000)
+	if (CInputManager::Instance()->GetKeyD())
 	{
 		MoveXFromSpeed(_time, MD_FRONT);
 	}

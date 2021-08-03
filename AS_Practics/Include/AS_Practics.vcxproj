@@ -158,6 +158,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Core\Camera.cpp" />
     <ClCompile Include="Core\CameraManager.cpp" />
     <ClCompile Include="Core\InputManager.cpp" />
     <ClCompile Include="Core\SourceManager.cpp" />
@@ -165,6 +166,7 @@
     <ClCompile Include="Core\PathManager.cpp" />
     <ClCompile Include="Core\Ref.cpp" />
     <ClCompile Include="Core\Texture.cpp" />
+    <ClCompile Include="Core\TfManager.cpp" />
     <ClCompile Include="Core\Timer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyFunc\MyGdiplus.cpp" />
@@ -175,13 +177,16 @@
     <ClCompile Include="Object\Stage.cpp" />
     <ClCompile Include="Object\StaticObj.cpp" />
     <ClCompile Include="Object\Tile.cpp" />
+    <ClCompile Include="Scene\AssistScene.cpp" />
     <ClCompile Include="Scene\InGameScene.cpp" />
     <ClCompile Include="Scene\Layer.cpp" />
     <ClCompile Include="Scene\MapEditScene.cpp" />
+    <ClCompile Include="Scene\MapToolScene.cpp" />
     <ClCompile Include="Scene\Scene.cpp" />
     <ClCompile Include="Scene\SceneManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Core\Camera.h" />
     <ClInclude Include="Core\CameraManager.h" />
     <ClInclude Include="Core\InputManager.h" />
     <ClInclude Include="Core\SourceManager.h" />
@@ -189,6 +194,7 @@
     <ClInclude Include="Core\PathManager.h" />
     <ClInclude Include="Core\Ref.h" />
     <ClInclude Include="Core\Texture.h" />
+    <ClInclude Include="Core\TfManager.h" />
     <ClInclude Include="Core\Timer.h" />
     <ClInclude Include="Flag.h" />
     <ClInclude Include="Game.h" />
@@ -202,9 +208,11 @@
     <ClInclude Include="Object\StaticObj.h" />
     <ClInclude Include="Object\Tile.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Scene\AssistScene.h" />
     <ClInclude Include="Scene\InGameScene.h" />
     <ClInclude Include="Scene\Layer.h" />
     <ClInclude Include="Scene\MapEditScene.h" />
+    <ClInclude Include="Scene\MapToolScene.h" />
     <ClInclude Include="Scene\Scene.h" />
     <ClInclude Include="Scene\SceneManager.h" />
     <ClInclude Include="Type.h" />

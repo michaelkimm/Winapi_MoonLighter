@@ -5,6 +5,7 @@
 
 #include "..\Game.h"
 #include "Layer.h"
+#include "..\Core\Camera.h"
 
 class CScene
 {
@@ -19,7 +20,30 @@ protected:
 	list<class CLayer*> layer_list_;
 
 public:
-	virtual bool Init() = 0;
+	CCamera* camera_;
+
+protected:
+	MY_POSE pose_;			// 절대 좌표
+	MY_SIZE wnd_size_;		// 윈도우 크기
+	MY_SIZE world_size_;	// 텍스처 크기
+
+	HWND hWnd_;
+
+public:
+	void SetPose(MY_POSE& _pose)			{ pose_ = _pose; }
+	void SetPose(float _x, float _y)		{ pose_ = MY_POSE(_x, _y); }
+	void SetWndSize(MY_SIZE& _size)			{ wnd_size_ = _size; }
+	void SetWndSize(float _x, float _y)		{ wnd_size_ = MY_SIZE(_x, _y); }
+	void SetWorldSize(MY_SIZE& _size)		{ world_size_ = _size; }
+	void SetWorldSize(float _x, float _y)	{ world_size_ = MY_SIZE(_x, _y); }
+
+	MY_POSE GetPose() const			{ return pose_; }
+	MY_SIZE GetWndSize() const		{ return wnd_size_; }
+	MY_SIZE GetWorldSize() const	{ return world_size_; }
+	HWND	GetHwnd() const			{ return hWnd_; }
+
+public:
+	virtual bool Init(HWND _hWnd) = 0;
 	virtual void Input(float _time);
 	virtual void Update(float _time);
 	virtual void LateUpdate(float _time);

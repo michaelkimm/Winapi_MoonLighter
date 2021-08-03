@@ -33,6 +33,7 @@ public:
 
 public:
 	void AddObj(class CObject* obj);
+	void Clear();
 
 public:
 	bool Init();
@@ -41,6 +42,24 @@ public:
 	void LateUpdate(float _time);
 	void Collision(float _time);
 	void Render(HDC _hdc, float _time);
+
+public:
+	template <typename T>
+	T* FindObj(const string& _str_tag)
+	{
+		typename list<class CObject*>::iterator iter;
+		typename list<class CObject*>::iterator iter_end = obj_list_.end();
+
+		for (iter = obj_list_.begin(); iter != iter_end; iter++)
+		{
+			if ((*iter)->GetTag() == _str_tag)
+			{
+				(*iter)->AddRef();
+				return static_cast<T*>(*iter);
+			}
+		}
+		return NULL;
+	}
 };
 
 #endif

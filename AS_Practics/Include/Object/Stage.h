@@ -21,17 +21,24 @@ private:
 	TILE_NAME tile_edit_name_;
 
 public:
-	bool CreateTile(int _num_x, int _num_y, int _size_x, int _size_y, 
+	bool CreateTile(const MY_POSE& _start_pose, int _num_x, int _num_y, int _size_x, int _size_y, 
 						const string& _texture_key, const wchar_t* _file_name, const string& _root_str);
+	void ChangeTile(int _idx, CTile* _t);
 	void SetTileXNum(int _x_num) { tile_x_num_ = _x_num; }
 	void SetTileYNum(int _y_num) { tile_y_num_ = _y_num; }
 	void SetTileWidth(int _width) { tile_width_ = _width; }
 	void SetTileHeight(int _height) { tile_height_ = _height; }
 
+
+	CTile* GetTile(int _idx) const;
 	int GetTileXNum() const { return tile_x_num_; }
 	int GetTileYNum() const { return tile_y_num_; }
 	int GetTileWidth() const { return tile_width_; }
 	int GetTileHeight() const { return tile_height_; }
+
+public:
+	void MapEditSceneInput();
+	void AssistSceneInput();
 
 public:
 	CStage();

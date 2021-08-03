@@ -1,25 +1,23 @@
 #pragma once
-#ifndef CMAPEDITSCENE_H_
-#define CMAPEDITSCENE_H_
+#ifndef CASSISTSCENE_H_
+#define CASSISTSCENE_H_
 
 #include "MapToolScene.h"
 
-class CMapEditScene :
+class CAssistScene :
 	public CMapToolScene
 {
+private:
 	friend class CSceneManager;
-	friend class CAssistScene;
-
-	// 마우스 사각형 갯수
-	static int rect_num_x_;
-	static int rect_num_y_;
-	static vector<class CTile*> rect_tile_vec_;
-	static void AddTile(class CTile* _t);
-	static void ClearTile();
 
 private:
-	CMapEditScene();
-	~CMapEditScene();
+	vector<class CTile*> rect_tile_vec_;
+
+	void MakeCTileVec(MY_POSE _start_pose, int _num_x, int _num_y);
+
+private:
+	CAssistScene();
+	~CAssistScene();
 
 public:
 	virtual bool Init(HWND _hWnd);
@@ -29,6 +27,7 @@ public:
 	virtual void Collision(float _time);
 	virtual void Render(HDC _hdc, float _time);
 
+public:
 };
 
 #endif

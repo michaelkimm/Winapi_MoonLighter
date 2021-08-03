@@ -22,6 +22,11 @@ void CLayer::AddObj(class CObject* _obj)
 	obj_list_.push_back(_obj);
 }
 
+void CLayer::Clear()
+{
+	SafeReleaseList(obj_list_);
+}
+
 bool CLayer::Init()
 {
 	return true;

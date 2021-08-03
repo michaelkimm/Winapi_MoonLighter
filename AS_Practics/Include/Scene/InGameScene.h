@@ -5,7 +5,8 @@
 
 #include "Scene.h"
 
-class CInGameScene : public  CScene
+class CInGameScene : 
+	public  CScene
 {
 private:
 	// 씬 매니저는 생성 & 소멸자를 쓸 수 있어야함
@@ -17,7 +18,7 @@ private:
 	~CInGameScene();
 
 public:
-	virtual bool Init();
+	virtual bool Init(HWND _hWnd);
 	virtual void Input(float _time);
 	virtual void Update(float _time);
 	virtual void LateUpdate(float _time);

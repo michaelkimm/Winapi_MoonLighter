@@ -16,7 +16,7 @@ private:
 	TILE_OPTION option_;
 
 public:
-	void SetOption(TILE_OPTION& _op)	{ option_ = _op; }
+	void SetOption(const TILE_OPTION& _op)	{ option_ = _op; }
 
 	TILE_OPTION GetOption() const	{ return option_; }
 

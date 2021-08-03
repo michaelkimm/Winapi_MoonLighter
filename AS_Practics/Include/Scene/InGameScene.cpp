@@ -15,11 +15,10 @@ CInGameScene::~CInGameScene()
 {
 }
 
-bool CInGameScene::Init()
+bool CInGameScene::Init(HWND _hWnd)
 {
-	// 부모 Scene 클래스의 초기화 함수를 호출해준다.
-	// 왜지??
-	if (!CScene::Init())
+	// 위에서 Init한 것을 기반으로 초기화 하기 때문에 밑에 선언
+	if (!CScene::Init(_hWnd))
 		return false;
 
 	class CLayer*	pt_layer;
@@ -37,15 +36,24 @@ bool CInGameScene::Init()
 	// 텍스처 & 물체 size 설정
 	pt_stage->SetTexture("Background", _T("3000.bmp"), TEXTURE_PATH);
 
+
 	// 배경 사이즈 정해질 때 카메라 내 월드 사이즈도 설정
 	MY_SIZE stage_size = pt_stage->GetSize();
-	CCameraManager::Instance()->SetWorldSize(stage_size.x, stage_size.y);
+	SetWorldSize(stage_size);
+
+	// 씬의 카메라 초기화
+	hWnd_ = _hWnd;
+	RECT rectView;
+	GetClientRect(hWnd_, &rectView);
+	SetWndSize(rectView.right, rectView.bottom);
+
+	// main 화면 기준 위치, 월드 사이즈 & 씬 사이즈 & 속도 초기화
+	camera_->Init(MY_POSE(0.f, 0.f), wnd_size_, world_size_, 500.f);
 
 	SAFE_RELEASE(pt_stage);
 
+
 	// ---------------------------------------------------------------------- : <<
-
-
 
 	
 
@@ -62,7 +70,7 @@ bool CInGameScene::Init()
 	pt_player->SetTexture(PLAYER_TAG, _T("sigong.bmp"), TEXTURE_PATH);
 
 	// 플레이어에 카메라 고정
-	CCameraManager::Instance()->SetMaster(pt_player);
+	camera_->SetMaster(pt_player);
 
 	// CreateObj해서 레이어에 추가까지 하면 참조 카운트가 2개가 된다. 따라서 1개로 만들기 위해 pt_layer 해제
 	SAFE_RELEASE(pt_player);
@@ -82,6 +90,7 @@ bool CInGameScene::Init()
 	//SAFE_RELEASE(pt_monster);
 
 	// ---------------------------------------------------------------------- : <<
+
 
 	return true;
 }
@@ -108,5 +117,5 @@ void CInGameScene::Collision(float _time)
 
 void CInGameScene::Render(HDC _hdc, float _time)
 {
-	CScene::Render(_hdc, _time);
+	// CScene::Render(_hdc, _time);
 }
