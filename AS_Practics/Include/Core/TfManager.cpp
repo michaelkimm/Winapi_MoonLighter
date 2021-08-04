@@ -42,7 +42,7 @@ MY_POSE CTfManager::GetTf(const string & _tf_name) const
 
 bool CTfManager::Init()
 {
-	return false;
+	return true;
 }
 
 void CTfManager::Input(float _time)

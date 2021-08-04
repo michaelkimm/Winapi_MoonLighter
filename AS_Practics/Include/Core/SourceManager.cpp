@@ -58,7 +58,7 @@ class CTexture* CSourceManager::LoadTexture(const string& _texture_key, const wc
 	// 파일이 경로에 있는 경우, 텍스쳐 객체를 만들어서 source_map에 추가
 	source_map_.insert(make_pair(_texture_key, _pt_texture));
 
-	// 텍스처 포인터 돌주기 때문에 참조 카운트 증가
+	// insert에서 pt_texture 가져가기 때문에 참조 카운트 증가.
 	_pt_texture->AddRef();
 
 	return _pt_texture;

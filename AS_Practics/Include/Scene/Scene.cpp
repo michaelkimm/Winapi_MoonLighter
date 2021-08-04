@@ -2,6 +2,7 @@
 #include "Layer.h"
 #include "..\Core\Core.h"
 #include "..\Core\InputManager.h"
+#include "..\Core\Camera.h"
 
 CScene::CScene()
 {
@@ -10,13 +11,14 @@ CScene::CScene()
 	pt_layer = CreateLayer("Player", 20);
 	pt_layer = CreateLayer("UI", INT_MAX - 1);
 	pt_layer = CreateLayer("Assist_scene_mouse_rect", INT_MAX);
-	camera_ = new CCamera();
+	camera_ = new CCamera;
 }
 
 CScene::~CScene()
 {
 	// 레이어를 전부 동적할당 해제 및 리스트 클리어
 	SafeDeleteList(layer_list_);
+	SAFE_DELETE(camera_);
 }
 
 bool CScene::Init(HWND _hWnd)

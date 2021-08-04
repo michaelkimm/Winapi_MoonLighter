@@ -12,25 +12,27 @@ class CTexture :
 private:
 	Image* img_;
 	ImageAttributes imgAttr_;
-	int x_;
-	int y_;
+	// int x_;
+	// int y_;
 	int w_;
 	int h_;
 
 public:
-	Image*			GetImg() const { return img_; }
+	Image* GetImg() const { return img_; }
 	// ImageAttributes GetImgAttr() const	{ return imgAttr_; }
-	int				GetWidth() const { return w_; }
-	int				GetHeight() const { return h_; }
-	HDC				GetDC() const { return hMemDC_; }
-	HDC hMemDC_;
+	// int				GetX() const { return x_; }
+	// int				GetY() const { return y_; }
+	int	GetWidth() const { return w_; }
+	int	GetHeight() const { return h_; }
+	// HDC	GetDC() const { return hMemDC_; }
+	// HDC hMemDC_;
 
 private:
-	HINSTANCE hInst_;
+	/*HINSTANCE hInst_;
 	HBITMAP hBitmap_;
 	BITMAP bitmap_;
 	HBITMAP hOldBitmap_;
-	HBITMAP hDoubleBufferImage_;
+	HBITMAP hDoubleBufferImage_;*/
 
 	COLORREF color_key;
 public:
@@ -48,7 +50,7 @@ public:
 	bool SetTexture(HINSTANCE _hInst, HDC& _hdc, const wchar_t* _file_name, const string& _str_path_key = TEXTURE_PATH,
 							const COLORREF& _color_key = RGB(255, 0, 255));
 	bool SetTextureImg(const wchar_t* _file_name, const string& _str_path_key = TEXTURE_PATH, const COLORREF& _color_key = RGB(255, 0, 255));
-	bool SetImgInfo(Image* _pt_img, int srcx, int srcy, int _srcwidth, int _srcheight, const COLORREF& _color_key = RGB(255, 0, 255));
+	// bool SetImgInfo(Image* _pt_img, int srcx, int srcy, int _srcwidth, int _srcheight, const COLORREF& _color_key = RGB(255, 0, 255));
 
 	void Render(HDC _hdc, float _time);
 };

@@ -13,15 +13,18 @@ private:
 	friend class CStage;
 
 private:
+	MY_POSE idx_int_texture_;
 	TILE_OPTION option_;
 
 public:
+	void SetIdxInTexture(float _x, float _y) { idx_int_texture_ = MY_POSE{ _x, _y }; }
 	void SetOption(const TILE_OPTION& _op)	{ option_ = _op; }
 
 	TILE_OPTION GetOption() const	{ return option_; }
+	MY_POSE		GetIdxInTexture() const { return idx_int_texture_; }
 
-	bool SetTileTexture(int _srcx, int _srcy, int _srcwidth, int _srcheight, const string& _texture_key, const wchar_t* _pFileName = NULL, const string& _str_path_key = TEXTURE_PATH,
-		const Color& _color_key = Color(255, 0, 255));
+
+	// bool SetTileTexture(int _srcx, int _srcy, int _srcwidth, int _srcheight, const string& _texture_key, const wchar_t* _pFileName = NULL, const string& _str_path_key = TEXTURE_PATH, const Color& _color_key = Color(255, 0, 255));
 
 private:
 	CTile();

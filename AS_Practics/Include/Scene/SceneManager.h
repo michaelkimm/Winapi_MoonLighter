@@ -5,6 +5,9 @@
 
 #include "..\Game.h"
 #include "Scene.h"
+#include "InGameScene.h"
+#include "MapEditScene.h"
+#include "AssistScene.h"
 
 class CSceneManager
 {

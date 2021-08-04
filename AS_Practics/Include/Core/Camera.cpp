@@ -1,7 +1,6 @@
 #include "Camera.h"
 
 #include "..\Scene\SceneManager.h"
-#include "CameraManager.h"
 #include "InputManager.h"
 #include "Core.h"
 #include "..\Object\Object.h"

@@ -75,19 +75,31 @@ void CObject::Collision(float _time)
 
 void CObject::Render(HDC _hdc, float _time)
 {
-	if (texture_)
-	{
-		if (texture_->GetDC() == NULL)
-			return;
+	//if (texture_)
+	//{
+	//	if (texture_->GetImg() == NULL)
+	//		return;
 
-		// MY_POSE pose_in_cam = pose_ - CCameraManager::Instance()->GetPose();	 // 카메라 기준 상대 좌표
-		MY_POSE pose_in_cam = pose_ - scene_->camera_->GetPose();	 // 카메라 기준 상대 좌표
+	//	// MY_POSE pose_in_cam = pose_ - CCameraManager::Instance()->GetPose();	 // 카메라 기준 상대 좌표
+	//	MY_POSE pose_in_cam = pose_ - scene_->camera_->GetPose();	 // 카메라 기준 상대 좌표
 
-		// BitBlt(_hdc, pose_.x, pose_.y, size_.x, size_.y, texture_->GetDC(), 0, 0, SRCCOPY);
-		TransparentBlt(_hdc, pose_in_cam.x, pose_in_cam.y, size_.x, size_.y, texture_->GetDC(), 0, 0, texture_->GetWidth(), texture_->GetHeight(), texture_->GetColorKey());
-		// 오브젝트의 카메라 상에서 위치 = 스테이지 위치 - 윈도우 위치
-		
-		// cout << "pose_ : (" << pose_.x << ", " << pose_.y << ")\n";
-		// cout << "pose_in_cam : (" << pose_in_cam.x << ", " << pose_in_cam.y << ")\n\n\n";
-	}
+	//	// BitBlt(_hdc, pose_.x, pose_.y, size_.x, size_.y, texture_->GetDC(), 0, 0, SRCCOPY);
+	//	Graphics graphics(_hdc);
+
+	//	int w = texture_->GetWidth();
+	//	int h = texture_->GetHeight();
+	//	int x = texture_->GetX() * w;
+	//	int y = texture_->GetY() * h;
+	//	
+	//	ImageAttributes imgAttr;
+	//	imgAttr.SetColorKey(Color(200, 0, 200), Color(255, 10, 255));
+
+	//	graphics.DrawImage(texture_->GetImg(), Rect{ (int)pose_in_cam.x, (int)pose_in_cam.y, (int)size_.x, (int)size_.y }, x, y, w, h, UnitPixel, &imgAttr);
+
+	//	// TransparentBlt(_hdc, pose_in_cam.x, pose_in_cam.y, size_.x, size_.y, texture_->GetDC(), 0, 0, texture_->GetWidth(), texture_->GetHeight(), texture_->GetColorKey());
+	//	// 오브젝트의 카메라 상에서 위치 = 스테이지 위치 - 윈도우 위치
+	//	
+	//	// cout << "pose_ : (" << pose_.x << ", " << pose_.y << ")\n";
+	//	// cout << "pose_in_cam : (" << pose_in_cam.x << ", " << pose_in_cam.y << ")\n\n\n";
+	//}
 }

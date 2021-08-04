@@ -4,7 +4,6 @@
 #include "PathManager.h"
 #include "SourceManager.h"
 #include "Texture.h"
-#include "CameraManager.h"
 #include "InputManager.h"
 #include "TfManager.h"
 
@@ -21,9 +20,6 @@ CCore::CCore()
 }
 CCore::~CCore()
 {
-	// GDi plus 종료
-	Gdi_End();
-
 	// 장면 관리자 파괴
 	CSceneManager::DestroyInst();
 
@@ -42,7 +38,13 @@ CCore::~CCore()
 	// 입력 관리자 파괴
 	CInputManager::DestroyInst();
 
+	// Tf 관리자 파괴
+	CTfManager::DestroyInst();
+
 	ReleaseDC(hWnd_, hdc_);
+
+	// GDi plus 종료
+	Gdi_End();
 }
 
 bool CCore::Init(HINSTANCE _hInst)
@@ -93,6 +95,10 @@ bool CCore::Init(HINSTANCE _hInst)
 	if (!CInputManager::Instance()->Init(hWnd_))
 		return false;
 
+	// Tf 관리자 초기화
+	if (!CTfManager::Instance()->Init())
+		return false;
+
 	return true;
 }
 
@@ -125,7 +131,7 @@ void CCore::Logic()
 	// 타이머 dt 얻기
 	CTimer::Instance()->Update();
 	float delta_time = CTimer::Instance()->GetDeltaTime();
-
+	
 	Input(delta_time);
 	Update(delta_time);
 	LateUpdate(delta_time);
@@ -141,7 +147,7 @@ void CCore::Input(float _time)
 {
 	CInputManager::Instance()->KeyBoardInput(_time);
 	CInputManager::Instance()->MouseInput(_time);
-	CSceneManager::Instance()->Input(_time);
+	// CSceneManager::Instance()->Input(_time);
 }
 
 void CCore::Update(float _time)
@@ -176,14 +182,27 @@ void CCore::Render(float _time)
 	
 	// 빈 흰색 도화지 그리기
 	CTexture* back_buffer = CSourceManager::Instance()->GetBackBuffer();
-	// Rectangle(back_buffer->GetDC(), 0, 0, back_buffer->GetWidth(), back_buffer->GetHeight());
 
-	// 컨텐츠 그리기
-	CSceneManager::Instance()->Render(back_buffer->GetDC(), _time);
+	RECT rectView;
+	GetClientRect(hWnd_, &rectView);
+
+	HDC hdc = CreateCompatibleDC(hdc_);
+	HBITMAP hDoubleBufferImage = CreateCompatibleBitmap(hdc_, rectView.right, rectView.bottom);
+	HBITMAP hOldBitmap = (HBITMAP)SelectObject(hdc, hDoubleBufferImage);
+
+	Graphics graphics(hdc);
+	graphics.DrawImage(back_buffer->GetImg(), 0, 0, back_buffer->GetWidth(), back_buffer->GetHeight());
+
+	// 컨텐츠 그리기	
+	CSceneManager::Instance()->Render(hdc, _time);
 
 	// 흰색 도화지에 그려진걸 옮기기
-	BitBlt(hdc_, 0, 0, back_buffer->GetWidth() - mx, back_buffer->GetHeight() - my, back_buffer->GetDC(), 0, 0, SRCCOPY);
+	BitBlt(hdc_, 0, 0, back_buffer->GetWidth() - mx, back_buffer->GetHeight() - my, hdc, 0, 0, SRCCOPY);
 
+	SelectObject(hdc, hOldBitmap);
+	DeleteDC(hdc);
+	DeleteObject(hDoubleBufferImage);
+	DeleteObject(hOldBitmap);
 	SAFE_RELEASE(back_buffer);
 }
 
@@ -268,7 +287,7 @@ LRESULT CCore::TileSetProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		// 윈도우 핸들 Init
 		CSceneManager::Instance()->LoadHwnd(ASSIST_SCENE, hWnd);
 
-		SetTimer(hWnd, 123, 20, NULL);
+		// SetTimer(hWnd, 123, 20, NULL);
 		// 윈도우 위치 데이터 업데이트 for Tf
 		/*RECT tmp_rect;
 		GetWindowRect(hWnd, &tmp_rect);
@@ -300,7 +319,7 @@ LRESULT CCore::TileSetProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		break;
 
 	case WM_DESTROY:
-		KillTimer(hWnd ,123);
+		// KillTimer(hWnd ,123);
 		PostQuitMessage(0);
 		break;
 
@@ -337,7 +356,7 @@ BOOL CCore::Create()
 	GetClientRect(hWnd_, &rectView);
 
 	// 부모 윈도우 사이즈를 배경 사이즈로 설정
-	CCameraManager::Instance()->SetWorldSize(rectView.right, rectView.bottom);
+	// CCameraManager::Instance()->SetWorldSize(rectView.right, rectView.bottom);
 
 	// 가로 알파 간견
 	int dx = 1;

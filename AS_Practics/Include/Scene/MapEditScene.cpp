@@ -7,7 +7,7 @@
 #include "..\Object\Stage.h"
 #include "..\Core\Core.h"
 #include "..\Core\SourceManager.h"
-#include "..\Core\CameraManager.h"
+// #include "..\Core\CameraManager.h"
 #include "..\Core\InputManager.h"
 
 // 정적 변수 초기화
@@ -58,13 +58,13 @@ bool CMapEditScene::Init(HWND _hWnd)
 	// CStage 클래스 오브젝트를 생성해서 pt_layer에 넣는다. 태그 = "stage" 
 	CStage* pt_stage = CObject::CreateObj<CStage>("stage", pt_layer);
 
-	if (!pt_stage->CreateTile(pose_, 100, 100, 16, 16, WATER1, _T("water1.bmp"), TEXTURE_PATH))
+	if (!pt_stage->CreateTile(pose_, 1, 1, 16, 16, WATER1, _T("water1.bmp"), TEXTURE_PATH))
 	{
 		SAFE_RELEASE(pt_stage);
 		return false;
 	}
 
-	/*if (!pt_stage->CreateTileImg(pose_, 16, 16, SV_BEACH_SUMMER, _T("SV_Beach_Summer.png"), TEXTURE_PATH))
+	/*if (!pt_stage->CreateTileImg(pose_, 16, 16, WATER1, _T("water1.bmp"), TEXTURE_PATH))
 	{
 		SAFE_RELEASE(pt_stage);
 		return false;

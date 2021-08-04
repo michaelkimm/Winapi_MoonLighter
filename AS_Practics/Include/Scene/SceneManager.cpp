@@ -13,7 +13,9 @@ CSceneManager::CSceneManager()
 
 CSceneManager::~CSceneManager()
 {
-	SAFE_DELETE(pt_scene_)
+	SAFE_DELETE(pt_scene_);
+	SAFE_DELETE(pt_next_scene_);
+	SAFE_DELETE(pt_assist_scene_);
 }
 
 void CSceneManager::LoadHwnd(const string& _scene_name, HWND _hWnd)
@@ -45,8 +47,8 @@ bool CSceneManager::Init()
 void CSceneManager::Input(float _time)
 {
 	// 순서 중요!
-	pt_assist_scene_->Input(_time);
-	pt_scene_->Input(_time);
+	// pt_assist_scene_->Input(_time);
+	// pt_scene_->Input(_time);
 }
 
 void CSceneManager::Update(float _time)

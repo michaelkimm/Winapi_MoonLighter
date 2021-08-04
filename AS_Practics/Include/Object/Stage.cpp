@@ -1,7 +1,6 @@
 #include "Stage.h"
 #include "Tile.h"
 #include "..\Core\Texture.h"
-#include "..\Core\CameraManager.h"
 #include "..\Core\InputManager.h"
 #include "..\Core\TfManager.h"
 #include "..\Scene\SceneManager.h"
@@ -22,18 +21,24 @@ bool CStage::CreateTile(const MY_POSE& _start_pose, int _num_x, int _num_y, int 
 	{
 		for (int j = 0; j < _num_x; j++)
 		{
-			CTile* pt_tile = CObject::CreateObj<CTile>(_texture_key, layer_);
+			// 타일은 내가 어느 레이어에 있는지 알 필요가 없다.
+			CTile* pt_tile = CObject::CreateObj<CTile>(_texture_key, NULL);
 			if (pt_tile == NULL) return false;
 
 			// 텍스처 설정
 			if (!pt_tile->SetTexture(_texture_key, _file_name, TEXTURE_PATH))
+			{
+				SAFE_RELEASE(pt_tile);
 				return false;
-			
-			// 사이즈 설정
-			pt_tile->SetSize(_size_x, _size_y);
-
-			// 위치 설정
+			}
+		
+			// 타일의 절대 위치 설정
 			pt_tile->SetPose(_start_pose.x + j * _size_x, _start_pose.y + i * _size_y);
+
+			// img에서의 인덱스 및 타일 한개 사이즈 설정
+			// 텍스쳐가 하나기 때문에 (0, 0)으로 설정
+			pt_tile->SetIdxInTexture(0, 0);
+			pt_tile->SetSize(_size_x, _size_y);
 
 			tile_vec_.push_back(pt_tile);
 
@@ -64,16 +69,20 @@ bool CStage::CreateTileImg(const MY_POSE& _start_pose, int _size_x, int _size_y,
 	{
 		for (int j = 0; j < tile_x_num_; j++)
 		{
-			CTile* pt_tile = CObject::CreateObj<CTile>(_texture_key, layer_);
+			CTile* pt_tile = CObject::CreateObj<CTile>(_texture_key, NULL);
 			if (pt_tile == NULL) return false;
 
 			// 텍스처 설정 (Img도 적용 가능)
 			// img, 사이즈 설정
-			if (!pt_tile->SetTileTexture(j, i, 16, 16, _texture_key, _file_name, TEXTURE_PATH))
+			if (!pt_tile->SetTexture(_texture_key, _file_name, TEXTURE_PATH))
 				return false;
 
 			// 타일의 절대 위치 설정
 			pt_tile->SetPose(_start_pose.x + j * _size_x, _start_pose.y + i * _size_y);
+
+			// img에서의 인덱스 및 타일 한개 사이즈 설정
+			pt_tile->SetIdxInTexture(j, i);
+			pt_tile->SetSize(_size_x, _size_y);
 			tile_vec_.push_back(pt_tile);
 
 			SAFE_RELEASE(pt_tile);
@@ -104,56 +113,56 @@ CTile* CStage::GetTile(int _idx) const
 
 void CStage::MapEditSceneInput()
 {
-	// 타일 이름 설정
-	if (CInputManager::Instance()->GetKey1())
-		tile_edit_name_ = TILE_WATER1;
-	else if (CInputManager::Instance()->GetKey2())
-		tile_edit_name_ = TILE_WATER2;
-	else if (CInputManager::Instance()->GetKey3())
-		tile_edit_name_ = TILE_SAND1;
+	//// 타일 이름 설정
+	//if (CInputManager::Instance()->GetKey1())
+	//	tile_edit_name_ = TILE_WATER1;
+	//else if (CInputManager::Instance()->GetKey2())
+	//	tile_edit_name_ = TILE_WATER2;
+	//else if (CInputManager::Instance()->GetKey3())
+	//	tile_edit_name_ = TILE_SAND1;
 
-	// : >> 클릭한 곳의 타일 정보를 알아오기
-	if (CInputManager::Instance()->GetMouseLeftDown())
-	{
-		// 카메라 내 마우스 클릭한 곳 좌표
-		MY_POSE m_pose = CInputManager::Instance()->GetMousePose();
-		// cout << "\n\n\n마우스 절대좌표 mouspose: (" << m_pose.x << ", " << m_pose.y << endl;
+	//// : >> 클릭한 곳의 타일 정보를 알아오기
+	//if (CInputManager::Instance()->GetMouseLeftDown())
+	//{
+	//	// 카메라 내 마우스 클릭한 곳 좌표
+	//	MY_POSE m_pose = CInputManager::Instance()->GetMousePose();
+	//	// cout << "\n\n\n마우스 절대좌표 mouspose: (" << m_pose.x << ", " << m_pose.y << endl;
 
-		// cout << "mouspose: (" << m_pose.x << ", " << m_pose.y << endl;
+	//	// cout << "mouspose: (" << m_pose.x << ", " << m_pose.y << endl;
 
-		// 마우스 클릭한 곳의 절대 좌표
-		m_pose += CCameraManager::Instance()->GetPose();
-		// cout << "카메라 pose: (" << CCameraManager::Instance()->GetPose().x << ", " << CCameraManager::Instance()->GetPose().y << endl;
-		// cout << "절대좌표 mouspose: (" << m_pose.x << ", " << m_pose.y << endl;
+	//	// 마우스 클릭한 곳의 절대 좌표
+	//	m_pose += CCameraManager::Instance()->GetPose();
+	//	// cout << "카메라 pose: (" << CCameraManager::Instance()->GetPose().x << ", " << CCameraManager::Instance()->GetPose().y << endl;
+	//	// cout << "절대좌표 mouspose: (" << m_pose.x << ", " << m_pose.y << endl;
 
-		// 2차원 타일 집합 내, 해당 타일 위치(타일 크기 고려)
-		m_pose /= tile_vec_[0]->GetSize();
+	//	// 2차원 타일 집합 내, 해당 타일 위치(타일 크기 고려)
+	//	m_pose /= tile_vec_[0]->GetSize();
 
-		// cout << "tile_pose: (" << m_pose.x << ", " << m_pose.y << endl;
+	//	// cout << "tile_pose: (" << m_pose.x << ", " << m_pose.y << endl;
 
-		int idx = floor(m_pose.y) * tile_x_num_ + floor(m_pose.x);
-		if (idx >= (int)tile_vec_.size())
-		{
-			cout << "벡터 range 바깥! idx: (" << idx << endl;
-		}
+	//	int idx = floor(m_pose.y) * tile_x_num_ + floor(m_pose.x);
+	//	if (idx >= (int)tile_vec_.size())
+	//	{
+	//		cout << "벡터 range 바깥! idx: (" << idx << endl;
+	//	}
 
-		// 특정 레이어 & 특정 상태일 때, 해당 타일 내 텍스쳐만 교환할 수 있어야함
-		switch (tile_edit_name_)
-		{
-		case TILE_WATER1:
-			if (!tile_vec_[idx]->SetTexture(WATER1, _T("water1.bmp"), TEXTURE_PATH))
-				cout << "tile set texture 실패!\n";
-			break;
-		case TILE_WATER2:
-			if (!tile_vec_[idx]->SetTexture(WATER2, _T("water2.bmp"), TEXTURE_PATH))
-				cout << "tile set texture 실패!\n";
-			break;
-		case TILE_SAND1:
-			if (!tile_vec_[idx]->SetTexture(SAND1, _T("sand1.bmp"), TEXTURE_PATH))
-				cout << "tile set texture 실패!\n";
-			break;
-		}
-	}
+	//	// 특정 레이어 & 특정 상태일 때, 해당 타일 내 텍스쳐만 교환할 수 있어야함
+	//	switch (tile_edit_name_)
+	//	{
+	//	case TILE_WATER1:
+	//		if (!tile_vec_[idx]->SetTexture(WATER1, _T("water1.bmp"), TEXTURE_PATH))
+	//			cout << "tile set texture 실패!\n";
+	//		break;
+	//	case TILE_WATER2:
+	//		if (!tile_vec_[idx]->SetTexture(WATER2, _T("water2.bmp"), TEXTURE_PATH))
+	//			cout << "tile set texture 실패!\n";
+	//		break;
+	//	case TILE_SAND1:
+	//		if (!tile_vec_[idx]->SetTexture(SAND1, _T("sand1.bmp"), TEXTURE_PATH))
+	//			cout << "tile set texture 실패!\n";
+	//		break;
+	//	}
+	//}
 }
 
 void CStage::AssistSceneInput()
@@ -216,19 +225,19 @@ void CStage::Render(HDC _hdc, float _time)
 	MY_POSE cam_pose = scene_->camera_->GetPose();
 
 	// CStaticObj::Render(_hdc, _time);
-	if (texture_)
-	{
-		if (texture_->GetDC() == NULL)
-			return;
+	//if (texture_)
+	//{
+	//	if (texture_->GetDC() == NULL)
+	//		return;
 
-		// BitBlt(_hdc, pose_.x, pose_.y, size_.x, size_.y, texture_->GetDC(), 0, 0, SRCCOPY);
-		// TransparentBlt(_hdc, 0, 0, size_.x, size_.y, texture_->GetDC(), cam_pose.x, cam_pose.y, texture_->GetWidth(), texture_->GetHeight(), RGB(255, 0, 255));
-		TransparentBlt(_hdc, pose_.x, pose_.y, cam_size.x, cam_size.y, texture_->GetDC(), cam_pose.x, cam_pose.y, cam_size.x, cam_size.y, RGB(255, 0, 255));
-		// TransparentBlt(_hdc, cam_pose.x, cam_pose.y, cam_size.x, cam_size.y, texture_->GetDC(), 0, 0, cam_size.x, cam_size.y, RGB(255, 0, 255));
-		// 오브젝트의 카메라 상에서 위치 = 스테이지 위치 - 윈도우 위치
+	//	// BitBlt(_hdc, pose_.x, pose_.y, size_.x, size_.y, texture_->GetDC(), 0, 0, SRCCOPY);
+	//	// TransparentBlt(_hdc, 0, 0, size_.x, size_.y, texture_->GetDC(), cam_pose.x, cam_pose.y, texture_->GetWidth(), texture_->GetHeight(), RGB(255, 0, 255));
+	//	TransparentBlt(_hdc, pose_.x, pose_.y, cam_size.x, cam_size.y, texture_->GetDC(), cam_pose.x, cam_pose.y, cam_size.x, cam_size.y, RGB(255, 0, 255));
+	//	// TransparentBlt(_hdc, cam_pose.x, cam_pose.y, cam_size.x, cam_size.y, texture_->GetDC(), 0, 0, cam_size.x, cam_size.y, RGB(255, 0, 255));
+	//	// 오브젝트의 카메라 상에서 위치 = 스테이지 위치 - 윈도우 위치
 
-		// cout << "cam_pose_ : (" << cam_pose.x << ", " << cam_pose.y << ")\n";
-	}
+	//	// cout << "cam_pose_ : (" << cam_pose.x << ", " << cam_pose.y << ")\n";
+	//}
 
 	HDC hMemDC = CreateCompatibleDC(_hdc);
 	HBITMAP hOldBitmap;
@@ -240,7 +249,8 @@ void CStage::Render(HDC _hdc, float _time)
 	{
 		for (int j = 0; j < tile_x_num_; j++)
 		{
-			tile_vec_[i * tile_x_num_ + j]->Render(hMemDC, _time);
+			if (tile_vec_[i * tile_x_num_ + j])
+				tile_vec_[i * tile_x_num_ + j]->Render(hMemDC, _time);
 		}
 	}
 	// cout << "BitBlt cam_pose: (" << cam_pose.x << ", " << cam_pose.y << ")\n";

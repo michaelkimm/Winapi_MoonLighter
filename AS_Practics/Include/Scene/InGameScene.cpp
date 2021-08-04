@@ -3,7 +3,7 @@
 #include "..\Object\Player.h"
 #include "..\Object\Monster.h"
 #include "..\Core\SourceManager.h"
-#include "..\Core\CameraManager.h"
+// #include "..\Core\CameraManager.h"
 #include "..\Object\Stage.h"
 
 
