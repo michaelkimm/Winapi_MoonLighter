@@ -47,7 +47,7 @@ bool CSceneManager::Init()
 void CSceneManager::Input(float _time)
 {
 	// 순서 중요!
-	// pt_assist_scene_->Input(_time);
+	pt_assist_scene_->Input(_time);
 	// pt_scene_->Input(_time);
 }
 

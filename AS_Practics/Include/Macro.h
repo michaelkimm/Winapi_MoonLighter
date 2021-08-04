@@ -19,7 +19,9 @@
 #define WATER1 "water1"
 #define WATER2 "water2"
 #define SAND1 "sand1"
+#define EMPTY_WHITE_16 "empty_white_16"
 #define EMPTY_BLACK_16 "empty_black_16"
+#define EMPTY_BW_16 "empty_bw_16"
 #define SV_BEACH_SUMMER "SV_Beach_Summer"
 // <<
 

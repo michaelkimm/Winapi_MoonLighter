@@ -176,7 +176,6 @@
     <ClCompile Include="Object\MoveObj.cpp" />
     <ClCompile Include="Object\Object.cpp" />
     <ClCompile Include="Object\Player.cpp" />
-    <ClCompile Include="Object\Stage.cpp" />
     <ClCompile Include="Object\StaticObj.cpp" />
     <ClCompile Include="Object\Tile.cpp" />
     <ClCompile Include="Scene\AssistScene.cpp" />
@@ -208,7 +207,6 @@
     <ClInclude Include="Object\MoveObj.h" />
     <ClInclude Include="Object\Object.h" />
     <ClInclude Include="Object\Player.h" />
-    <ClInclude Include="Object\Stage.h" />
     <ClInclude Include="Object\StaticObj.h" />
     <ClInclude Include="Object\Tile.h" />
     <ClInclude Include="resource.h" />

@@ -14,6 +14,7 @@ CTexture::~CTexture()
 	// DeleteDC(hMemDC_);
 	// DeleteObject(hBitmap_);
 	// DeleteObject(hDoubleBufferImage_);
+	SAFE_DELETE(img_);
 }
 
 bool CTexture::SetTexture(HINSTANCE _hInst, HDC& _hdc, const wchar_t * _file_name, const string& _str_path_key, const COLORREF& _color_key)

@@ -5,6 +5,7 @@
 #include "..\Game.h"
 #include "..\Core\Ref.h"
 #include "..\Scene\Layer.h"
+#include "..\Core\Texture.h"
 
 class CObject
 	: public CRef
@@ -27,8 +28,7 @@ public:
 	void SetSize(int _x, int _y)		{ size_ = MY_SIZE(_x, _y); }
 	void SetPivot(MY_POSE& _pivot)		{ pivot_ = _pivot; }
 	bool SetTexture(class CTexture* _t);
-	bool SetTexture(const string& _texture_key, const wchar_t* _pFileName = NULL, const string& _str_path_key = TEXTURE_PATH,
-							const Color& _color_key = Color(255, 0, 255));
+	bool SetTexture(const string& _texture_key, const Color& _color_key = Color(255, 0, 255));
 
 	string GetTag() const { return str_tag_; }
 	MY_POSE GetPose() const { return pose_; }

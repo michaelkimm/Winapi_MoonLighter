@@ -28,6 +28,36 @@ bool CSourceManager::Init(HINSTANCE _hInst, HDC& _hdc)
 	// 백 버퍼를 불러온다.
 	back_buffer_ = LoadTexture("back_buffer", _T("back_white.bmp"));
 
+	CTexture* tmp_pt = LoadTexture(SV_BEACH_SUMMER, _T("SV_Beach_Summer.png"));
+	if (tmp_pt == NULL)
+		return false;
+	SAFE_RELEASE(tmp_pt);
+
+	tmp_pt = LoadTexture(WATER1, _T("water1.bmp"));
+	if (tmp_pt == NULL)
+		return false;
+	SAFE_RELEASE(tmp_pt);
+
+	tmp_pt = LoadTexture(WATER2, _T("water2.bmp"));
+	if (tmp_pt == NULL)
+		return false;
+	SAFE_RELEASE(tmp_pt);
+
+	tmp_pt = LoadTexture(EMPTY_WHITE_16, _T("empty_white_16.bmp"));
+	if (tmp_pt == NULL)
+		return false;
+	SAFE_RELEASE(tmp_pt);
+
+	tmp_pt = LoadTexture(EMPTY_BLACK_16, _T("empty_black_16.bmp"));
+	if (tmp_pt == NULL)
+		return false;
+	SAFE_RELEASE(tmp_pt);
+
+	tmp_pt = LoadTexture(EMPTY_BW_16, _T("empty_bw_16.bmp"));
+	if (tmp_pt == NULL)
+		return false;
+	SAFE_RELEASE(tmp_pt);
+
 	return true;
 }
 
@@ -40,13 +70,6 @@ class CTexture* CSourceManager::LoadTexture(const string& _texture_key, const wc
 		return _pt_texture;
 
 	_pt_texture = new CTexture();	// ref_cnt = 1;
-
-	//// 파일이 없는 경우
-	//if (!_pt_texture->SetTexture(hInst_, hdc_, _file_name, _str_path_key, _color_key))
-	//{
-	//	SAFE_RELEASE(_pt_texture)
-	//	return NULL;
-	//}
 
 	// 파일이 경로에 없는 경우
 	if (!_pt_texture->SetTextureImg(_file_name, _str_path_key, _color_key))

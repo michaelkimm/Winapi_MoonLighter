@@ -3,6 +3,7 @@
 #define CASSISTSCENE_H_
 
 #include "MapToolScene.h"
+#include "..\Object\Tile.h"
 
 class CAssistScene :
 	public CMapToolScene

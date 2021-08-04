@@ -14,10 +14,10 @@ bool CObject::SetTexture(CTexture * _t)
 	return true;
 }
 
-bool CObject::SetTexture(const string & _texture_key, const wchar_t * _pFileName, const string & _str_path_key, const Color& _color_key)
+bool CObject::SetTexture(const string & _texture_key, const Color& _color_key)
 {
 	SAFE_RELEASE(texture_);
-	texture_ = CSourceManager::Instance()->LoadTexture(_texture_key, _pFileName, _str_path_key);
+	texture_ = CSourceManager::Instance()->FindTexture(_texture_key);
 	if (texture_ == NULL) return false;
 
 	float world_w = texture_->GetWidth();

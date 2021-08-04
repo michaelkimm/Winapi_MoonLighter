@@ -10,7 +10,7 @@ class CTile :
 {
 private:
 	friend class CObject;
-	friend class CStage;
+	friend class CLayer;
 
 private:
 	MY_POSE idx_int_texture_;

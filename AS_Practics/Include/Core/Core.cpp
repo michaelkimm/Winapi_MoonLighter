@@ -16,7 +16,7 @@ CCore::CCore()
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	
 	// 메모리 릭 일어난 곳으로 이동 시켜주는 함수
-	// _CrtSetBreakAlloc(215);
+	// _CrtSetBreakAlloc(216);
 }
 CCore::~CCore()
 {
@@ -147,7 +147,7 @@ void CCore::Input(float _time)
 {
 	CInputManager::Instance()->KeyBoardInput(_time);
 	CInputManager::Instance()->MouseInput(_time);
-	// CSceneManager::Instance()->Input(_time);
+	CSceneManager::Instance()->Input(_time);
 }
 
 void CCore::Update(float _time)
@@ -174,7 +174,7 @@ void CCore::Render(float _time)
 	if (map_edit_mode_)
 	{
 		GetClientRect(ChildHwnd_[0], &map_edit_size);
-		cout << "map_edit_size: (" << map_edit_size.left << ", " << map_edit_size.top << ", " << map_edit_size.right << ", " << map_edit_size.bottom << ")\n";
+		// cout << "map_edit_size: (" << map_edit_size.left << ", " << map_edit_size.top << ", " << map_edit_size.right << ", " << map_edit_size.bottom << ")\n";
 		mx = map_edit_size.right + 5;
 		my = map_edit_size.top;
 	}
@@ -287,7 +287,7 @@ LRESULT CCore::TileSetProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		// 윈도우 핸들 Init
 		CSceneManager::Instance()->LoadHwnd(ASSIST_SCENE, hWnd);
 
-		// SetTimer(hWnd, 123, 20, NULL);
+		SetTimer(hWnd, 123, 1000, NULL);
 		// 윈도우 위치 데이터 업데이트 for Tf
 		/*RECT tmp_rect;
 		GetWindowRect(hWnd, &tmp_rect);
@@ -308,7 +308,8 @@ LRESULT CCore::TileSetProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		HDC hdc = BeginPaint(hWnd, &ps);
 
 		// 컨텐츠 그리기
-		CSceneManager::Instance()->pt_assist_scene_->Render(hdc, 0);
+		if (CSceneManager::Instance()->pt_assist_scene_)
+			CSceneManager::Instance()->pt_assist_scene_->Render(hdc, 0);
 
 		EndPaint(hWnd, &ps);
 	}
@@ -319,7 +320,7 @@ LRESULT CCore::TileSetProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		break;
 
 	case WM_DESTROY:
-		// KillTimer(hWnd ,123);
+		KillTimer(hWnd ,123);
 		PostQuitMessage(0);
 		break;
 
