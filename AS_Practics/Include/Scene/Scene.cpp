@@ -17,6 +17,7 @@ CScene::~CScene()
 {
 	// 레이어를 전부 동적할당 해제 및 리스트 클리어
 	SafeDeleteList(layer_list_);
+	SAFE_DELETE(camera_);
 }
 
 bool CScene::Init(HWND _hWnd)

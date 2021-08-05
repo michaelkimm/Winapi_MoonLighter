@@ -7,6 +7,7 @@ enum SCENE_CREATE
 {
 	SC_CURRENT,
 	SC_NEXT,
+	SC_MAP_EDIT,
 	SC_ASSIST
 };
 

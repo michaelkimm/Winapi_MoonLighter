@@ -28,6 +28,36 @@ bool CSourceManager::Init(HINSTANCE _hInst, HDC& _hdc)
 	// 백 버퍼를 불러온다.
 	back_buffer_ = LoadTexture("back_buffer", _T("back_white.bmp"));
 
+	CTexture* tmp_pt = LoadTexture(SV_BEACH_SUMMER, _T("SV_Beach_Summer_32_pink.bmp"));
+	if (tmp_pt == NULL)
+		return false;
+	SAFE_RELEASE(tmp_pt);
+
+	tmp_pt = LoadTexture(WATER1, _T("water1_32.bmp"));
+	if (tmp_pt == NULL)
+		return false;
+	SAFE_RELEASE(tmp_pt);
+
+	tmp_pt = LoadTexture(WATER2, _T("water2_32.bmp"));
+	if (tmp_pt == NULL)
+		return false;
+	SAFE_RELEASE(tmp_pt);
+
+	tmp_pt = LoadTexture(EMPTY_WHITE_16, _T("empty_white_32.bmp"));
+	if (tmp_pt == NULL)
+		return false;
+	SAFE_RELEASE(tmp_pt);
+
+	tmp_pt = LoadTexture(EMPTY_BLACK_16, _T("empty_black_32.bmp"));
+	if (tmp_pt == NULL)
+		return false;
+	SAFE_RELEASE(tmp_pt);
+
+	tmp_pt = LoadTexture(EMPTY_BW_16, _T("empty_bw_32.bmp"));
+	if (tmp_pt == NULL)
+		return false;
+	SAFE_RELEASE(tmp_pt);
+
 	return true;
 }
 

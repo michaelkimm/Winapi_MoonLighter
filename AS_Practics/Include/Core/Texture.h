@@ -10,20 +10,15 @@ class CTexture :
 {
 	friend class CSourceManager;
 private:
-	Image* img_;
-	ImageAttributes imgAttr_;
 	int w_;
 	int h_;
 
 public:
-	Image*			GetImg() const { return img_; }
-	// ImageAttributes GetImgAttr() const	{ return imgAttr_; }
 	int				GetWidth() const { return w_; }
 	int				GetHeight() const { return h_; }
-	HDC				GetDC() const { return hMemDC_; }
-	HDC hMemDC_;
 
 private:
+	HDC hMemDC_;
 	HINSTANCE hInst_;
 	HBITMAP hBitmap_;
 	BITMAP bitmap_;
@@ -34,15 +29,13 @@ private:
 public:
 	void		SetColorKey(COLORREF _color_key)	{ color_key = _color_key; }
 	COLORREF	GetColorKey() const					{ return color_key; }
+	HDC			GetDC() const { return hMemDC_; }
 
 private:
 	CTexture();
 	~CTexture();	
 
 public:
-	
-
-
 	bool SetTexture(HINSTANCE _hInst, HDC& _hdc, const wchar_t* _file_name, const string& _str_path_key = TEXTURE_PATH,
 							const COLORREF& _color_key = RGB(255, 0, 255));
 	void Render(HDC _hdc, float _time);

@@ -159,7 +159,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core\Camera.cpp" />
-    <ClCompile Include="Core\CameraManager.cpp" />
     <ClCompile Include="Core\InputManager.cpp" />
     <ClCompile Include="Core\SourceManager.cpp" />
     <ClCompile Include="Core\Core.cpp" />
@@ -169,12 +168,10 @@
     <ClCompile Include="Core\TfManager.cpp" />
     <ClCompile Include="Core\Timer.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MyFunc\MyGdiplus.cpp" />
     <ClCompile Include="Object\Monster.cpp" />
     <ClCompile Include="Object\MoveObj.cpp" />
     <ClCompile Include="Object\Object.cpp" />
     <ClCompile Include="Object\Player.cpp" />
-    <ClCompile Include="Object\Stage.cpp" />
     <ClCompile Include="Object\StaticObj.cpp" />
     <ClCompile Include="Object\Tile.cpp" />
     <ClCompile Include="Scene\AssistScene.cpp" />
@@ -187,7 +184,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Camera.h" />
-    <ClInclude Include="Core\CameraManager.h" />
     <ClInclude Include="Core\InputManager.h" />
     <ClInclude Include="Core\SourceManager.h" />
     <ClInclude Include="Core\Core.h" />
@@ -199,12 +195,10 @@
     <ClInclude Include="Flag.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Macro.h" />
-    <ClInclude Include="MyFunc\MyGdiplus.h" />
     <ClInclude Include="Object\Monster.h" />
     <ClInclude Include="Object\MoveObj.h" />
     <ClInclude Include="Object\Object.h" />
     <ClInclude Include="Object\Player.h" />
-    <ClInclude Include="Object\Stage.h" />
     <ClInclude Include="Object\StaticObj.h" />
     <ClInclude Include="Object\Tile.h" />
     <ClInclude Include="resource.h" />

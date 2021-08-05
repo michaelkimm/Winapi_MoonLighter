@@ -17,6 +17,7 @@ private:
 
 public:
 	// 보조 화면 저장 공간
+	class CScene* pt_map_edit_scene_;
 	class CScene* pt_assist_scene_;
 
 private:
@@ -54,6 +55,10 @@ public:
 		case SC_NEXT:
 			SAFE_DELETE(pt_next_scene_);
 			pt_next_scene_ = pt_tmp_scene;
+			break;
+		case SC_MAP_EDIT:
+			SAFE_DELETE(pt_map_edit_scene_);
+			pt_map_edit_scene_ = pt_tmp_scene;
 			break;
 		case SC_ASSIST:
 			SAFE_DELETE(pt_assist_scene_);

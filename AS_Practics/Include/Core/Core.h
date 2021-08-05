@@ -56,6 +56,7 @@ public:
 private:
 	HWND ChildHwnd_[2];
 	static LRESULT CALLBACK TileSetProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK MapEditProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 };
 
 #endif // !CCORE_H_

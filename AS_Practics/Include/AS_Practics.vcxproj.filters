@@ -96,17 +96,8 @@
     <ClCompile Include="Core\Texture.cpp">
       <Filter>Core\Source</Filter>
     </ClCompile>
-    <ClCompile Include="MyFunc\MyGdiplus.cpp">
-      <Filter>MyFunc</Filter>
-    </ClCompile>
-    <ClCompile Include="Object\Stage.cpp">
-      <Filter>Object\StaticObject</Filter>
-    </ClCompile>
     <ClCompile Include="Object\Tile.cpp">
       <Filter>Object\StaticObject</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\CameraManager.cpp">
-      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\InputManager.cpp">
       <Filter>Core</Filter>
@@ -188,17 +179,8 @@
     <ClInclude Include="Core\Texture.h">
       <Filter>Core\Source</Filter>
     </ClInclude>
-    <ClInclude Include="MyFunc\MyGdiplus.h">
-      <Filter>MyFunc</Filter>
-    </ClInclude>
-    <ClInclude Include="Object\Stage.h">
-      <Filter>Object\StaticObject</Filter>
-    </ClInclude>
     <ClInclude Include="Object\Tile.h">
       <Filter>Object\StaticObject</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\CameraManager.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Core\InputManager.h">
       <Filter>Core</Filter>

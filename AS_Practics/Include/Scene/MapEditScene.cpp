@@ -4,27 +4,28 @@
 #include "..\Object\Object.h"
 #include "..\Object\Player.h"
 #include "..\Object\Monster.h"
-#include "..\Object\Stage.h"
+#include "..\Object\Tile.h"
 #include "..\Core\Core.h"
 #include "..\Core\SourceManager.h"
-#include "..\Core\CameraManager.h"
 #include "..\Core\InputManager.h"
 
 // 정적 변수 초기화
 int CMapEditScene::rect_num_x_ = 0;
 int CMapEditScene::rect_num_y_ = 0;
-vector<class CTile*> CMapEditScene::rect_tile_vec_;\
+vector<class CTile*> CMapEditScene::rect_tile_vec_;
 
 void CMapEditScene::AddTile(class CTile* _t)
 {
 	// 포인터 생성으로 인해 추가
 	_t->AddRef();
 
-	// push_back으로 추가
-	_t->AddRef();
-	rect_tile_vec_.push_back(_t);
+	// Clone은 자동 참조 카운트 추가
+	CTile* tmp_tile = _t->Clone();
 
-	SAFE_RELEASE(_t);
+	// push_back으로 추가
+	tmp_tile->AddRef();
+	rect_tile_vec_.push_back(tmp_tile);
+	SAFE_RELEASE(tmp_tile)
 }
 
 void CMapEditScene::ClearTile()
@@ -55,18 +56,21 @@ bool CMapEditScene::Init(HWND _hWnd)
 	CLayer* pt_layer = FindLayer("Background");
 	if (pt_layer == nullptr) return false;
 
-	// CStage 클래스 오브젝트를 생성해서 pt_layer에 넣는다. 태그 = "stage" 
-	CStage* pt_stage = CObject::CreateObj<CStage>("stage", pt_layer);
+	int tile_x_num_ = 50;
+	int tile_y_num_ = 50;
+	int tile_width_ = TEXTURE_SIZE;
+	int tile_height_ = TEXTURE_SIZE;
+	string texture_key = WATER1;
 
-	if (!pt_stage->CreateTile(pose_, 100, 100, 16, 16, WATER1, _T("water1.bmp"), TEXTURE_PATH))
-	{
-		SAFE_RELEASE(pt_stage);
-		return false;
-	}
+	// 월드 사이즈 설정
+	world_size_.x = tile_width_ * tile_x_num_;
+	world_size_.y = tile_height_ * tile_y_num_;
+	/*SetWindowPos(hWnd_, HWND_TOPMOST, 100, 100, 300, 300, SWP_NOMOVE | SWP_NOZORDER);
+	ShowWindow(hWnd_, SW_SHOW);
+	UpdateWindow(hWnd_);*/
 
-	// 배경 사이즈 정해질 때 카메라 내 월드 사이즈도 설정
-	MY_SIZE stage_size = pt_stage->GetSize();
-	SetWorldSize(stage_size);
+	// 레이어 내 크기, 갯수, 텍스처 종류로 타일 생성
+	pt_layer->CreateTile(pose_, tile_x_num_, tile_y_num_, tile_width_, tile_height_, texture_key, _T("water1.bmp"), TEXTURE_PATH);
 
 	// 씬의 카메라 초기화
 	hWnd_ = _hWnd;
@@ -76,9 +80,6 @@ bool CMapEditScene::Init(HWND _hWnd)
 
 	// main 화면 기준 위치, 월드 사이즈 & 씬 사이즈 & 속도 초기화
 	camera_->Init(MY_POSE(0.f, 0.f), wnd_size_, world_size_, 500.f);
-
-	SAFE_RELEASE(pt_stage);
-
 
 	// ---------------------------------------------------------------------- : <<
 
@@ -91,8 +92,6 @@ void CMapEditScene::Input(float _time)
 {
 	CScene::Input(_time);
 	// CCameraManager::Instance()->Input(_time);
-
-	cout << "rect_num_x_, rect_num_y_: (" << rect_num_x_ << ", " << rect_num_y_ << ")\n";
 
 	// 마우스 위치가 Assist 씬 위일 경우만 실행
 	if (CInputManager::Instance()->GetHwnd() != hWnd_)
@@ -127,7 +126,7 @@ void CMapEditScene::Input(float _time)
 	//--------------------------------------------------------------------------------------------//
 
 	// 1. mouse_down_pose_ 위치 조정 (전체 타일 집합에 맞게) 
-	MY_POSE tmp_mouse_pose = mouse_pos / 16;
+	MY_POSE tmp_mouse_pose = mouse_pos / TEXTURE_SIZE;
 	int tmp_mouse_pose_x_idx = floor(tmp_mouse_pose.x);
 	int tmp_mouse_pose_y_idx = floor(tmp_mouse_pose.y);
 
@@ -137,15 +136,15 @@ void CMapEditScene::Input(float _time)
 	if (pt_layer2 == nullptr) return;
 
 	// 해당 레이어에서 "stage" 오브젝트를 가져와 타일 집합의 x, y 방향 갯수를 알아낸다.
-	CStage* pt_stage2 = pt_layer2->FindObj<CStage>("stage");
+	/*CStage* pt_stage2 = pt_layer2->FindObj<CStage>("stage");
 	if (pt_stage2 == nullptr)
 	{
 		SAFE_RELEASE(pt_stage2);
 		return;
-	}
+	}*/
 
-	int tileset_x_length = pt_stage2->GetTileXNum();
-	int tileset_y_length = pt_stage2->GetTileYNum();
+	int tileset_x_length = pt_layer2->GetTileXNum();
+	int tileset_y_length = pt_layer2->GetTileYNum();
 	if (tileset_x_length < tmp_mouse_pose_x_idx + rect_num_x)
 	{
 		rect_num_x = tileset_x_length - tmp_mouse_pose_x_idx;
@@ -157,7 +156,7 @@ void CMapEditScene::Input(float _time)
 
 	if (rect_num_x <= 0 || rect_num_y <= 0)
 	{
-		SAFE_RELEASE(pt_stage2);
+		// SAFE_RELEASE(pt_stage2);
 		return;
 	}
 
@@ -175,14 +174,14 @@ void CMapEditScene::Input(float _time)
 	CLayer* pt_layer = FindLayer("Assist_scene_mouse_rect");
 	if (pt_layer == NULL)
 	{
-		SAFE_RELEASE(pt_stage2);
+		// SAFE_RELEASE(pt_stage2);
 		return;
 	}
 
 	// 레이어에 오브젝트 있으면 삭제
 	pt_layer->Clear();
 
-	CStage* pt_stage = CObject::CreateObj<CStage>("Assist_scene_mouse_rect", pt_layer);
+	// CStage* pt_stage = CObject::CreateObj<CStage>("Assist_scene_mouse_rect", pt_layer);
 
 
 	//// 마우스 처음 다운된 곳 보다 현재 마우스 위치가 작다면 혹은 화면상 높은 경우의 수 제외
@@ -194,21 +193,23 @@ void CMapEditScene::Input(float _time)
 
 	// : >> 값 조정
 	// 1. mouse_down_pose_ 위치 조정 (전체 타일 집합에 맞게) 
-	mouse_pos /= 16;
+	mouse_pos += camera_->GetPose();
+	mouse_pos /= TEXTURE_SIZE;
 	int mouse_pose_x_idx = floor(mouse_pos.x);
 	int mouse_pose_y_idx = floor(mouse_pos.y);
 	mouse_pos.x = mouse_pose_x_idx;
 	mouse_pos.y = mouse_pose_y_idx;
-	mouse_pos *= 16;
+	mouse_pos *= TEXTURE_SIZE;
+	
 
 	// <<
 
 	// 타일 생성
 	// 실패 시, 리턴
-	if (!pt_stage->CreateTile(mouse_pos, rect_num_x, rect_num_y, 16, 16, EMPTY_BLACK_16, _T("empty_b&w_16.bmp"), TEXTURE_PATH))
+	if (!pt_layer->CreateTile(mouse_pos, rect_num_x, rect_num_y, TEXTURE_SIZE, TEXTURE_SIZE, EMPTY_BW_16, _T("empty_bw_16.bmp"), TEXTURE_PATH))
 	{
-		SAFE_RELEASE(pt_stage);
-		SAFE_RELEASE(pt_stage2);
+		// SAFE_RELEASE(pt_stage);
+		// SAFE_RELEASE(pt_stage2);
 		return;
 	}
 
@@ -220,12 +221,14 @@ void CMapEditScene::Input(float _time)
 
 	//--------------------------------------------------------------------------------------------//
 
+	// return;
+
 	// 마우스가 눌려진게 아니면 업데이트할 필요 없음!
 	if (!CInputManager::Instance()->GetMouseLeftDown())
 	{
 		cout << "\nhaha4\n";
-		SAFE_RELEASE(pt_stage);
-		SAFE_RELEASE(pt_stage2);
+		// SAFE_RELEASE(pt_stage);
+		// SAFE_RELEASE(pt_stage2);
 		return;
 	}
 	cout << "\nhaha5\n";
@@ -239,7 +242,15 @@ void CMapEditScene::Input(float _time)
 			int idx = init_i + tileset_x_length * i;
 			idx += j;
 			cout << "idx : " << idx << endl;
-			pt_stage2->ChangeTile(idx, rect_tile_vec_[cnt++]);
+
+			// int w = rect_tile_vec_[cnt]->GetWidth();
+			// Clone은 자동 참조 카운트 추가
+			CTile* tmp_tile = rect_tile_vec_[cnt++]->Clone();
+			tmp_tile->SetPose(mouse_pos.x + j * TEXTURE_SIZE, mouse_pos.y + i * TEXTURE_SIZE);
+
+			pt_layer2->AddObj(tmp_tile);
+			
+			// pt_stage2->ChangeTile(idx, rect_tile_vec_[cnt++]);
 			cout << "idx haha : " << idx << endl;
 		}
 	}
@@ -252,8 +263,8 @@ void CMapEditScene::Input(float _time)
 
 	//--------------------------------------------------------------------------------------------//
 
-	SAFE_RELEASE(pt_stage);
-	SAFE_RELEASE(pt_stage2);
+	// SAFE_RELEASE(pt_stage);
+	// SAFE_RELEASE(pt_stage2);
 }
 
 void CMapEditScene::Update(float _time)

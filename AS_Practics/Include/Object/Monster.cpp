@@ -1,4 +1,4 @@
-#include "Monster.h"
+	#include "Monster.h"
 #include "..\Core\Core.h"
 
 CMonster::CMonster()	:
