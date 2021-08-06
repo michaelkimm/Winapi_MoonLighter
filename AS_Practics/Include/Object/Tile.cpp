@@ -1,6 +1,7 @@
 #include "Tile.h"
 #include "StaticObj.h"
 #include "..\Core\Texture.h"
+#include "..\Core\Core.h"
 
 CTile::CTile()	:
 	option_(TILE_NONE)
@@ -59,6 +60,12 @@ void CTile::Render(HDC _hdc, float _time)
 		int y = tmp_pose.y;
 
 		// BitBlt(_hdc, pose_.x, pose_.y, size_.x, size_.y, texture_->GetDC(), 0, 0, SRCCOPY);
+
+		if (pose_in_cam.x >= CCore::Instance()->GetResolution().w || pose_in_cam.x + size_.x <= 0)
+			return;
+		else if (pose_in_cam.y >= CCore::Instance()->GetResolution().h || pose_in_cam.y + size_.y <= 0)
+			return;
+
 		TransparentBlt(_hdc, pose_in_cam.x, pose_in_cam.y, size_.x, size_.y, texture_->GetDC(), x, y, size_.x, size_.y, texture_->GetColorKey());
 		// 오브젝트의 카메라 상에서 위치 = 스테이지 위치 - 윈도우 위치
 

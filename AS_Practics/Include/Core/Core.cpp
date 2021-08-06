@@ -6,6 +6,8 @@
 #include "Texture.h"
 #include "InputManager.h"
 #include "TfManager.h"
+#include "..\Scene\MapEditScene.h"
+#include "..\Scene\AssistScene.h"
 
 DEFINE_SINGLETON(CCore)
 bool CCore::loop_ = true;
@@ -164,10 +166,10 @@ void CCore::Render(float _time)
 	int my = 0;
 	if (map_edit_mode_)
 	{
-		GetClientRect(ChildHwnd_[0], &map_edit_size);
-		//cout << "map_edit_size: (" << map_edit_size.left << ", " << map_edit_size.top << ", " << map_edit_size.right << ", " << map_edit_size.bottom << ")\n";
-		mx = map_edit_size.right + 5;
-		my = map_edit_size.top;
+		// GetClientRect(ChildHwnd_[0], &map_edit_size);
+		// cout << "map_edit_size: (" << map_edit_size.left << ", " << map_edit_size.top << ", " << map_edit_size.right << ", " << map_edit_size.bottom << ")\n";
+		// mx = map_edit_size.right + 5;
+		// my = map_edit_size.top;
 	}
 	// 더블 버퍼링
 	
@@ -200,18 +202,25 @@ ATOM CCore::MyRegisterClass()
 	wcex_.hCursor = LoadCursor(nullptr, IDC_ARROW);
 	wcex_.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 	wcex_.lpszMenuName = MAKEINTRESOURCEW(IDI_ICON1);
+	wcex_.lpszMenuName = MAKEINTRESOURCEW(IDR_MENU2);
 	wcex_.lpszClassName = L"AS21prac";
 	wcex_.hIconSm = LoadIcon(wcex_.hInstance, MAKEINTRESOURCE(IDI_ICON1));
 	RegisterClassExW(&wcex_);
 
-	wcex_.lpfnWndProc = TileSetProc;
-	wcex_.lpszMenuName = NULL;
-	wcex_.lpszClassName = L"TileSet";
+	wcex_.lpfnWndProc = ChildWndProc;
+	// wcex_.lpszMenuName = NULL;
+	wcex_.lpszMenuName = MAKEINTRESOURCEW(IDR_MAP_TOOL);
+	wcex_.lpszClassName = _T("Child Window");
 	RegisterClassExW(&wcex_);
-	
+
 	wcex_.lpfnWndProc = MapEditProc;
 	wcex_.lpszMenuName = NULL;
-	wcex_.lpszClassName = L"MapEdit";
+	wcex_.lpszClassName = _T("MapEdit Window");
+	RegisterClassExW(&wcex_);
+
+	wcex_.lpfnWndProc = TileSetProc;
+	wcex_.lpszMenuName = NULL;
+	wcex_.lpszClassName = _T("TileSet Window");
 	RegisterClassExW(&wcex_);
 
 	return NULL;
@@ -283,36 +292,6 @@ BOOL CCore::Create()
 		NULL
 	);*/
 
-	ChildHwnd_[0] = CreateWindowEx(
-		WS_EX_CLIENTEDGE,
-		_T("MapEdit"),
-		NULL,
-		WS_CHILD | WS_VISIBLE,
-		0,
-		0,
-		rectView.right - size_x,
-		size_y,
-		hWnd_,
-		NULL,
-		hInst_,
-		NULL
-	);
-
-	ChildHwnd_[1] = CreateWindowEx(
-		WS_EX_CLIENTEDGE,
-		_T("TileSet"),
-		NULL,
-		WS_CHILD | WS_VISIBLE,
-		rectView.right - size_x + dx,
-		0,
-		size_x - dx,
-		size_y,
-		hWnd_,
-		NULL,
-		hInst_,
-		NULL
-	);
-
 	CTfManager::Instance()->LoadTf("TileSetProc", MY_POSE{ rectView.right - size_x + dx, 0.f });
 
 	return TRUE;
@@ -320,27 +299,67 @@ BOOL CCore::Create()
 
 LRESULT CCore::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	static RECT	rect_view;
+	static HWND hwndClient;
+	CLIENTCREATESTRUCT clientcreate;
+	MDICREATESTRUCT mdicreate;
+	HWND hwndChild;
+
+	int dx = 0;
+	float size_coef = 1;
+	float size_x = 0;
+	float size_y = 0;
+	MY_SIZE tmp_rect(0.f, 0.f);
+
 	switch (message)
 	{
 	case WM_CREATE:
 		// 윈도우 핸들 Init
+		GetClientRect(hWnd, &rect_view);
+
+		// 크기 조절하려고 tmp_rect 만들었지만, 무슨 이유에선지 안됌.
+		tmp_rect = MY_SIZE(rect_view.right - rect_view.left, rect_view.bottom - rect_view.top);
+		tmp_rect *= size_coef;
+
 		CSceneManager::Instance()->LoadHwnd(INGAME_SCENE, hWnd);
 
-		//// 윈도우 위치 데이터 업데이트 for Tf
-		//RECT tmp_rect;
-		//GetWindowRect(hWnd, &tmp_rect);
+		clientcreate.hWindowMenu = GetSubMenu(GetMenu(hWnd), 0);
+		clientcreate.idFirstChild = 100;
+		hwndClient = CreateWindow(
+			_T("MDICLIENT"),
+			NULL,
+			WS_CHILD | WS_CLIPCHILDREN | WS_VISIBLE,
+			0, 0, rect_view.right, rect_view.bottom + 100,
+			hWnd,
+			NULL,
+			CCore::Instance()->GetHInstance(),
+			(LPSTR)&clientcreate);
 
-		//POINT tmp_point;
-		//tmp_point = POINT{ tmp_rect.left, tmp_rect.top };
-		//ScreenToClient(hWnd, &tmp_point);
-		//cout << "tmp_point: (" << tmp_point.x << ", " << tmp_point.y << ")\n";
-
-		//CTfManager::Instance()->LoadTf("WndProc", MY_POSE(tmp_rect.left, tmp_rect.top));
+		ShowWindow(hwndClient, SW_SHOW);
 
 		break;
 
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case ID_FILENEW:
+			mdicreate.szClass = _T("Child Window");
+			mdicreate.szTitle = _T("Child Window");
+			mdicreate.hOwner = CCore::Instance()->GetHInstance();
+			mdicreate.x = 0;
+			mdicreate.y = 0;
+			mdicreate.cx = rect_view.right;
+			mdicreate.cy = rect_view.bottom; //  (int)tmp_rect.y;
+			mdicreate.style = 0;
+			mdicreate.lParam = 0;
+			hwndChild = (HWND)SendMessage(hwndClient, WM_MDICREATE, 0, (LPARAM)(LPMDICREATESTRUCT)&mdicreate);
+			// cout << "bb\n"; 
+			return 0;
+		}
+		break;
+
 	case WM_MOUSEMOVE:
-		CInputManager::Instance()->SetHwnd(hWnd);
+		// CInputManager::Instance()->SetHwnd(hWnd);
 		break;
 
 	case WM_PAINT:
@@ -363,34 +382,63 @@ LRESULT CCore::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 
-
-LRESULT CCore::TileSetProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CCore::ChildWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	static RECT rectView;
+	static RECT rect_view;
+	HWND tmp_hwnd;
+
+	int dx = 1;
+	float size_coef = 0.35;
+	float size_x = 0;
+	float size_y = 0;
 
 	switch (message)
 	{
 	case WM_CREATE:
 		// 윈도우 핸들 Init
-		CSceneManager::Instance()->LoadHwnd(ASSIST_SCENE, hWnd);
+		// CSceneManager::Instance()->LoadHwnd(MAP_EDIT_SCENE, hWnd);
 
-		GetClientRect(hWnd, &rectView);
+		GetClientRect(hWnd, &rect_view);
 
-		SetTimer(hWnd, 123, 100, NULL);
-		// 윈도우 위치 데이터 업데이트 for Tf
-		/*RECT tmp_rect;
-		GetWindowRect(hWnd, &tmp_rect);
+		// SetTimer(hWnd, 124, 100, NULL);
+		tmp_hwnd = CreateWindowEx(
+			WS_EX_CLIENTEDGE,
+			_T("MapEdit Window"),
+			NULL,
+			WS_CHILD | WS_VISIBLE,
+			0,
+			0,
+			rect_view.right - rect_view.right * size_coef, // rect_view.right * size_coef,
+			rect_view.bottom,
+			hWnd,
+			NULL,
+			CCore::Instance()->GetHInstance(),
+			NULL
+		);
+		CCore::Instance()->SetChildHwnd(0, tmp_hwnd);
 
-		POINT tmp_point;
-		tmp_point = POINT{ tmp_rect.left, tmp_rect.top };
-		ScreenToClient(hWnd, &tmp_point);
-		cout << "tmp_point: (" << tmp_point.x << ", " << tmp_point.y << ")\n";*/
+		tmp_hwnd = CreateWindowEx(
+			WS_EX_CLIENTEDGE,
+			_T("TileSet Window"),
+			NULL,
+			WS_CHILD | WS_VISIBLE,
+			rect_view.right - rect_view.right * size_coef + dx,
+			0,
+			rect_view.right,
+			rect_view.bottom,
+			hWnd,
+			NULL,
+			CCore::Instance()->GetHInstance(),
+			NULL
+		);
+		CCore::Instance()->SetChildHwnd(1, tmp_hwnd);
 
-		// CTfManager::Instance()->LoadTf("TileSetProc", MY_POSE(tmp_rect.left, tmp_rect.top));
 		break;
+
 	case WM_SIZE:
-		GetClientRect(hWnd, &rectView);
+		GetClientRect(hWnd, &rect_view);
 		break;
+
 	case WM_TIMER:
 		InvalidateRect(hWnd, NULL, false);
 		break;
@@ -400,24 +448,6 @@ LRESULT CCore::TileSetProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(hWnd, &ps);
 
-		// 더블 버퍼링 준비
-		HDC hMemDC = CreateCompatibleDC(hdc);
-		HBITMAP hDoubleBufferBitmap = CreateCompatibleBitmap(hdc, rectView.right, rectView.bottom);
-		HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, hDoubleBufferBitmap);
-		Rectangle(hMemDC, 0, 0, 2000, 2000);
-
-
-		// 컨텐츠 그리기
-		if (CSceneManager::Instance()->pt_assist_scene_)
-			CSceneManager::Instance()->pt_assist_scene_->Render(hMemDC, 0);
-		BitBlt(hdc, 0, 0, 2000, 2000, hMemDC, 0, 0, SRCCOPY);
-
-
-		// DC 삭제
-		SelectObject(hMemDC, hOldBitmap);
-		DeleteDC(hMemDC);
-		DeleteObject(hDoubleBufferBitmap);
-
 		EndPaint(hWnd, &ps);
 	}
 	break;
@@ -427,7 +457,7 @@ LRESULT CCore::TileSetProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		break;
 
 	case WM_DESTROY:
-		KillTimer(hWnd ,123);
+		// KillTimer(hWnd, 124);
 		PostQuitMessage(0);
 		break;
 
@@ -436,6 +466,7 @@ LRESULT CCore::TileSetProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 	}
 	return 0;
 }
+
 
 LRESULT CCore::MapEditProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -446,20 +477,12 @@ LRESULT CCore::MapEditProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 	case WM_CREATE:
 		// 윈도우 핸들 Init
 		CSceneManager::Instance()->LoadHwnd(MAP_EDIT_SCENE, hWnd);
+		CSceneManager::Instance()->CreateScene<CMapEditScene>(SC_MAP_EDIT, hWnd);
 
 		GetClientRect(hWnd, &rectView);
 
 		SetTimer(hWnd, 124, 100, NULL);
-		// 윈도우 위치 데이터 업데이트 for Tf
-		/*RECT tmp_rect;
-		GetWindowRect(hWnd, &tmp_rect);
 
-		POINT tmp_point;
-		tmp_point = POINT{ tmp_rect.left, tmp_rect.top };
-		ScreenToClient(hWnd, &tmp_point);
-		cout << "tmp_point: (" << tmp_point.x << ", " << tmp_point.y << ")\n";*/
-
-		// CTfManager::Instance()->LoadTf("TileSetProc", MY_POSE(tmp_rect.left, tmp_rect.top));
 		break;
 
 	case WM_SIZE:
@@ -503,6 +526,73 @@ LRESULT CCore::MapEditProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 	case WM_DESTROY:
 		KillTimer(hWnd, 124);
+		PostQuitMessage(0);
+		break;
+
+	default:
+		return DefWindowProc(hWnd, message, wParam, lParam);
+	}
+	return 0;
+}
+
+
+LRESULT CCore::TileSetProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	static RECT rectView;
+
+	switch (message)
+	{
+	case WM_CREATE:
+		// 윈도우 핸들 Init
+		CSceneManager::Instance()->LoadHwnd(ASSIST_SCENE, hWnd);
+		CSceneManager::Instance()->CreateScene<CAssistScene>(SC_ASSIST, hWnd);
+
+
+		GetClientRect(hWnd, &rectView);
+
+		SetTimer(hWnd, 123, 100, NULL);
+		
+		break;
+	case WM_SIZE:
+		GetClientRect(hWnd, &rectView);
+		break;
+	case WM_TIMER:
+		InvalidateRect(hWnd, NULL, false);
+		break;
+
+	case WM_PAINT:
+	{
+		PAINTSTRUCT ps;
+		HDC hdc = BeginPaint(hWnd, &ps);
+
+		// 더블 버퍼링 준비
+		HDC hMemDC = CreateCompatibleDC(hdc);
+		HBITMAP hDoubleBufferBitmap = CreateCompatibleBitmap(hdc, rectView.right, rectView.bottom);
+		HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, hDoubleBufferBitmap);
+		Rectangle(hMemDC, 0, 0, 2000, 2000);
+
+
+		// 컨텐츠 그리기
+		if (CSceneManager::Instance()->pt_assist_scene_)
+			CSceneManager::Instance()->pt_assist_scene_->Render(hMemDC, 0);
+		BitBlt(hdc, 0, 0, 2000, 2000, hMemDC, 0, 0, SRCCOPY);
+
+
+		// DC 삭제
+		SelectObject(hMemDC, hOldBitmap);
+		DeleteDC(hMemDC);
+		DeleteObject(hDoubleBufferBitmap);
+
+		EndPaint(hWnd, &ps);
+	}
+	break;
+
+	case WM_MOUSEMOVE:
+		CInputManager::Instance()->SetHwnd(hWnd);
+		break;
+
+	case WM_DESTROY:
+		KillTimer(hWnd ,123);
 		PostQuitMessage(0);
 		break;
 

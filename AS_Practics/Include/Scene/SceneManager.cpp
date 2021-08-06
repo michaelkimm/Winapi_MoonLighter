@@ -6,7 +6,7 @@
 DEFINE_SINGLETON(CSceneManager)
 
 CSceneManager::CSceneManager()
-	: pt_scene_(NULL)
+	: pt_scene_(NULL), pt_next_scene_(NULL), pt_assist_scene_(NULL)
 {
 
 }
@@ -39,16 +39,17 @@ bool CSceneManager::Init()
 {
 	// CInGameScene 타입으로 현재 씬을 만든다.
 	// CreateScene<CInGameScene>(SC_CURRENT);
-	CreateScene<CMapEditScene>(SC_MAP_EDIT, hwnd_map_[MAP_EDIT_SCENE]);
-	CreateScene<CAssistScene>(SC_ASSIST, hwnd_map_[ASSIST_SCENE]);
+	
 	return true;
 }
 
 void CSceneManager::Input(float _time)
 {
 	// 순서 중요!
-	pt_assist_scene_->Input(_time);
-	pt_map_edit_scene_->Input(_time);
+	if (pt_assist_scene_)
+		pt_assist_scene_->Input(_time);
+	if (pt_map_edit_scene_)
+		pt_map_edit_scene_->Input(_time);
 	// pt_scene_->Input(_time);
 }
 

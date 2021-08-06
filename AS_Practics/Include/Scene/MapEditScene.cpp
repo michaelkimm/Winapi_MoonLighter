@@ -90,6 +90,8 @@ bool CMapEditScene::Init(HWND _hWnd)
 
 void CMapEditScene::Input(float _time)
 {
+	cout << "11\n";
+
 	CScene::Input(_time);
 	// CCameraManager::Instance()->Input(_time);
 
@@ -117,6 +119,7 @@ void CMapEditScene::Input(float _time)
 	int rect_num_x = rect_num_x_;
 	int rect_num_y = rect_num_y_;
 
+	cout << "22\n";
 
 
 	//--------------------------------------------------------------------------------------------//
@@ -160,6 +163,7 @@ void CMapEditScene::Input(float _time)
 		return;
 	}
 
+	cout << "33\n";
 
 	//--------------------------------------------------------------------------------------------//
 
@@ -213,7 +217,7 @@ void CMapEditScene::Input(float _time)
 		return;
 	}
 
-
+	cout << "44\n";
 
 	//--------------------------------------------------------------------------------------------//
 
@@ -256,6 +260,8 @@ void CMapEditScene::Input(float _time)
 	}
 	cout << endl << endl;
 	 // <<
+
+	cout << "55\n";
 
 	//--------------------------------------------------------------------------------------------//
 

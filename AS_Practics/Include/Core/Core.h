@@ -54,9 +54,14 @@ public:
 	bool GetMapEditMode() const { return map_edit_mode_; }
 
 private:
-	HWND ChildHwnd_[2];
-	static LRESULT CALLBACK TileSetProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-	static LRESULT CALLBACK MapEditProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+	HWND child_hwnd[2];
+public:
+	void SetChildHwnd(int _idx, HWND _h) { child_hwnd[_idx] = _h; }
+
+private:
+	static LRESULT CALLBACK ChildWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK MapEditProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK TileSetProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 };
 
 #endif // !CCORE_H_
