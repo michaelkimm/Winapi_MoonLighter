@@ -13,6 +13,8 @@
 #define MAP_EDIT_SCENE "MapEditScene"
 #define INGAME_SCENE "InGameScene"
 #define ASSIST_SCENE "AssistScene"
+#define TILESET_SETTING_SCENE "TileSetSettingScene"
+#define TILESET_SETTING_INNER_SCENE "TileSetSettingInnerScene"
 // << 
 
 // : >> Layer name
@@ -33,6 +35,7 @@
 #define EMPTY_WHITE_32 "empty_white_32"
 #define EMPTY_BLACK_32 "empty_black_32"
 #define EMPTY_BW_32 "empty_bw_32"
+#define EMPTY_GRAY_32 "empty_gray_32"
 #define SV_BEACH_SUMMER "SV_Beach_Summer"
 #define SV_BEACH_WINTER "SV_Beach_Winter"
 

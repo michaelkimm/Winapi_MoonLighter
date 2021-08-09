@@ -1,18 +1,19 @@
 #pragma once
-#ifndef CASSISTSCENE_H_
-#define CASSISTSCENE_H_
+#ifndef CTILESETSETTINGSCENE_H_
+#define CTILESETSETTINGSCENE_H_
 
-#include "MapToolScene.h"
+#include "MapToolScene.h"\
+#include "SceneManager.h"
+#include "..\Game.h"
 
-class CAssistScene :
+class CTileSetSettingScene :
 	public CMapToolScene
 {
-private:
 	friend class CSceneManager;
 
 private:
-	CAssistScene();
-	~CAssistScene();
+	CTileSetSettingScene();
+	~CTileSetSettingScene();
 
 public:
 	virtual bool Init(HWND _hWnd);
@@ -21,8 +22,6 @@ public:
 	virtual void LateUpdate(float _time);
 	virtual void Collision(float _time);
 	virtual void Render(HDC _hdc, float _time);
-
-public:
 };
 
 #endif

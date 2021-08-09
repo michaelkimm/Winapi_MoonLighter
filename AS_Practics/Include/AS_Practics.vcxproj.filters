@@ -117,6 +117,9 @@
     <ClCompile Include="Scene\MapToolScene.cpp">
       <Filter>Scene\MapTool</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\TileSetSettingScene.cpp">
+      <Filter>Scene\MapTool</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -198,6 +201,9 @@
       <Filter>Scene\MapTool</Filter>
     </ClInclude>
     <ClInclude Include="Scene\MapToolScene.h">
+      <Filter>Scene\MapTool</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\TileSetSettingScene.h">
       <Filter>Scene\MapTool</Filter>
     </ClInclude>
   </ItemGroup>

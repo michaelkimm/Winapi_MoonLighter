@@ -8,6 +8,7 @@
 #include "TfManager.h"
 #include "..\Scene\MapEditScene.h"
 #include "..\Scene\AssistScene.h"
+#include "..\Scene\TileSetSettingScene.h"
 
 DEFINE_SINGLETON(CCore)
 bool CCore::loop_ = true;
@@ -107,6 +108,7 @@ int CCore::Run()
 	{
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
+			// cout << "peek\n";
 			if (msg.message == WM_QUIT)
 				break;
 			else
@@ -117,6 +119,7 @@ int CCore::Run()
 		}
 		else
 		{
+			// cout << "Logic\n";
 			Logic();
 		}
 	}
@@ -207,21 +210,34 @@ ATOM CCore::MyRegisterClass()
 	wcex_.hIconSm = LoadIcon(wcex_.hInstance, MAKEINTRESOURCE(IDI_ICON1));
 	RegisterClassExW(&wcex_);
 
+	// 맵툴 에디터 창
 	wcex_.lpfnWndProc = ChildWndProc;
-	// wcex_.lpszMenuName = NULL;
 	wcex_.lpszMenuName = MAKEINTRESOURCEW(IDR_MAP_TOOL_MENU);
-	// wcex_.lpszMenuName = MAKEINTRESOURCEW(IDR_MAP_TOOL_TOOLBAR);
 	wcex_.lpszClassName = _T("Child Window");
 	RegisterClassExW(&wcex_);
 
+	// 맵툴 에디터 창 왼쪽
 	wcex_.lpfnWndProc = MapEditProc;
 	wcex_.lpszMenuName = NULL;
 	wcex_.lpszClassName = _T("MapEdit Window");
 	RegisterClassExW(&wcex_);
 
+	// 맵툴 에디터 창 오른쪽
 	wcex_.lpfnWndProc = TileSetProc;
 	wcex_.lpszMenuName = NULL;
 	wcex_.lpszClassName = _T("TileSet Window");
+	RegisterClassExW(&wcex_);
+
+	// 맵툴 에디터 내 타일셋 세팅 창
+	wcex_.lpfnWndProc = TileSettingProc;
+	wcex_.lpszMenuName = NULL;
+	wcex_.lpszClassName = _T("TileSetting Window");
+	RegisterClassExW(&wcex_);
+
+	// 타일 셋 세팅 창 내 타일 셋 보여주는 MDI 윈도우
+	wcex_.lpfnWndProc = TileSettingInnerProc;
+	wcex_.lpszMenuName = NULL;
+	wcex_.lpszClassName = _T("TileSettingInner Window");
 	RegisterClassExW(&wcex_);
 
 	return NULL;
@@ -396,7 +412,9 @@ LRESULT CCore::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 LRESULT CCore::ChildWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static RECT rect_view;
-	HWND tmp_hwnd;
+	static HWND tmp_hwnd = NULL;
+
+	static HWND h_tile_setting = NULL;
 
 	int dx = 1;
 	float size_coef = 0.35;
@@ -411,7 +429,7 @@ LRESULT CCore::ChildWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 
 		GetClientRect(hWnd, &rect_view);
 
-		// SetTimer(hWnd, 124, 100, NULL);
+		// Child Window를 두개 영역으로 나눈다.
 		tmp_hwnd = CreateWindowEx(
 			WS_EX_CLIENTEDGE,
 			_T("MapEdit Window"),
@@ -444,6 +462,18 @@ LRESULT CCore::ChildWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		);
 		CCore::Instance()->SetChildHwnd(1, tmp_hwnd);
 
+		// 타일 세팅 윈도우 생성
+		h_tile_setting = CreateWindow(
+			_T("TileSetting Window"),
+			NULL,
+			WS_OVERLAPPEDWINDOW,
+			0, 0, rect_view.right / 2, rect_view.bottom,
+			hWnd,
+			NULL,
+			CCore::Instance()->GetHInstance(),
+			NULL);
+
+
 		break;
 
 	case WM_COMMAND:
@@ -455,6 +485,10 @@ LRESULT CCore::ChildWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		case ID_LAYER_SELECTION:
 			DialogBoxW(CCore::Instance()->GetHInstance(), MAKEINTRESOURCE(IDD_DIALOG_LAYER), hWnd, Dlg_Layer_Proc);
 			break;
+		case ID_TILESET_SETTING:
+			ShowWindow(h_tile_setting, SW_SHOW);
+			UpdateWindow(h_tile_setting);
+			break;
 		}
 		break;
 
@@ -462,7 +496,10 @@ LRESULT CCore::ChildWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		cout << "ChildWndProc WM_KEYDONW!\n";
 		if (wParam == 0x20)
 		{
-
+			cout << "고양이!!!!!!!!!!!!!!!  PaintAllTile 시작\n";
+			CMapEditScene* pt_assist = static_cast<CMapEditScene*>(CSceneManager::Instance()->pt_map_edit_scene_);
+			pt_assist->PaintAllTile();
+			cout << "고양이!!!!!!!!!!!!!!!  PaintAllTile 끝\n";
 		}
 		break;
 
@@ -540,13 +577,16 @@ LRESULT CCore::MapEditProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		HDC hMemDC = CreateCompatibleDC(hdc);
 		HBITMAP hDoubleBufferBitmap = CreateCompatibleBitmap(hdc, rectView.right, rectView.bottom);
 		HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, hDoubleBufferBitmap);
-		Rectangle(hMemDC, 0, 0, 2000, 2000);
+
+		// 월드 사이즈 만큼만 더블버퍼링 도화지 만들자
+		MY_POSE world_size = CSceneManager::Instance()->pt_map_edit_scene_->GetWorldSize();
+		Rectangle(hMemDC, 0, 0, world_size.x, world_size.y);
 
 
 		// 컨텐츠 그리기
 		if (CSceneManager::Instance()->pt_map_edit_scene_)
 			CSceneManager::Instance()->pt_map_edit_scene_->Render(hMemDC, 0);
-		BitBlt(hdc, 0, 0, 2000, 2000, hMemDC, 0, 0, SRCCOPY);
+		BitBlt(hdc, 0, 0, world_size.x, world_size.y, hMemDC, 0, 0, SRCCOPY);
 
 
 		// DC 삭제
@@ -607,13 +647,16 @@ LRESULT CCore::TileSetProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		HDC hMemDC = CreateCompatibleDC(hdc);
 		HBITMAP hDoubleBufferBitmap = CreateCompatibleBitmap(hdc, rectView.right, rectView.bottom);
 		HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, hDoubleBufferBitmap);
-		Rectangle(hMemDC, 0, 0, 2000, 2000);
+
+		// 월드 사이즈 만큼만 더블버퍼링 도화지 만들자
+		MY_POSE world_size = CSceneManager::Instance()->pt_assist_scene_->GetWorldSize();
+		Rectangle(hMemDC, 0, 0, world_size.x, world_size.y);
 
 
 		// 컨텐츠 그리기
 		if (CSceneManager::Instance()->pt_assist_scene_)
 			CSceneManager::Instance()->pt_assist_scene_->Render(hMemDC, 0);
-		BitBlt(hdc, 0, 0, 2000, 2000, hMemDC, 0, 0, SRCCOPY);
+		BitBlt(hdc, 0, 0, world_size.x, world_size.y, hMemDC, 0, 0, SRCCOPY);
 
 
 		// DC 삭제
@@ -735,8 +778,205 @@ INT_PTR  CALLBACK CCore::Dlg_Layer_Proc(HWND hwnd, UINT message, WPARAM wParam, 
 			break;
 
 		case IDCANCEL:
+			EndDialog(hwnd, 0);
 			break;
 		}
+	}
+	return 0;
+}
+
+#define IDC_BUTTON 9999
+LRESULT CCore::TileSettingProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	// 창 크기
+	static RECT	rect_view;
+	
+	// 버튼 핸들
+	static HWND h_button = NULL;
+
+	// 버튼 설정
+	int btn_w;
+	int btn_h;
+			 ;
+	int btn_x;
+	int btn_y;
+
+	// 타일 세팅 안쪽 윈도우 핸들
+	static HWND h_inner_tile_setting = NULL;
+
+	int inner_w;
+	int inner_h;
+	int inner_x;
+	int inner_y;
+
+	switch (message)
+	{
+	case WM_CREATE:
+		// 윈도우 핸들 Init
+		GetClientRect(hWnd, &rect_view);
+		CSceneManager::Instance()->LoadHwnd(TILESET_SETTING_SCENE, hWnd);
+
+		// : >>  버튼 생성
+
+		// 버튼 크기 및 위치
+		btn_w = 100;
+		btn_h = 25;
+
+		btn_x = rect_view.right * 0.5 - btn_w * 0.5;
+		btn_y = rect_view.bottom - rect_view.bottom / 16 - btn_h * 0.5;
+
+		// 버튼 윈도우 생성
+		h_button = CreateWindow(
+			_T("button"),
+			_T("확인"),
+			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+			btn_x,
+			btn_y,
+			btn_w,
+			btn_h,
+			hWnd,
+			(HMENU)IDC_BUTTON,
+			CCore::Instance()->GetHInstance(),
+			NULL
+		);
+		// <<
+
+		// : >> 안쪽 윈도우 생성
+
+		// 안쪽 윈도우 크기 및 위치
+		inner_x = rect_view.right * 0.1;
+		inner_y = 2 * btn_h;
+		inner_w = rect_view.right - 2 * inner_x;
+		inner_h = rect_view.bottom - 2 * inner_y;
+		
+
+		// 타일 세팅 윈도우 안쪽 윈도우 생성
+		h_inner_tile_setting = CreateWindowEx(
+			WS_EX_CLIENTEDGE,
+			_T("TileSettingInner Window"),
+			NULL,
+			WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_HSCROLL,
+			inner_x, inner_y, inner_w, inner_h,
+			hWnd,
+			NULL,
+			CCore::Instance()->GetHInstance(),
+			NULL);
+		//  | WS_VSCROLL | WS_HSCROLL
+
+		// <<
+
+		// ShowWindow(h_inner_tile_setting, SW_SHOW);
+		// UpdateWindow(h_inner_tile_setting);
+		break;
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case IDC_BUTTON:
+			// 텍스트 정보 저장
+			break;
+
+		default:
+			break;
+		}
+		break;
+
+	case WM_MOUSEMOVE:
+		// CInputManager::Instance()->SetHwnd(hWnd);
+		break;
+
+	case WM_PAINT:
+	{
+		PAINTSTRUCT ps;
+		HDC hdc = BeginPaint(hWnd, &ps);
+
+		// 텍스트 위치
+		int text_x = rect_view.right / 3 + 20;
+		int text_y = rect_view.bottom / 32;
+
+		TextOut(hdc, text_x, text_y, _T("타일셋 데이터 설정"), 10);
+
+		EndPaint(hWnd, &ps);
+	}
+	break;
+
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		break;
+
+	default:
+		return DefWindowProc(hWnd, message, wParam, lParam);
+	}
+	return 0;
+}
+
+LRESULT CCore::TileSettingInnerProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	// 창 크기
+	static RECT	rect_view;
+
+	switch (message)
+	{
+	case WM_CREATE:
+		// 윈도우 핸들 Init
+		GetClientRect(hWnd, &rect_view);
+		CSceneManager::Instance()->LoadHwnd(TILESET_SETTING_INNER_SCENE, hWnd);
+
+		// 씬 초기화
+		CSceneManager::Instance()->CreateScene<CTileSetSettingScene>(SC_TILESET_SETTING, hWnd);
+		
+		CTileSetSettingScene* pt_setting = static_cast<CTileSetSettingScene*>(CSceneManager::Instance()->pt_tileset_setting_scene_);
+		pt_setting->PaintAllTile(MOUSE_RECT_LAYER);
+		break;
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case ID_FILENEW:
+			break;
+		}
+		break;
+
+	case WM_MOUSEMOVE:
+		// CInputManager::Instance()->SetHwnd(hWnd);
+		break;
+
+	case WM_PAINT:
+	{
+		PAINTSTRUCT ps;
+		HDC hdc = BeginPaint(hWnd, &ps);
+
+		// 더블 버퍼링 준비
+		HDC hMemDC = CreateCompatibleDC(hdc);
+		HBITMAP hDoubleBufferBitmap = CreateCompatibleBitmap(hdc, rect_view.right, rect_view.bottom);
+		HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, hDoubleBufferBitmap);
+		
+		// 월드 사이즈 만큼만 더블버퍼링 도화지 만들자
+		MY_POSE world_size = CSceneManager::Instance()->pt_tileset_setting_scene_->GetWorldSize();
+		Rectangle(hMemDC, 0, 0, world_size.x, world_size.y);
+
+
+		// 컨텐츠 그리기
+		if (CSceneManager::Instance()->pt_tileset_setting_scene_)
+			CSceneManager::Instance()->pt_tileset_setting_scene_->Render(hMemDC, 0);
+		BitBlt(hdc, 0, 0, world_size.x, world_size.y, hMemDC, 0, 0, SRCCOPY);
+
+
+		// DC 삭제
+		SelectObject(hMemDC, hOldBitmap);
+		DeleteDC(hMemDC);
+		DeleteObject(hDoubleBufferBitmap);
+
+		EndPaint(hWnd, &ps);
+	}
+	break;
+
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		break;
+
+	default:
+		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
 	return 0;
 }

@@ -6,8 +6,6 @@
 #include "..\Core\Texture.h"
 #include <algorithm>
 
-bool CmpObjY(class CObject* a, class CObject *b);
-
 CLayer::CLayer() :
 	pt_scene_(nullptr),
 	str_tag_(""),
@@ -28,12 +26,12 @@ void CLayer::AddObj(class CObject* _obj)
 
 	obj_list_.push_back(_obj);
 
-	cout << "sort 시작!\n";
+	// cout << "sort 시작!\n";
 
 	// y 값이 큰 순서대로 정렬
 	// std::sort(obj_list_.begin(), obj_list_.end(), CObject::CmpObjY);
 	
-	cout << "sort 끝!\n";
+	// cout << "sort 끝!\n";
 }
 
 CObject* CLayer::GetObj(int _idx) const

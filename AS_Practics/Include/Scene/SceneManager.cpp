@@ -6,7 +6,7 @@
 DEFINE_SINGLETON(CSceneManager)
 
 CSceneManager::CSceneManager()
-	: pt_scene_(NULL), pt_next_scene_(NULL), pt_assist_scene_(NULL)
+	: pt_scene_(NULL), pt_next_scene_(NULL), pt_assist_scene_(NULL), pt_map_edit_scene_(NULL), pt_tileset_setting_scene_(NULL)
 {
 
 }
@@ -17,6 +17,7 @@ CSceneManager::~CSceneManager()
 	SAFE_DELETE(pt_next_scene_);
 	SAFE_DELETE(pt_assist_scene_);
 	SAFE_DELETE(pt_map_edit_scene_);
+	SAFE_DELETE(pt_tileset_setting_scene_);
 }
 
 void CSceneManager::LoadHwnd(const string& _scene_name, HWND _hWnd)

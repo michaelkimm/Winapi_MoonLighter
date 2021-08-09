@@ -19,6 +19,7 @@ public:
 	// 보조 화면 저장 공간
 	class CScene* pt_map_edit_scene_;
 	class CScene* pt_assist_scene_;
+	class CScene* pt_tileset_setting_scene_;
 
 private:
 	unordered_map<string, HWND> hwnd_map_;
@@ -63,6 +64,10 @@ public:
 		case SC_ASSIST:
 			SAFE_DELETE(pt_assist_scene_);
 			pt_assist_scene_ = pt_tmp_scene;
+			break;
+		case SC_TILESET_SETTING:
+			SAFE_DELETE(pt_tileset_setting_scene_);
+			pt_tileset_setting_scene_ = pt_tmp_scene;
 			break;
 		}
 		return pt_tmp_scene;

@@ -9,14 +9,15 @@
 #define IDR_MAP_TOOL_MENU               106
 #define IDR_MAP_TOOL_TOOLBAR            107
 #define IDD_DIALOG_TSS                  109
-#define IDD_DIALOG2                     111
 #define IDD_DIALOG_LAYER                111
+#define IDD_DIALOG_TILESET_SETTING      113
 #define IDC_TAB1                        1001
 #define IDC_TSS_COMBO                   1002
 #define ID_TSS_OK                       1003
 #define IDR_LAYER_FLOOR                 1004
 #define IDR_LAYER_OBJECT                1005
 #define IDBTN_LAYER_OK                  1007
+#define IDC_SCROLLBAR1                  1008
 #define ID_FILENEW                      40002
 #define ID_NEWMAP                       40006
 #define ID_STOREMAP                     40007
@@ -38,9 +39,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        113
+#define _APS_NEXT_RESOURCE_VALUE        115
 #define _APS_NEXT_COMMAND_VALUE         40027
-#define _APS_NEXT_CONTROL_VALUE         1008
+#define _APS_NEXT_CONTROL_VALUE         1009
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

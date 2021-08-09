@@ -13,7 +13,6 @@
 int CMapEditScene::rect_num_x_ = 0;
 int CMapEditScene::rect_num_y_ = 0;
 vector<class CTile*> CMapEditScene::rect_tile_vec_;
-string CMapEditScene::edit_layer_ = FLOOR_LAYER;
 
 void CMapEditScene::AddTile(class CTile* _t)
 {
@@ -35,15 +34,67 @@ void CMapEditScene::ClearTile()
 	SafeReleaseList(rect_tile_vec_);
 }
 
-void CMapEditScene::PaintAllTile()
+void CMapEditScene::PaintAllTile(const string& _target_layer)
 {
-	for (int i = 0; i < world_size_.x; i += rect_num_x_)
-	{
-		for (int j = 0; i < world_size_.y; j += rect_num_y_)
-		{
+	// 선택한 사각형의 가로 세로 픽셀합 크기
+	int rect_dx = rect_num_x_ * TEXTURE_SIZE;
+	int rect_dy = rect_num_y_ * TEXTURE_SIZE;
 
+	for (int i = 0; i < world_size_.x; i += rect_dx)
+	{
+		for (int j = 0; j < world_size_.y; j += rect_dy)
+		{
+			CLayer* pt_layer = NULL;
+
+			// 레이어 찾기
+			if (_target_layer == "")
+				pt_layer = FindLayer(edit_layer_);
+			else
+				pt_layer = FindLayer(_target_layer);
+
+			if (pt_layer == nullptr) return;
+
+			MY_POSE tmp = MY_POSE(i, j);
+			if (((int)(tmp.x + rect_dx) > (int)(world_size_.x)) || ((int)(tmp.y + rect_dy) > (int)(world_size_.y)))
+				continue;
+
+			PaintTiles(pt_layer, tmp, rect_num_x_, rect_num_y_);
 		}
 	}
+}
+
+void CMapEditScene::PaintTiles(CLayer* _target_layer, MY_POSE _pose, int _x_length, int _y_length)
+{
+	int cnt = 0;
+	for (int i = 0; i < _y_length; i++)
+	{
+		for (int j = 0; j < _x_length; j++)
+		{
+			// Clone은 자동 참조 카운트 추가
+			CTile* tmp_tile = rect_tile_vec_[cnt++]->Clone();
+			tmp_tile->SetPose(_pose.x + j * TEXTURE_SIZE, _pose.y + i * TEXTURE_SIZE);
+
+			_target_layer->AddObj(tmp_tile);
+
+			SAFE_RELEASE(tmp_tile);
+		}
+	}
+}
+
+void CMapEditScene::UpdateMousePoseWithCam()
+{
+	// 현재 마우스 위치 get
+	mouse_pose_with_cam_ = CInputManager::Instance()->GetMousePose();
+
+	// : >> 값 조정
+	// 1. mouse_down_pose_ 위치 조정 (전체 타일 집합에 맞게) 
+	mouse_pose_with_cam_ += camera_->GetPose();
+	mouse_pose_with_cam_ /= TEXTURE_SIZE;
+	int mouse_pose_x_idx = floor(mouse_pose_with_cam_.x);
+	int mouse_pose_y_idx = floor(mouse_pose_with_cam_.y);
+	mouse_pose_with_cam_.x = mouse_pose_x_idx;
+	mouse_pose_with_cam_.y = mouse_pose_y_idx;
+	mouse_pose_with_cam_ *= TEXTURE_SIZE;
 }
 
 CMapEditScene::CMapEditScene()
@@ -58,7 +109,7 @@ CMapEditScene::~CMapEditScene()
 
 bool CMapEditScene::Init(HWND _hWnd)
 {
-	if (!CScene::Init(_hWnd))
+	if (!CMapToolScene::Init(_hWnd))
 		return false;
 
 	CCore::Instance()->SetMapEditMode(true);
@@ -122,7 +173,7 @@ void CMapEditScene::Input(float _time)
 {
 	// cout << "m11\n";
 
-	CScene::Input(_time);
+	CMapToolScene::Input(_time);
 	// CCameraManager::Instance()->Input(_time);
 
 	// 마우스 위치가 Assist 씬 위일 경우만 실행
@@ -171,15 +222,6 @@ void CMapEditScene::Input(float _time)
 	// cout << "백그라운드 타일 갯수: " << pt_layer2->GetObjCnt() << endl;
 	// cout << edit_layer_.c_str() << endl;
 
-
-	// 해당 레이어에서 "stage" 오브젝트를 가져와 타일 집합의 x, y 방향 갯수를 알아낸다.
-	/*CStage* pt_stage2 = pt_layer2->FindObj<CStage>("stage");
-	if (pt_stage2 == nullptr)
-	{
-		SAFE_RELEASE(pt_stage2);
-		return;
-	}*/
-
 	int tileset_x_length = pt_layer2->GetTileXNum();
 	int tileset_y_length = pt_layer2->GetTileYNum();
 	if (tileset_x_length < tmp_mouse_pose_x_idx + rect_num_x)
@@ -220,23 +262,13 @@ void CMapEditScene::Input(float _time)
 	pt_layer->Clear();
 
 
-
-	// : >> 값 조정
 	// 1. mouse_down_pose_ 위치 조정 (전체 타일 집합에 맞게) 
-	mouse_pos += camera_->GetPose();
-	mouse_pos /= TEXTURE_SIZE;
-	int mouse_pose_x_idx = floor(mouse_pos.x);
-	int mouse_pose_y_idx = floor(mouse_pos.y);
-	mouse_pos.x = mouse_pose_x_idx;
-	mouse_pos.y = mouse_pose_y_idx;
-	mouse_pos *= TEXTURE_SIZE;
-	
+	UpdateMousePoseWithCam();
 
-	// <<
 
 	// 타일 생성
 	// 실패 시, 리턴
-	if (!pt_layer->CreateTile(mouse_pos, rect_num_x, rect_num_y, TEXTURE_SIZE, TEXTURE_SIZE, EMPTY_BW_32, TEXTURE_PATH))
+	if (!pt_layer->CreateTile(mouse_pose_with_cam_, rect_num_x, rect_num_y, TEXTURE_SIZE, TEXTURE_SIZE, EMPTY_BW_32, TEXTURE_PATH))
 		return;
 
 	// cout << "m44\n";
@@ -256,27 +288,10 @@ void CMapEditScene::Input(float _time)
 		return;
 	}
 	// cout << "\nhaha5\n";
-	// MapEditScene 타일 업데이트
-	int cnt = 0;
-	// int init_i = tmp_mouse_pose_x_idx + tmp_mouse_pose_y_idx * tileset_x_length;
-	for (int i = 0; i < rect_num_y_; i++)
-	{
-		for (int j = 0; j < rect_num_x_; j++)
-		{
-			// int idx = init_i + tileset_x_length * i;
-			// idx += j;
-			// cout << "idx : " << idx << endl;
+	
+	// 해당 레이어에 rect_tile_vec_ 내에 저장 돼있던 타일 붙여넣기
+	PaintTiles(pt_layer2, mouse_pose_with_cam_, rect_num_x_, rect_num_y_);
 
-			// Clone은 자동 참조 카운트 추가
-			CTile* tmp_tile = rect_tile_vec_[cnt++]->Clone();
-			tmp_tile->SetPose(mouse_pos.x + j * TEXTURE_SIZE, mouse_pos.y + i * TEXTURE_SIZE);
-
-			pt_layer2->AddObj(tmp_tile);
-			
-			SAFE_RELEASE(tmp_tile);
-			// cout << "idx haha : " << idx << endl;
-		}
-	}
 	cout << endl << endl;
 	 // <<
 
@@ -291,20 +306,20 @@ void CMapEditScene::Input(float _time)
 
 void CMapEditScene::Update(float _time)
 {
-	CScene::Update(_time);
+	CMapToolScene::Update(_time);
 }
 
 void CMapEditScene::LateUpdate(float _time)
 {
-	CScene::LateUpdate(_time);
+	CMapToolScene::LateUpdate(_time);
 }
 
 void CMapEditScene::Collision(float _time)
 {
-	CScene::Collision(_time);
+	CMapToolScene::Collision(_time);
 }
 
 void CMapEditScene::Render(HDC _hdc, float _time)
 {
-	CScene::Render(_hdc, _time);
+	CMapToolScene::Render(_hdc, _time);
 }

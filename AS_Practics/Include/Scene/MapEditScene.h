@@ -19,12 +19,14 @@ class CMapEditScene :
 	static void ClearTile();
 	
 public:
-	void PaintTiles();
-	void PaintAllTile();
+	void PaintTiles(CLayer* _target_layer, MY_POSE _pose, int _x_length, int _y_length);
+	void PaintAllTile(const string& _target_layer = "");
 
-	// edit할 레이어 지정. 다이얼로그 박스에서 지정한다.
-	// 외부 지정이기 때문에 전역 퍼블릭
-	static string edit_layer_;
+private:
+	MY_POSE mouse_pose_with_cam_;
+	void UpdateMousePoseWithCam();
+
+	
 
 private:
 	CMapEditScene();

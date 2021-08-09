@@ -65,6 +65,9 @@ private:
 
 	static INT_PTR  CALLBACK Dlg_TSS_Proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 	static INT_PTR  CALLBACK Dlg_Layer_Proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+	static LRESULT CALLBACK TileSettingProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK TileSettingInnerProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 };
 
 #endif // !CCORE_H_

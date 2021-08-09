@@ -68,6 +68,11 @@ bool CSourceManager::Init(HINSTANCE _hInst, HDC& _hdc)
 		return false;
 	SAFE_RELEASE(tmp_pt);
 
+	tmp_pt = LoadTexture(EMPTY_GRAY_32, _T("empty_gray_32.bmp"));
+	if (tmp_pt == NULL)
+		return false;
+	SAFE_RELEASE(tmp_pt);
+
 	return true;
 }
 

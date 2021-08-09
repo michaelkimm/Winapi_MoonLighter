@@ -30,6 +30,22 @@ public:
 	MY_POSE GetPose() const { return pose_; }
 	MY_SIZE GetSize() const { return size_; }
 
+
+protected:
+	// 타일셋 백그라운드 레이어의 텍스처 이름
+	string texture_tag_;
+
+	// edit할 레이어 지정. 다이얼로그 박스에서 지정한다.
+	// 외부 지정이기 때문에 전역 퍼블릭
+	static string edit_layer_;
+
+public:
+	// 타일셋 백그라운드 레이어의 타일셋 시트를 바꾼다
+	bool ChangeBackTileSheet(HWND _hwnd, const string& _str_key);
+	string GetTextureTag() const { return texture_tag_; }
+
+	
+
 public:
 	virtual bool Init(HWND _hWnd);
 	virtual void Input(float _time);
