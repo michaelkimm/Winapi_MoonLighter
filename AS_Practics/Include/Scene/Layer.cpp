@@ -1,8 +1,12 @@
 #include "Layer.h"
+
 #include "..\Object\Object.h"
 #include "..\Object\Tile.h"
 #include "..\Core\SourceManager.h"
 #include "..\Core\Texture.h"
+#include <algorithm>
+
+bool CmpObjY(class CObject* a, class CObject *b);
 
 CLayer::CLayer() :
 	pt_scene_(nullptr),
@@ -23,6 +27,13 @@ void CLayer::AddObj(class CObject* _obj)
 	_obj->AddRef();
 
 	obj_list_.push_back(_obj);
+
+	cout << "sort 시작!\n";
+
+	// y 값이 큰 순서대로 정렬
+	// std::sort(obj_list_.begin(), obj_list_.end(), CObject::CmpObjY);
+	
+	cout << "sort 끝!\n";
 }
 
 CObject* CLayer::GetObj(int _idx) const
@@ -100,9 +111,8 @@ void CLayer::Render(HDC _hdc, float _time)
 	}
 }
 
-
 bool CLayer::CreateTile(const MY_POSE& _start_pose, int _num_x, int _num_y, int _size_x, int _size_y,
-	const string & _texture_key, const wchar_t * _file_name, const string & _root_str)
+	const string & _texture_key, const string & _root_str, bool _no_tile_only_size)
 {
 	tile_x_num_ = _num_x;
 	tile_y_num_ = _num_y;
@@ -113,6 +123,10 @@ bool CLayer::CreateTile(const MY_POSE& _start_pose, int _num_x, int _num_y, int 
 	MY_SIZE size_;
 	size_.x = tile_width_ * tile_x_num_;
 	size_.y = tile_height_ * tile_y_num_;
+
+	// 타일 생성 없이 사이즈만 만들 경우
+	if (_no_tile_only_size)
+		return true;
 
 	for (int i = 0; i < _num_y; i++)
 	{
@@ -145,7 +159,7 @@ bool CLayer::CreateTile(const MY_POSE& _start_pose, int _num_x, int _num_y, int 
 
 
 bool CLayer::CreateTileSpriteSheet(const MY_POSE& _start_pose, int _size_x, int _size_y,
-	const string& _texture_key, const wchar_t* _file_name, const string& _root_str)
+	const string& _texture_key, const string& _root_str)
 {
 
 	CTexture* tmp_texture = CSourceManager::Instance()->FindTexture(_texture_key);
@@ -191,3 +205,5 @@ bool CLayer::CreateTileSpriteSheet(const MY_POSE& _start_pose, int _size_x, int 
 	}
 	return true;
 }
+
+

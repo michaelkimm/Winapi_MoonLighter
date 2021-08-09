@@ -5,11 +5,18 @@
 
 CScene::CScene()
 {
-	CLayer* pt_layer = CreateLayer("Background", 0);
+	/*CLayer* pt_layer = CreateLayer("Background", 0);
 	pt_layer = CreateLayer("Monster", 10);
 	pt_layer = CreateLayer("Player", 20);
 	pt_layer = CreateLayer("UI", INT_MAX - 1);
-	pt_layer = CreateLayer("Assist_scene_mouse_rect", INT_MAX);
+	pt_layer = CreateLayer("Assist_scene_mouse_rect", INT_MAX);*/
+
+	CLayer* pt_layer = CreateLayer(FLOOR_LAYER, 0);
+	pt_layer = CreateLayer(MAP_OBJ_LAYER, 10);
+	pt_layer = CreateLayer(PLAYER_LAYER, 20);
+	pt_layer = CreateLayer(UI_LAYER, INT_MAX - 1);
+	pt_layer = CreateLayer(MOUSE_RECT_LAYER, INT_MAX);
+
 	camera_ = new CCamera();
 }
 

@@ -17,6 +17,11 @@ public:
 		++ref_;
 	}
 
+	void InitRef()
+	{
+		ref_ = 1;
+	}
+
 	int Release()
 	{
 		--ref_;

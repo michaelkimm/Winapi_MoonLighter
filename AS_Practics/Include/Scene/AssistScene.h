@@ -11,9 +11,15 @@ private:
 	friend class CSceneManager;
 
 private:
-	vector<class CTile*> rect_tile_vec_;
+	// 마우스가 그리는 사각형에 쓰이는 타일 저장
+	// vector<class CTile*> rect_tile_vec_;
 
+	// 용도 모름. 우선 유지
 	void MakeCTileVec(MY_POSE _start_pose, int _num_x, int _num_y);
+
+public:
+	// 타일셋 백그라운드 레이어의 타일셋 시트를 바꾼다
+	bool ChangeBackTileSheet(HWND _hwnd, const string& _str_key);
 
 private:
 	CAssistScene();

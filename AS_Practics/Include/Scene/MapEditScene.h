@@ -9,6 +9,7 @@ class CMapEditScene :
 {
 	friend class CSceneManager;
 	friend class CAssistScene;
+	friend class CCore;
 
 	// 마우스 사각형 갯수
 	static int rect_num_x_;
@@ -16,6 +17,14 @@ class CMapEditScene :
 	static vector<class CTile*> rect_tile_vec_;
 	static void AddTile(class CTile* _t);
 	static void ClearTile();
+	
+public:
+	void PaintTiles();
+	void PaintAllTile();
+
+	// edit할 레이어 지정. 다이얼로그 박스에서 지정한다.
+	// 외부 지정이기 때문에 전역 퍼블릭
+	static string edit_layer_;
 
 private:
 	CMapEditScene();

@@ -14,6 +14,7 @@ CTexture::~CTexture()
 	DeleteDC(hMemDC_);
 	DeleteObject(hBitmap_);
 	DeleteObject(hDoubleBufferImage_);
+	DeleteObject(hOldBitmap_);
 }
 
 bool CTexture::SetTexture(HINSTANCE _hInst, HDC& _hdc, const wchar_t * _file_name, const string& _str_path_key, const COLORREF& _color_key)
@@ -51,9 +52,8 @@ bool CTexture::SetTexture(HINSTANCE _hInst, HDC& _hdc, const wchar_t * _file_nam
 	if (hDoubleBufferImage_ == NULL)
 		hDoubleBufferImage_ = CreateCompatibleBitmap(_hdc, w_, h_);
 
-
+	// 도화지 덮고 hBitmap 그리기
 	hOldBitmap_ = (HBITMAP)SelectObject(hMemDC_, hDoubleBufferImage_);
-
 	hOldBitmap_ = (HBITMAP)SelectObject(hMemDC_, hBitmap_);
 
 	return true;

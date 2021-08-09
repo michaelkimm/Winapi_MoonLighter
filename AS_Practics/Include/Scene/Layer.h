@@ -34,10 +34,6 @@ private:
 	int		z_order_;
 	vector<class CObject*> obj_list_;
 
-private:
-	CLayer();
-	~CLayer();
-
 public:
 	void SetScene(class CScene* _scene) { pt_scene_ = _scene; }
 	void SetTag(const string& _str_tag) { str_tag_ = _str_tag; }
@@ -48,9 +44,14 @@ public:
 	string	GetTag() { return str_tag_; }
 
 public:
-	void AddObj(class CObject* obj);
-	CObject* GetObj(int _idx) const;
-	void Clear();
+	void		AddObj(class CObject* obj);
+	CObject*	GetObj(int _idx) const;
+	int			GetObjCnt() { return obj_list_.size(); }
+	void		Clear();
+
+private:
+	CLayer();
+	~CLayer();
 
 public:
 	bool Init();
@@ -78,10 +79,17 @@ public:
 		return NULL;
 	}
 
+	// static bool CmpObjY(class CObject* a, class CObject *b);
+
 	bool CreateTile(const MY_POSE& _start_pose, int _num_x, int _num_y, int _size_x, int _size_y,
+		const string& _texture_key, const string& _root_str, bool _no_tile_only_size = false);
+	bool CreateTileSpriteSheet(const MY_POSE& _start_pose, int _size_x, int _size_y,
+		const string& _texture_key, const string& _root_str);
+
+	/*bool CreateTile(const MY_POSE& _start_pose, int _num_x, int _num_y, int _size_x, int _size_y,
 		const string& _texture_key, const wchar_t* _file_name, const string& _root_str);
 	bool CreateTileSpriteSheet(const MY_POSE& _start_pose, int _size_x, int _size_y,
-		const string& _texture_key, const wchar_t* _file_name, const string& _root_str);
+		const string& _texture_key, const wchar_t* _file_name, const string& _root_str);*/
 };
 
 #endif

@@ -210,5 +210,8 @@
     <Image Include="icon1.ico">
       <Filter>리소스 파일</Filter>
     </Image>
+    <Image Include="toolbar1.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
   </ItemGroup>
 </Project>

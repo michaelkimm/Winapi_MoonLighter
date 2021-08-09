@@ -9,6 +9,8 @@
 class CObject
 	: public CRef
 {
+	friend class CLayer;
+
 protected:
 	string	str_tag_;
 	MY_POSE pose_;	// Àý´ë ÁÂÇ¥
@@ -81,7 +83,17 @@ public:
 
 		return pt_obj;
 	}
+
+	static bool CmpObjY(class CObject* a, class CObject *b)
+	{
+		float y1 = a->GetPose().y;
+		float y2 = b->GetPose().y;
+		bool result = y1 < y2;
+		return !result;
+	}
 };
+
+
 
 #endif
 

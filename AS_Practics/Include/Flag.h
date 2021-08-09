@@ -44,4 +44,14 @@ enum MOUSE_STATE
 	RBUTTON_UP,
 };
 
+//// Layer type
+//enum LAYER_NAME
+//{
+//	LAYER_NONE,
+//	LAYER_FLOOR,
+//	LAYER_MAP_OBJECT,
+//	LAYER_PLAYER,
+//	LAYER_UI
+//};
+
 #endif

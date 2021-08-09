@@ -62,6 +62,9 @@ private:
 	static LRESULT CALLBACK ChildWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK MapEditProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK TileSetProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+	static INT_PTR  CALLBACK Dlg_TSS_Proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+	static INT_PTR  CALLBACK Dlg_Layer_Proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 };
 
 #endif // !CCORE_H_

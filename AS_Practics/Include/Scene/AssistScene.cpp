@@ -22,7 +22,7 @@ CAssistScene::CAssistScene()
 
 CAssistScene::~CAssistScene()
 {
-	SafeReleaseList(rect_tile_vec_);
+	// SafeReleaseList(rect_tile_vec_);
 }
 
 void CAssistScene::MakeCTileVec(MY_POSE _start_pose, int _num_x, int _num_y)
@@ -31,10 +31,9 @@ void CAssistScene::MakeCTileVec(MY_POSE _start_pose, int _num_x, int _num_y)
 	return;
 }
 
-bool CAssistScene::Init(HWND _hWnd)
+bool CAssistScene::ChangeBackTileSheet(HWND _hwnd, const string & _str_key)
 {
-	if (!CScene::Init(_hWnd))
-		return false;
+	cout << "ChangeBackTileSheet 1\n";
 
 	// 마우스 다운 관련 변수 초기화
 	mouse_down_pose_ = MY_POSE(-1.f, -1.f);
@@ -43,33 +42,39 @@ bool CAssistScene::Init(HWND _hWnd)
 
 	CCore::Instance()->SetMapEditMode(true);
 
-	// Assist_scene_mouse_rect
-
 	// ---------------------------------------------------------------------- : >> 스테이지 생성
 
 	// 레이어 찾기
-	CLayer* pt_layer = FindLayer("Background");
+	CLayer* pt_layer = FindLayer(FLOOR_LAYER);
 	if (pt_layer == nullptr) return false;
+
+	// 기존 레이어 비우기
+	pt_layer->Clear();
+
+	cout << "ChangeBackTileSheet 2\n";
 
 	int tile_width_ = TEXTURE_SIZE;
 	int tile_height_ = TEXTURE_SIZE;
-	string texture_key = SV_BEACH_SUMMER;
+	string texture_key = _str_key;
 
 	// 월드 사이즈 설정
 	CTexture* tmp_texture = CSourceManager::Instance()->FindTexture(texture_key);
 	world_size_.x = tmp_texture->GetWidth();
 	world_size_.y = tmp_texture->GetHeight();
-	// cout << "world_size_: (" << world_size_.x << ", " << world_size_.y << ")\n";
-	// SetWindowPos(hWnd_, HWND_TOPMOST, 100, 100, world_size_.x, world_size_.y, SWP_NOMOVE | SWP_NOZORDER);
+
 	SAFE_RELEASE(tmp_texture);
 
+	cout << "ChangeBackTileSheet 3\n";
+
 	// 레이어 내 크기, 갯수, 텍스처 종류로 타일 생성
-	pt_layer->CreateTileSpriteSheet(pose_, tile_width_, tile_height_, texture_key, _T("SV_Beach_Summer_pink.bmp"), TEXTURE_PATH);
+	pt_layer->CreateTileSpriteSheet(pose_, tile_width_, tile_height_, texture_key, TEXTURE_PATH);
+
+	cout << "ChangeBackTileSheet 4\n";
 
 	// 씬의 카메라 초기화
-	hWnd_ = _hWnd;
+	hWnd_ = _hwnd;
 	RECT rectView;
-	GetClientRect(hWnd_, &rectView);
+	GetClientRect(_hwnd, &rectView);
 	SetWndSize(rectView.right, rectView.bottom);
 
 	// main 화면 기준 위치, 월드 사이즈 & 씬 사이즈 & 속도 초기화
@@ -80,11 +85,22 @@ bool CAssistScene::Init(HWND _hWnd)
 	return true;
 }
 
+bool CAssistScene::Init(HWND _hWnd)
+{
+	if (!CScene::Init(_hWnd))
+		return false;
+
+	ChangeBackTileSheet(_hWnd, SAND1);
+	return true;
+}
+
 
 
 void CAssistScene::Input(float _time)
 {
 	CScene::Input(_time);
+	
+	// cout << "1\n";
 
 	// 마우스 위치가 assist 씬 위일 경우만 실행
 	if (CInputManager::Instance()->GetHwnd() != hWnd_)
@@ -108,9 +124,12 @@ void CAssistScene::Input(float _time)
 		return;
 	}
 
+
 	// 과거에 마우스 다운 한 적 없으면 아웃
 	if (!past_mouse_down_)
 		return;
+
+	// cout << "2\n";
 
 	// 현재 마우스 위치 Get
 	MY_POSE mouse_pos = CInputManager::Instance()->GetMousePose();
@@ -143,7 +162,7 @@ void CAssistScene::Input(float _time)
 
 	// 2. rect_num_x_ & rect_num_y_ 조정 (전체 타일 집합 크기에 맞게) 
 	// 레이어 찾기
-	CLayer* pt_layer2 = FindLayer("Background");
+	CLayer* pt_layer2 = FindLayer(FLOOR_LAYER);
 	if (pt_layer2 == nullptr) return;
 
 	int tileset_x_length = pt_layer2->GetTileXNum();
@@ -160,6 +179,7 @@ void CAssistScene::Input(float _time)
 	if (rect_num_x_ <= 0 || rect_num_y_ <= 0)
 		return;
 
+	// cout << "3\n";
 
 	//--------------------------------------------------------------------------------------------//
 
@@ -168,7 +188,7 @@ void CAssistScene::Input(float _time)
 	//--------------------------------------------------------------------------------------------//
 
 	// 레이어 찾기
-	CLayer* pt_layer = FindLayer("Assist_scene_mouse_rect");
+	CLayer* pt_layer = FindLayer(MOUSE_RECT_LAYER);
 	if (pt_layer == NULL)
 		return;
 
@@ -193,6 +213,9 @@ void CAssistScene::Input(float _time)
 	
 	// <<
 
+	// cout << "4\n";
+
+
 	// : >> MapEditScene 관리
 
 	// MapEditScene 정적 변수 변경
@@ -211,17 +234,22 @@ void CAssistScene::Input(float _time)
 			int idx = init_i + tileset_x_length * i;
 			idx += j;
 			CTile* pt_tile = static_cast<CTile*>(pt_layer2->GetObj(idx));
-			CMapEditScene::AddTile(pt_tile);
+			if (pt_tile)
+				CMapEditScene::AddTile(pt_tile);
 
 			SAFE_RELEASE(pt_tile);
 		}
 	}
 	// <<
 
+	// cout << "5\n";
+
 	// 타일 생성
 	// 실패 시, 리턴
-	if (!pt_layer->CreateTile(mouse_down_pose_cam_, rect_num_x_, rect_num_y_, TEXTURE_SIZE, TEXTURE_SIZE, EMPTY_BW_16, _T("empty_bw_16.bmp"), TEXTURE_PATH))
+	if (!pt_layer->CreateTile(mouse_down_pose_cam_, rect_num_x_, rect_num_y_, TEXTURE_SIZE, TEXTURE_SIZE, EMPTY_BW_32, TEXTURE_PATH))
 		return;
+
+	// cout << "6\n";
 
 	// << <<
 	return;

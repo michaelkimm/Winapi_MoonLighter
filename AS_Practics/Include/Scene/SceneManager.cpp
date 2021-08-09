@@ -16,6 +16,7 @@ CSceneManager::~CSceneManager()
 	SAFE_DELETE(pt_scene_);
 	SAFE_DELETE(pt_next_scene_);
 	SAFE_DELETE(pt_assist_scene_);
+	SAFE_DELETE(pt_map_edit_scene_);
 }
 
 void CSceneManager::LoadHwnd(const string& _scene_name, HWND _hWnd)

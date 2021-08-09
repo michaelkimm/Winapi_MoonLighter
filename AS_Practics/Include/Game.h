@@ -35,6 +35,8 @@ using namespace Gdiplus;
 
 // << :
 
+// 툴바
+#include "commctrl.h"
 
 // : >> 디버깅용 콘솔창
 #include <stdio.h>

@@ -16,9 +16,9 @@ CCore::CCore()
 {
 	// 메모리 릭 체크
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	
+
 	// 메모리 릭 일어난 곳으로 이동 시켜주는 함수
-	// _CrtSetBreakAlloc(235);
+	// _CrtSetBreakAlloc(215);
 }
 CCore::~CCore()
 {
@@ -61,6 +61,14 @@ bool CCore::Init(HINSTANCE _hInst)
 	wnd_rs_.w = 1280;
 	wnd_rs_.h = 720;
 
+	// PathManager 초기화
+	if (!CPathManager::Instance()->Init())
+		return false;
+
+	// SourceManager 초기화
+	if (!CSourceManager::Instance()->Init(hInst_, hdc_))
+		return false;
+
 	// 인스턴스 핸들을 저장 후, 창을 만든다.
 	if (!Create())
 		return false;
@@ -72,14 +80,6 @@ bool CCore::Init(HINSTANCE _hInst)
 	if (!CTimer::Instance()->Init())
 		return false;
 
-	// PathManager 초기화
-	if (!CPathManager::Instance()->Init())
-		return false;
-
-	// SourceManager 초기화
-	if (!CSourceManager::Instance()->Init(hInst_, hdc_))
-		return false;
-
 	// 창 관리자 초기화
 	if (!CSceneManager::Instance()->Init())
 		return false;
@@ -87,7 +87,7 @@ bool CCore::Init(HINSTANCE _hInst)
 	// 카메라 관리자 생성
 	// if (!CCameraManager::Instance()->Init())
 	// 	return false;
-	
+
 	// 입력 관리자 생성
 	if (!CInputManager::Instance()->Init(hWnd_))
 		return false;
@@ -172,12 +172,12 @@ void CCore::Render(float _time)
 		// my = map_edit_size.top;
 	}
 	// 더블 버퍼링
-	
+
 	// 빈 흰색 도화지 그리기
 	CTexture* back_buffer = CSourceManager::Instance()->GetBackBuffer();
 	// Rectangle(back_buffer->GetDC(), 0, 0, back_buffer->GetWidth(), back_buffer->GetHeight());
 
-	
+
 
 	// 컨텐츠 그리기
 	// CSceneManager::Instance()->Render(back_buffer->GetDC(), _time);
@@ -209,7 +209,8 @@ ATOM CCore::MyRegisterClass()
 
 	wcex_.lpfnWndProc = ChildWndProc;
 	// wcex_.lpszMenuName = NULL;
-	wcex_.lpszMenuName = MAKEINTRESOURCEW(IDR_MAP_TOOL);
+	wcex_.lpszMenuName = MAKEINTRESOURCEW(IDR_MAP_TOOL_MENU);
+	// wcex_.lpszMenuName = MAKEINTRESOURCEW(IDR_MAP_TOOL_TOOLBAR);
 	wcex_.lpszClassName = _T("Child Window");
 	RegisterClassExW(&wcex_);
 
@@ -301,9 +302,9 @@ LRESULT CCore::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static RECT	rect_view;
 	static HWND hwndClient;
-	CLIENTCREATESTRUCT clientcreate;
-	MDICREATESTRUCT mdicreate;
-	HWND hwndChild;
+	// CLIENTCREATESTRUCT clientcreate;
+	// MDICREATESTRUCT mdicreate;
+	// HWND hwndChild;
 
 	int dx = 0;
 	float size_coef = 1;
@@ -323,9 +324,9 @@ LRESULT CCore::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		CSceneManager::Instance()->LoadHwnd(INGAME_SCENE, hWnd);
 
-		clientcreate.hWindowMenu = GetSubMenu(GetMenu(hWnd), 0);
-		clientcreate.idFirstChild = 100;
-		hwndClient = CreateWindow(
+		// clientcreate.hWindowMenu = GetSubMenu(GetMenu(hWnd), 0);
+		// clientcreate.idFirstChild = 100;
+		/*hwndClient = CreateWindow(
 			_T("MDICLIENT"),
 			NULL,
 			WS_CHILD | WS_CLIPCHILDREN | WS_VISIBLE,
@@ -333,27 +334,37 @@ LRESULT CCore::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			hWnd,
 			NULL,
 			CCore::Instance()->GetHInstance(),
-			(LPSTR)&clientcreate);
+			(LPSTR)&clientcreate);*/
+		hwndClient = CreateWindow(
+			_T("Child Window"),
+			NULL,
+			WS_OVERLAPPEDWINDOW,
+			0, 0, rect_view.right, rect_view.bottom + 100,
+			hWnd,
+			NULL,
+			CCore::Instance()->GetHInstance(),
+			NULL);
 
 		ShowWindow(hwndClient, SW_SHOW);
 
 		break;
-
+		// WS_OVERLAPPEDWINDOW
+		// WS_CHILD | WS_CLIPCHILDREN | WS_VISIBLE,
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
 		case ID_FILENEW:
-			mdicreate.szClass = _T("Child Window");
-			mdicreate.szTitle = _T("Child Window");
-			mdicreate.hOwner = CCore::Instance()->GetHInstance();
-			mdicreate.x = 0;
-			mdicreate.y = 0;
-			mdicreate.cx = rect_view.right;
-			mdicreate.cy = rect_view.bottom; //  (int)tmp_rect.y;
-			mdicreate.style = 0;
-			mdicreate.lParam = 0;
-			hwndChild = (HWND)SendMessage(hwndClient, WM_MDICREATE, 0, (LPARAM)(LPMDICREATESTRUCT)&mdicreate);
-			// cout << "bb\n"; 
+			//mdicreate.szClass = _T("Child Window");
+			//mdicreate.szTitle = _T("Child Window");
+			//mdicreate.hOwner = CCore::Instance()->GetHInstance();
+			//mdicreate.x = 0;
+			//mdicreate.y = 0;
+			//mdicreate.cx = rect_view.right;
+			//mdicreate.cy = rect_view.bottom; //  (int)tmp_rect.y;
+			//mdicreate.style = 0;
+			//mdicreate.lParam = 0;
+			//hwndChild = (HWND)SendMessage(hwndClient, WM_MDICREATE, 0, (LPARAM)(LPMDICREATESTRUCT)&mdicreate);
+			UpdateWindow(hWnd);
 			return 0;
 		}
 		break;
@@ -435,6 +446,26 @@ LRESULT CCore::ChildWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 
 		break;
 
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case ID_TILESET_SELECTION:
+			DialogBoxW(CCore::Instance()->GetHInstance(), MAKEINTRESOURCE(IDD_DIALOG_TSS), hWnd, Dlg_TSS_Proc);
+			break;
+		case ID_LAYER_SELECTION:
+			DialogBoxW(CCore::Instance()->GetHInstance(), MAKEINTRESOURCE(IDD_DIALOG_LAYER), hWnd, Dlg_Layer_Proc);
+			break;
+		}
+		break;
+
+	case WM_KEYDOWN:
+		cout << "ChildWndProc WM_KEYDONW!\n";
+		if (wParam == 0x20)
+		{
+
+		}
+		break;
+
 	case WM_SIZE:
 		GetClientRect(hWnd, &rect_view);
 		break;
@@ -491,6 +522,13 @@ LRESULT CCore::MapEditProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 	case WM_TIMER:
 		InvalidateRect(hWnd, NULL, false);
+		break;
+
+	case WM_KEYDOWN:
+		cout << "MapEditProc WM_KEYDONW!\n";
+		if (CInputManager::Instance()->GetKey1())
+			cout << "MapEditProc key 1 눌림!\n";
+
 		break;
 
 	case WM_PAINT:
@@ -551,7 +589,7 @@ LRESULT CCore::TileSetProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		GetClientRect(hWnd, &rectView);
 
 		SetTimer(hWnd, 123, 100, NULL);
-		
+
 		break;
 	case WM_SIZE:
 		GetClientRect(hWnd, &rectView);
@@ -592,12 +630,113 @@ LRESULT CCore::TileSetProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		break;
 
 	case WM_DESTROY:
-		KillTimer(hWnd ,123);
+		KillTimer(hWnd, 123);
 		PostQuitMessage(0);
 		break;
 
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
+	}
+	return 0;
+}
+
+INT_PTR  CALLBACK CCore::Dlg_TSS_Proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	// 콤보박스 핸들
+	static HWND hCombo;
+
+	// 콤보박스에서 선택된 문자열 위치
+	static int selection = -1;
+
+	// 콤박스로부터 가져올 문자열 저장
+	TCHAR name[256] = { 0, };
+	char ch_name[256] = { 0, };
+
+	// AssistScene 내 타일 셋 바꿀 때 사용
+	CAssistScene* pt_assist = NULL;
+
+	switch (message)
+	{
+	case WM_INITDIALOG:
+		hCombo = GetDlgItem(hwnd, IDC_TSS_COMBO);
+
+		// 콤보박스 켜지자마자 문자열 업로드
+		CSourceManager::Instance()->LoadTextureCombo(hCombo);
+		return 1;
+		
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case ID_TSS_OK:
+			if (selection == -1)
+			{
+				EndDialog(hwnd, 0);
+				break;
+			}
+			// 콤보박스 내 selection 위치에서 문자열 가져오기
+			ComboBox_GetLBText(hCombo, selection, name);
+			WideCharToMultiByte(CP_ACP, 0, name, 256, ch_name, 256, NULL, NULL);
+
+			// 가져온 문자열에 해당하는 타일셋으로 Assiscene 타일셋 변경
+			pt_assist = static_cast<CAssistScene*>(CSceneManager::Instance()->pt_assist_scene_);
+			pt_assist->ChangeBackTileSheet(CSceneManager::Instance()->GetHwnd(ASSIST_SCENE), string(ch_name));
+
+			EndDialog(hwnd, 0);
+			break;
+
+		case IDC_TSS_COMBO:
+			if (HIWORD(wParam) == CBN_SELCHANGE)
+				selection = SendMessage(hCombo, CB_GETCURSEL, 0, 0);
+			break;
+
+		case IDCANCEL:
+			EndDialog(hwnd, 0);
+			break;
+		}
+	}
+	return 0;
+}
+
+
+INT_PTR  CALLBACK CCore::Dlg_Layer_Proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	// 콤보박스 핸들
+	static HWND hCombo;
+
+	// 콤보박스에서 선택된 문자열 위치
+	static string selection = NONE_LAYER;
+
+	// AssistScene 내 타일 셋 바꿀 때 사용
+	CAssistScene* pt_assist = NULL;
+
+	switch (message)
+	{
+	case WM_INITDIALOG:
+		// floor ~ object 레이어까지 radio 버튼 등록. default = floor
+		CheckRadioButton(hwnd, IDR_LAYER_FLOOR, IDR_LAYER_OBJECT, IDR_LAYER_FLOOR);
+		selection = FLOOR_LAYER;
+		return 1;
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case IDBTN_LAYER_OK :
+			// cout << selection.c_str() << " 선택!\n";
+			CMapEditScene::edit_layer_ = selection;
+			EndDialog(hwnd, 0);
+			break;
+
+		case IDR_LAYER_FLOOR:
+			selection = FLOOR_LAYER;
+			break;
+
+		case IDR_LAYER_OBJECT:
+			selection = MAP_OBJ_LAYER;
+			break;
+
+		case IDCANCEL:
+			break;
+		}
 	}
 	return 0;
 }

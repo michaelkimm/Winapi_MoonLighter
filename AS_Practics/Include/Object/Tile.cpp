@@ -76,5 +76,8 @@ void CTile::Render(HDC _hdc, float _time)
 
 CTile * CTile::Clone()
 {
-	return new CTile(*this);
+	CTile* pt_temp = new CTile(*this);
+	pt_temp->InitRef();
+
+	return pt_temp;
 }
