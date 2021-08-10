@@ -15,7 +15,6 @@
 #include "..\Core\InputManager.h"
 #include "..\Core\Texture.h"
 
-string CMapToolScene::edit_layer_ = FLOOR_LAYER;
 
 
 CMapToolScene::CMapToolScene()
@@ -79,6 +78,119 @@ bool CMapToolScene::ChangeBackTileSheet(HWND _hwnd, const string & _str_key)
 	// ---------------------------------------------------------------------- : <<
 
 	return true;
+}
+
+bool CMapToolScene::PaintMap(vector<class CTile*> _vec_tile, int _rect_num_x, int _rect_num_y, const string& _target_layer, MY_SIZE _world_size)
+{
+	// 선택한 사각형의 가로 세로 픽셀합 크기
+	int rect_dx = _rect_num_x * TEXTURE_SIZE;
+	int rect_dy = _rect_num_y * TEXTURE_SIZE;
+
+	CLayer* pt_layer = NULL;
+
+	// 지정된 (_rect_num_x * _rect_num_y) 사각형으로 전체 칠하기
+	for (int j = 0; j < _world_size.y; j += rect_dy)
+	{
+		for (int i = 0; i < _world_size.x; i += rect_dx)
+		{
+			// 레이어 찾기
+			pt_layer = FindLayer(_target_layer);
+			if (pt_layer == nullptr) return false;
+
+			MY_POSE tmp = MY_POSE(i, j);
+			if (((int)(tmp.x + rect_dx) > (int)(_world_size.x)) || ((int)(tmp.y + rect_dy) > (int)(_world_size.y)))
+				continue;
+
+			// PaintTiles2(CLayer* _target_layer, MY_POSE _pose, vector<CTile*> _rect_tile_vec, int _x_length, int _y_length)
+			PaintTiles(pt_layer, tmp, _vec_tile, _rect_num_x, _rect_num_y);
+		}
+	}
+	return true;
+}
+
+bool CMapToolScene::PaintMap2(vector<class CTile*> _vec_tile, int _rect_num_x, int _rect_num_y, const string& _target_layer, MY_SIZE _world_size, const string& _texture_key)
+{
+	// 선택한 사각형의 가로 세로 픽셀합 크기
+	int rect_dx = _rect_num_x * TEXTURE_SIZE;
+	int rect_dy = _rect_num_y * TEXTURE_SIZE;
+
+	CLayer* pt_layer = NULL;
+
+	// 지정된 (_rect_num_x * _rect_num_y) 사각형으로 전체 칠하기
+	for (int j = 0; j < _world_size.y; j += rect_dy)
+	{
+		for (int i = 0; i < _world_size.x; i += rect_dx)
+		{
+			// 레이어 찾기
+			pt_layer = FindLayer(_target_layer);
+			if (pt_layer == nullptr) return false;
+
+			MY_POSE tmp = MY_POSE(i, j);
+			if (((int)(tmp.x + rect_dx) > (int)(_world_size.x)) || ((int)(tmp.y + rect_dy) > (int)(_world_size.y)))
+				continue;
+
+			// PaintTiles2(CLayer* _target_layer, MY_POSE _pose, vector<CTile*> _rect_tile_vec, int _x_length, int _y_length)
+			PaintTiles2(pt_layer, tmp, _vec_tile, _rect_num_x, _rect_num_y, i / rect_dx, j / rect_dy, _texture_key);
+		}
+	}
+	return true;
+}
+
+void CMapToolScene::PaintTiles(CLayer* _target_layer, MY_POSE _pose, vector<CTile*> _rect_tile_vec, int _x_length, int _y_length)
+{
+	int cnt = 0;
+	CTile* tmp_tile = NULL;
+	for (int i = 0; i < _y_length; i++)
+	{
+		for (int j = 0; j < _x_length; j++)
+		{
+			// Clone은 자동 참조 카운트 추가
+			tmp_tile = _rect_tile_vec[cnt++]->Clone();
+			tmp_tile->SetPose(_pose.x + j * TEXTURE_SIZE, _pose.y + i * TEXTURE_SIZE);
+
+			_target_layer->AddObj(tmp_tile);
+
+			SAFE_RELEASE(tmp_tile);
+		}
+	}
+}
+
+void CMapToolScene::PaintTiles2(CLayer* _target_layer, MY_POSE _pose, vector<CTile*> _rect_tile_vec, int _x_length, int _y_length, int _x, int _y, const string& _texture_key)
+{
+	CTexture* _t = CSourceManager::Instance()->FindTexture(_texture_key);
+	if (_t == NULL) return;
+
+	int cnt = 0;
+	CTile* tmp_tile = NULL;
+	for (int i = 0; i < _y_length; i++)
+	{
+		for (int j = 0; j < _x_length; j++)
+		{
+			// Clone은 자동 참조 카운트 추가
+			switch (_t->GetOptionVec(_x, _y))
+			{
+			case TILE_NONE:
+				cnt = 0;
+				break;
+			case TILE_NOMOVE:
+				cnt = 1;
+				break;
+			case TILE_TRANSPORT:
+				cnt = 2;
+				break;
+			}
+
+			// 타일 생성
+			tmp_tile = _rect_tile_vec[cnt]->Clone();
+			tmp_tile->SetPose(_pose.x + j * TEXTURE_SIZE, _pose.y + i * TEXTURE_SIZE);
+
+			_target_layer->AddObj(tmp_tile);
+
+			SAFE_RELEASE(tmp_tile);
+		}
+	}
+	SAFE_RELEASE(_t);
+
 }
 
 bool CMapToolScene::Init(HWND _hWnd)

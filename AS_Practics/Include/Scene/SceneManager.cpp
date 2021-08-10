@@ -52,6 +52,8 @@ void CSceneManager::Input(float _time)
 		pt_assist_scene_->Input(_time);
 	if (pt_map_edit_scene_)
 		pt_map_edit_scene_->Input(_time);
+	if (pt_tileset_setting_scene_)
+		pt_tileset_setting_scene_->Input(_time);
 	// pt_scene_->Input(_time);
 }
 

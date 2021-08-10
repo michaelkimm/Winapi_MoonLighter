@@ -9,11 +9,6 @@
 #include "..\Core\SourceManager.h"
 #include "..\Core\InputManager.h"
 
-// 정적 변수 초기화
-int CMapEditScene::rect_num_x_ = 0;
-int CMapEditScene::rect_num_y_ = 0;
-vector<class CTile*> CMapEditScene::rect_tile_vec_;
-
 void CMapEditScene::AddTile(class CTile* _t)
 {
 	// 포인터 생성으로 인해 추가
@@ -34,53 +29,6 @@ void CMapEditScene::ClearTile()
 	SafeReleaseList(rect_tile_vec_);
 }
 
-void CMapEditScene::PaintAllTile(const string& _target_layer)
-{
-	// 선택한 사각형의 가로 세로 픽셀합 크기
-	int rect_dx = rect_num_x_ * TEXTURE_SIZE;
-	int rect_dy = rect_num_y_ * TEXTURE_SIZE;
-
-	for (int i = 0; i < world_size_.x; i += rect_dx)
-	{
-		for (int j = 0; j < world_size_.y; j += rect_dy)
-		{
-			CLayer* pt_layer = NULL;
-
-			// 레이어 찾기
-			if (_target_layer == "")
-				pt_layer = FindLayer(edit_layer_);
-			else
-				pt_layer = FindLayer(_target_layer);
-
-			if (pt_layer == nullptr) return;
-
-			MY_POSE tmp = MY_POSE(i, j);
-			if (((int)(tmp.x + rect_dx) > (int)(world_size_.x)) || ((int)(tmp.y + rect_dy) > (int)(world_size_.y)))
-				continue;
-
-			PaintTiles(pt_layer, tmp, rect_num_x_, rect_num_y_);
-		}
-	}
-}
-
-void CMapEditScene::PaintTiles(CLayer* _target_layer, MY_POSE _pose, int _x_length, int _y_length)
-{
-	int cnt = 0;
-	for (int i = 0; i < _y_length; i++)
-	{
-		for (int j = 0; j < _x_length; j++)
-		{
-			// Clone은 자동 참조 카운트 추가
-			CTile* tmp_tile = rect_tile_vec_[cnt++]->Clone();
-			tmp_tile->SetPose(_pose.x + j * TEXTURE_SIZE, _pose.y + i * TEXTURE_SIZE);
-
-			_target_layer->AddObj(tmp_tile);
-
-			SAFE_RELEASE(tmp_tile);
-		}
-	}
-}
-
 void CMapEditScene::UpdateMousePoseWithCam()
 {
 	// 현재 마우스 위치 get
@@ -97,7 +45,8 @@ void CMapEditScene::UpdateMousePoseWithCam()
 	mouse_pose_with_cam_ *= TEXTURE_SIZE;
 }
 
-CMapEditScene::CMapEditScene()
+CMapEditScene::CMapEditScene()	:
+	edit_layer_(FLOOR_LAYER)
 {
 }
 
@@ -290,7 +239,10 @@ void CMapEditScene::Input(float _time)
 	// cout << "\nhaha5\n";
 	
 	// 해당 레이어에 rect_tile_vec_ 내에 저장 돼있던 타일 붙여넣기
-	PaintTiles(pt_layer2, mouse_pose_with_cam_, rect_num_x_, rect_num_y_);
+	PaintTiles(pt_layer2, mouse_pose_with_cam_, rect_tile_vec_, rect_num_x_, rect_num_y_);
+
+	// UI 레이어에 페인트 맵하되, 해당 인덱스에 대응하는 텍스쳐 옵션을 가져와서 칠하기.
+	// PaintMap(vector<class CTile*> _vec_tile, int _rect_num_x, int _rect_num_y, const string& _target_layer, MY_SIZE _world_size);
 
 	cout << endl << endl;
 	 // <<

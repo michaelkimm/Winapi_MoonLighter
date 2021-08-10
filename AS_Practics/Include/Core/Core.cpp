@@ -9,6 +9,8 @@
 #include "..\Scene\MapEditScene.h"
 #include "..\Scene\AssistScene.h"
 #include "..\Scene\TileSetSettingScene.h"
+#include "..\Object\Object.h"
+#include "..\Object\Tile.h"
 
 DEFINE_SINGLETON(CCore)
 bool CCore::loop_ = true;
@@ -462,18 +464,6 @@ LRESULT CCore::ChildWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		);
 		CCore::Instance()->SetChildHwnd(1, tmp_hwnd);
 
-		// 타일 세팅 윈도우 생성
-		h_tile_setting = CreateWindow(
-			_T("TileSetting Window"),
-			NULL,
-			WS_OVERLAPPEDWINDOW,
-			0, 0, rect_view.right / 2, rect_view.bottom,
-			hWnd,
-			NULL,
-			CCore::Instance()->GetHInstance(),
-			NULL);
-
-
 		break;
 
 	case WM_COMMAND:
@@ -486,6 +476,17 @@ LRESULT CCore::ChildWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 			DialogBoxW(CCore::Instance()->GetHInstance(), MAKEINTRESOURCE(IDD_DIALOG_LAYER), hWnd, Dlg_Layer_Proc);
 			break;
 		case ID_TILESET_SETTING:
+			// 타일 세팅 윈도우 생성
+			h_tile_setting = CreateWindow(
+				_T("TileSetting Window"),
+				NULL,
+				WS_OVERLAPPEDWINDOW,
+				0, 0, rect_view.right / 2, rect_view.bottom,
+				hWnd,
+				NULL,
+				CCore::Instance()->GetHInstance(),
+				NULL);
+
 			ShowWindow(h_tile_setting, SW_SHOW);
 			UpdateWindow(h_tile_setting);
 			break;
@@ -493,13 +494,12 @@ LRESULT CCore::ChildWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		break;
 
 	case WM_KEYDOWN:
-		cout << "ChildWndProc WM_KEYDONW!\n";
 		if (wParam == 0x20)
 		{
-			cout << "고양이!!!!!!!!!!!!!!!  PaintAllTile 시작\n";
-			CMapEditScene* pt_assist = static_cast<CMapEditScene*>(CSceneManager::Instance()->pt_map_edit_scene_);
-			pt_assist->PaintAllTile();
-			cout << "고양이!!!!!!!!!!!!!!!  PaintAllTile 끝\n";
+			// 스페이스 키 누를 시, 맵을 인자에 대입된 특성의 타일셋으로 칠한다.
+			CMapEditScene* pt_map_edit_scene = static_cast<CMapEditScene*>(CSceneManager::Instance()->pt_map_edit_scene_);
+			pt_map_edit_scene->PaintMap(pt_map_edit_scene->GetRectTileVec(), pt_map_edit_scene->GetRectNumX(), pt_map_edit_scene->GetRectNumY(),
+											pt_map_edit_scene->GetEditLayer(), pt_map_edit_scene->GetWorldSize());
 		}
 		break;
 
@@ -526,8 +526,7 @@ LRESULT CCore::ChildWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 
 	case WM_DESTROY:
 		// KillTimer(hWnd, 124);
-		PostQuitMessage(0);
-		break;
+		return 0;
 
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
@@ -593,6 +592,7 @@ LRESULT CCore::MapEditProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		SelectObject(hMemDC, hOldBitmap);
 		DeleteDC(hMemDC);
 		DeleteObject(hDoubleBufferBitmap);
+		DeleteObject(hOldBitmap);
 
 		EndPaint(hWnd, &ps);
 	}
@@ -604,8 +604,7 @@ LRESULT CCore::MapEditProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 	case WM_DESTROY:
 		KillTimer(hWnd, 124);
-		PostQuitMessage(0);
-		break;
+		return 0;
 
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
@@ -623,8 +622,9 @@ LRESULT CCore::TileSetProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 	case WM_CREATE:
 		// 윈도우 핸들 Init
 		CSceneManager::Instance()->LoadHwnd(ASSIST_SCENE, hWnd);
-		CSceneManager::Instance()->CreateScene<CAssistScene>(SC_ASSIST, hWnd);
 
+		// 씬 생성
+		CSceneManager::Instance()->CreateScene<CAssistScene>(SC_ASSIST, hWnd);
 
 		GetClientRect(hWnd, &rectView);
 
@@ -635,7 +635,13 @@ LRESULT CCore::TileSetProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		GetClientRect(hWnd, &rectView);
 		break;
 	case WM_TIMER:
-		InvalidateRect(hWnd, NULL, false);
+		if (wParam == PAINT_AGAIN && lParam == PAINT_AGAIN)
+		{
+			InvalidateRect(hWnd, NULL, true);
+			break;
+		}
+		else
+			InvalidateRect(hWnd, NULL, false);
 		break;
 
 	case WM_PAINT:
@@ -663,6 +669,7 @@ LRESULT CCore::TileSetProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		SelectObject(hMemDC, hOldBitmap);
 		DeleteDC(hMemDC);
 		DeleteObject(hDoubleBufferBitmap);
+		DeleteObject(hOldBitmap);
 
 		EndPaint(hWnd, &ps);
 	}
@@ -674,8 +681,7 @@ LRESULT CCore::TileSetProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 	case WM_DESTROY:
 		KillTimer(hWnd, 123);
-		PostQuitMessage(0);
-		break;
+		return 0;
 
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
@@ -697,6 +703,9 @@ INT_PTR  CALLBACK CCore::Dlg_TSS_Proc(HWND hwnd, UINT message, WPARAM wParam, LP
 
 	// AssistScene 내 타일 셋 바꿀 때 사용
 	CAssistScene* pt_assist = NULL;
+
+	// ASSIST_SCENE 핸들 저장
+	HWND tmp_hwnd;
 
 	switch (message)
 	{
@@ -723,6 +732,9 @@ INT_PTR  CALLBACK CCore::Dlg_TSS_Proc(HWND hwnd, UINT message, WPARAM wParam, LP
 			// 가져온 문자열에 해당하는 타일셋으로 Assiscene 타일셋 변경
 			pt_assist = static_cast<CAssistScene*>(CSceneManager::Instance()->pt_assist_scene_);
 			pt_assist->ChangeBackTileSheet(CSceneManager::Instance()->GetHwnd(ASSIST_SCENE), string(ch_name));
+
+			tmp_hwnd = CSceneManager::Instance()->GetHwnd(ASSIST_SCENE);
+			SendMessage(tmp_hwnd, WM_TIMER, PAINT_AGAIN, PAINT_AGAIN);
 
 			EndDialog(hwnd, 0);
 			break;
@@ -752,12 +764,19 @@ INT_PTR  CALLBACK CCore::Dlg_Layer_Proc(HWND hwnd, UINT message, WPARAM wParam, 
 	// AssistScene 내 타일 셋 바꿀 때 사용
 	CAssistScene* pt_assist = NULL;
 
+	// MapEdidScene 포인터
+	static CMapEditScene* pt_map_edit_scene;
+
 	switch (message)
 	{
 	case WM_INITDIALOG:
 		// floor ~ object 레이어까지 radio 버튼 등록. default = floor
 		CheckRadioButton(hwnd, IDR_LAYER_FLOOR, IDR_LAYER_OBJECT, IDR_LAYER_FLOOR);
 		selection = FLOOR_LAYER;
+
+		// MapEdidScene 초기화
+		pt_map_edit_scene = static_cast<CMapEditScene*>(CSceneManager::Instance()->pt_map_edit_scene_);
+
 		return 1;
 
 	case WM_COMMAND:
@@ -765,7 +784,7 @@ INT_PTR  CALLBACK CCore::Dlg_Layer_Proc(HWND hwnd, UINT message, WPARAM wParam, 
 		{
 		case IDBTN_LAYER_OK :
 			// cout << selection.c_str() << " 선택!\n";
-			CMapEditScene::edit_layer_ = selection;
+			pt_map_edit_scene->SetEditLayer(selection);
 			EndDialog(hwnd, 0);
 			break;
 
@@ -855,7 +874,7 @@ LRESULT CCore::TileSettingProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 			WS_EX_CLIENTEDGE,
 			_T("TileSettingInner Window"),
 			NULL,
-			WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_HSCROLL,
+			WS_CHILD | WS_VISIBLE,
 			inner_x, inner_y, inner_w, inner_h,
 			hWnd,
 			NULL,
@@ -873,16 +892,11 @@ LRESULT CCore::TileSettingProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 		switch (LOWORD(wParam))
 		{
 		case IDC_BUTTON:
-			// 텍스트 정보 저장
-			break;
+			return 0;
 
 		default:
 			break;
 		}
-		break;
-
-	case WM_MOUSEMOVE:
-		// CInputManager::Instance()->SetHwnd(hWnd);
 		break;
 
 	case WM_PAINT:
@@ -901,8 +915,7 @@ LRESULT CCore::TileSettingProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 	break;
 
 	case WM_DESTROY:
-		PostQuitMessage(0);
-		break;
+		return 0;
 
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
@@ -915,6 +928,15 @@ LRESULT CCore::TileSettingInnerProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
 	// 창 크기
 	static RECT	rect_view;
 
+	// 세팅 씬 포인터
+	CTileSetSettingScene* pt_setting;
+
+	// 타일 저장한 벡터
+	vector<CTile*> vec_tile;
+
+	// 타일 포인터
+	CTile* pt_tile;
+
 	switch (message)
 	{
 	case WM_CREATE:
@@ -922,11 +944,28 @@ LRESULT CCore::TileSettingInnerProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
 		GetClientRect(hWnd, &rect_view);
 		CSceneManager::Instance()->LoadHwnd(TILESET_SETTING_INNER_SCENE, hWnd);
 
+		// 타이머 설정
+		SetTimer(hWnd, 200, 200, NULL);
+
 		// 씬 초기화
 		CSceneManager::Instance()->CreateScene<CTileSetSettingScene>(SC_TILESET_SETTING, hWnd);
 		
-		CTileSetSettingScene* pt_setting = static_cast<CTileSetSettingScene*>(CSceneManager::Instance()->pt_tileset_setting_scene_);
-		pt_setting->PaintAllTile(MOUSE_RECT_LAYER);
+		// 세팅 씬 불러오기
+		pt_setting = static_cast<CTileSetSettingScene*>(CSceneManager::Instance()->pt_tileset_setting_scene_);
+
+		// vec_tile에 push_back할 것이기 때문에 pt_tile 참조카운트 고려 x
+		pt_tile = CObject::CreateObj<CTile>("gray_empty", NULL);
+		pt_tile->SetTexture(EMPTY_GRAY_32);
+		vec_tile.push_back(pt_tile);
+
+		pt_setting->PaintMap(vec_tile, 1, 1, MOUSE_RECT_LAYER, pt_setting->GetWorldSize());
+
+		SafeReleaseList(vec_tile);
+
+		break;
+
+	case WM_TIMER:
+		InvalidateRect(hWnd, NULL, false);
 		break;
 
 	case WM_COMMAND:
@@ -938,7 +977,7 @@ LRESULT CCore::TileSettingInnerProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
 		break;
 
 	case WM_MOUSEMOVE:
-		// CInputManager::Instance()->SetHwnd(hWnd);
+		CInputManager::Instance()->SetHwnd(hWnd);
 		break;
 
 	case WM_PAINT:
@@ -966,14 +1005,15 @@ LRESULT CCore::TileSettingInnerProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
 		SelectObject(hMemDC, hOldBitmap);
 		DeleteDC(hMemDC);
 		DeleteObject(hDoubleBufferBitmap);
+		DeleteObject(hOldBitmap);
 
 		EndPaint(hWnd, &ps);
 	}
 	break;
 
 	case WM_DESTROY:
-		PostQuitMessage(0);
-		break;
+		KillTimer(hWnd, 200);
+		return 0;
 
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);

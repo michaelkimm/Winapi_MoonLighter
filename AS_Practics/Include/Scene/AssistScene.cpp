@@ -2,6 +2,7 @@
 
 #include "InGameScene.h"
 #include "MapEditScene.h"
+#include "SceneManager.h"
 
 #include "..\Object\Object.h"
 #include "..\Object\Player.h"
@@ -155,11 +156,12 @@ void CAssistScene::Input(float _time)
 	// : >> MapEditScene 관리
 
 	// MapEditScene 정적 변수 변경
-	CMapEditScene::rect_num_x_ = rect_num_x_;
-	CMapEditScene::rect_num_y_ = rect_num_y_;
+	CMapEditScene* pt_map_edit_scene = static_cast<CMapEditScene*>(CSceneManager::Instance()->pt_map_edit_scene_);
+	pt_map_edit_scene->SetRectNumX(rect_num_x_);
+	pt_map_edit_scene->SetRectNumY(rect_num_y_);
 
 	// MapEditScene 본래 있던 타일 비우기
-	CMapEditScene::ClearTile();
+	pt_map_edit_scene->ClearTile();
 
 	// MapEditScene 타일 업데이트
 	int init_i = mouse_down_pose_x_idx + mouse_down_pose_y_idx * tileset_x_length;
@@ -171,7 +173,7 @@ void CAssistScene::Input(float _time)
 			idx += j;
 			CTile* pt_tile = static_cast<CTile*>(pt_layer2->GetObj(idx));
 			if (pt_tile)
-				CMapEditScene::AddTile(pt_tile);
+				pt_map_edit_scene->AddTile(pt_tile);
 
 			SAFE_RELEASE(pt_tile);
 		}

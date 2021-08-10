@@ -11,22 +11,34 @@ class CMapEditScene :
 	friend class CAssistScene;
 	friend class CCore;
 
+private:
+
+	// edit할 레이어 지정. 다이얼로그 박스에서 지정한다.
+	string edit_layer_;
+
 	// 마우스 사각형 갯수
-	static int rect_num_x_;
-	static int rect_num_y_;
-	static vector<class CTile*> rect_tile_vec_;
-	static void AddTile(class CTile* _t);
-	static void ClearTile();
-	
+	int rect_num_x_;
+	int rect_num_y_;
+	vector<class CTile*> rect_tile_vec_;
+
 public:
-	void PaintTiles(CLayer* _target_layer, MY_POSE _pose, int _x_length, int _y_length);
-	void PaintAllTile(const string& _target_layer = "");
+	void SetEditLayer(const string& _str)						{ edit_layer_ = _str; }
+	void SetRectNumX(int _x)									{ rect_num_x_ = _x; }
+	void SetRectNumY(int _y)									{ rect_num_y_ = _y; }
+	void SetRectTileVec(vector<class CTile*> _rect_tile_vec)	{ rect_tile_vec_ = _rect_tile_vec; }
+
+	string					GetEditLayer() const	{ return edit_layer_; }
+	int						GetRectNumX() const		{ return rect_num_x_; }
+	int						GetRectNumY() const		{ return rect_num_y_; }
+	vector<class CTile*>	GetRectTileVec() const	{ return rect_tile_vec_; }
+
+	void AddTile(class CTile* _t);
+	void ClearTile();
 
 private:
+	// 카메라 스크롤을 고려한 마우스 위치 in 절대좌표
 	MY_POSE mouse_pose_with_cam_;
 	void UpdateMousePoseWithCam();
-
-	
 
 private:
 	CMapEditScene();

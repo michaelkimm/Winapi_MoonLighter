@@ -5,6 +5,9 @@
 
 #define PRINT_POINT_DATA(d)	cout << "data: (" << d.x << ", " << d.y << endl;
 
+// 사용자 정의 명령어
+#define PAINT_AGAIN 8888
+
 #define ROOT_PATH "root_path"
 #define TEXTURE_PATH "texture_path"
 #define PLAYER_TAG "player"
@@ -36,6 +39,9 @@
 #define EMPTY_BLACK_32 "empty_black_32"
 #define EMPTY_BW_32 "empty_bw_32"
 #define EMPTY_GRAY_32 "empty_gray_32"
+#define O_32 "O_32"
+#define X_32 "X_32"
+#define T_32 "T_32"
 #define SV_BEACH_SUMMER "SV_Beach_Summer"
 #define SV_BEACH_WINTER "SV_Beach_Winter"
 

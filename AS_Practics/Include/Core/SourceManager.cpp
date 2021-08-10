@@ -33,7 +33,7 @@ bool CSourceManager::Init(HINSTANCE _hInst, HDC& _hdc)
 		return false;
 	SAFE_RELEASE(tmp_pt);
 
-	tmp_pt = LoadTexture(SV_BEACH_WINTER, _T("SV_Beach_Winter_32_pink_1.bmp"));
+	tmp_pt = LoadTexture(SV_BEACH_WINTER, _T("SV_Beach_Winter_32_pink.bmp"));
 	if (tmp_pt == NULL)
 		return false;
 	SAFE_RELEASE(tmp_pt);
@@ -69,6 +69,21 @@ bool CSourceManager::Init(HINSTANCE _hInst, HDC& _hdc)
 	SAFE_RELEASE(tmp_pt);
 
 	tmp_pt = LoadTexture(EMPTY_GRAY_32, _T("empty_gray_32.bmp"));
+	if (tmp_pt == NULL)
+		return false;
+	SAFE_RELEASE(tmp_pt);
+
+	tmp_pt = LoadTexture(O_32, _T("O_32.bmp"));
+	if (tmp_pt == NULL)
+		return false;
+	SAFE_RELEASE(tmp_pt);
+
+	tmp_pt = LoadTexture(X_32, _T("X_32.bmp"));
+	if (tmp_pt == NULL)
+		return false;
+	SAFE_RELEASE(tmp_pt);
+
+	tmp_pt = LoadTexture(T_32, _T("T_32.bmp"));
 	if (tmp_pt == NULL)
 		return false;
 	SAFE_RELEASE(tmp_pt);

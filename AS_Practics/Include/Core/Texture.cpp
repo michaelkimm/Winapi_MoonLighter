@@ -17,6 +17,16 @@ CTexture::~CTexture()
 	DeleteObject(hOldBitmap_);
 }
 
+TILE_OPTION CTexture::GetOptionVec(int _x, int _y) const
+{
+	return option_vec_[_x + _y * (w_ / TEXTURE_SIZE)];
+}
+
+void CTexture::SetOptionVec(TILE_OPTION _op, int _x, int _y)
+{
+	option_vec_[_x + _y * (w_ / TEXTURE_SIZE)] = _op;
+}
+
 bool CTexture::SetTexture(HINSTANCE _hInst, HDC& _hdc, const wchar_t * _file_name, const string& _str_path_key, const COLORREF& _color_key)
 {
 	const wchar_t* texture_path = CPathManager::Instance()->FindPath(_str_path_key);
@@ -39,6 +49,9 @@ bool CTexture::SetTexture(HINSTANCE _hInst, HDC& _hdc, const wchar_t * _file_nam
 	// 너비 & 높이 설정
 	w_ = bitmap_.bmWidth;
 	h_ = bitmap_.bmHeight;
+	
+	// "텍스쳐 내 각 단위 타일의 옵션 정보 저장" 벡터 초기화
+	option_vec_.assign((w_ / TEXTURE_SIZE) * (h_ / TEXTURE_SIZE), TILE_NONE);
 
 	// DC 설정
 	if (hMemDC_)

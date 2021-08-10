@@ -2,7 +2,7 @@
 #ifndef CTILESETSETTINGSCENE_H_
 #define CTILESETSETTINGSCENE_H_
 
-#include "MapToolScene.h"\
+#include "MapToolScene.h"
 #include "SceneManager.h"
 #include "..\Game.h"
 
@@ -10,6 +10,9 @@ class CTileSetSettingScene :
 	public CMapToolScene
 {
 	friend class CSceneManager;
+
+private:
+	string texture_tag_;
 
 private:
 	CTileSetSettingScene();
