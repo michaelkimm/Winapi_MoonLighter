@@ -147,10 +147,7 @@ void CMapToolScene::PaintTiles(CLayer* _target_layer, MY_POSE _pose, vector<CTil
 			tmp_tile = _rect_tile_vec[cnt++]->Clone();
 			tmp_tile->SetPose(_pose.x + j * TEXTURE_SIZE, _pose.y + i * TEXTURE_SIZE);
 
-			// MY_POSE tmp_pose(_pose.x + j * TEXTURE_SIZE, _pose.y + i * TEXTURE_SIZE);
-			// cout << "붙여 놓는 인덱스: (" << tmp_pose.x / TEXTURE_SIZE << ", " << tmp_pose.y / TEXTURE_SIZE << ")\n";
-
-			_target_layer->AddObj(tmp_tile);
+			_target_layer->AddObj(tmp_tile, true);
 
 			SAFE_RELEASE(tmp_tile);
 		}

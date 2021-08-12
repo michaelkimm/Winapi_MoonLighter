@@ -50,20 +50,29 @@ vector<class CObject*>::iterator CLayer::FindObj(MY_POSE _pose_idx)
 	return iter;
 }
 
-void CLayer::AddObj(class CObject* _obj)
+bool CmpObjY2(class CObject* a, class CObject* b)
+{
+	return a->GetPose().y > b->GetPose().y;
+}
+
+void CLayer::SortObjList()
+{
+	cout << "sort 시작!\n";
+	// y 값이 큰 순서대로 정렬
+	std::sort(obj_list_.begin(), obj_list_.end(), CmpObjY2);
+	cout << "sort 끝!\n";
+}
+
+void CLayer::AddObj(class CObject* _obj, bool _sort)
 {
 	_obj->SetScene(pt_scene_);
 	_obj->SetLayer(this);
 	_obj->AddRef();
 
 	obj_list_.push_back(_obj);
-
-	// cout << "sort 시작!\n";
-
-	// y 값이 큰 순서대로 정렬
-	// std::sort(obj_list_.begin(), obj_list_.end(), CObject::CmpObjY);
 	
-	// cout << "sort 끝!\n";
+	if (_sort)
+		SortObjList();
 }
 
 CObject* CLayer::GetObj(int _idx) const
@@ -216,8 +225,11 @@ bool CLayer::CreateTile(const MY_POSE& _start_pose, int _num_x, int _num_y, int 
 	{
 		for (int j = 0; j < _num_x; j++)
 		{
+			// 타일의 절대 위치 설정
+			MY_POSE tile_pose(_start_pose.x + j * _size_x, _start_pose.y + i * _size_y);
+
 			// 타일 이름과 속한 레이어 넘겨서 타일 생성
-			CTile* pt_tile = CObject::CreateObj<CTile>(_texture_key, this);
+			CTile* pt_tile = CObject::CreateObj<CTile>(_texture_key, this, tile_pose, true);
 			if (pt_tile == NULL) return false;
 
 			// 텍스처 설정
@@ -226,9 +238,6 @@ bool CLayer::CreateTile(const MY_POSE& _start_pose, int _num_x, int _num_y, int 
 				SAFE_RELEASE(pt_tile);
 				return false;
 			}
-
-			// 타일의 절대 위치 설정
-			pt_tile->SetPose(_start_pose.x + j * _size_x, _start_pose.y + i * _size_y);
 
 			// img에서의 인덱스 및 타일 한개 사이즈 설정
 			// 텍스쳐가 하나기 때문에 (0, 0)으로 설정
@@ -265,8 +274,11 @@ bool CLayer::CreateTileSpriteSheet(const MY_POSE& _start_pose, int _size_x, int 
 	{
 		for (int j = 0; j < tile_x_num_; j++)
 		{
+			// 타일의 절대 위치 설정
+			MY_POSE tmp_pose(_start_pose.x + j * _size_x, _start_pose.y + i * _size_y);
+
 			// 타일 이름과 속한 레이어 넘겨서 타일 생성
-			CTile* pt_tile = CObject::CreateObj<CTile>(_texture_key, this);
+			CTile* pt_tile = CObject::CreateObj<CTile>(_texture_key, this, tmp_pose, false);
 			if (pt_tile == NULL) return false;
 
 			// 텍스처 설정
@@ -277,8 +289,7 @@ bool CLayer::CreateTileSpriteSheet(const MY_POSE& _start_pose, int _size_x, int 
 				return false;
 			}
 
-			// 타일의 절대 위치 설정
-			pt_tile->SetPose(_start_pose.x + j * _size_x, _start_pose.y + i * _size_y);
+			
 
 			// img에서의 인덱스 및 타일 한개 사이즈 설정
 			pt_tile->SetIdxInTexture(j, i);

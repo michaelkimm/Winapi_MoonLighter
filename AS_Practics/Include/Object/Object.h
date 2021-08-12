@@ -69,7 +69,7 @@ public:
 
 public:
 	template <typename T>
-	static T* CreateObj(const string& _str_tag, CLayer* _layer)
+	static T* CreateObj(const string& _str_tag, CLayer* _layer, MY_POSE _pose = MY_POSE(0, 0), bool _sort = false)
 	{
 		T* pt_obj = new T; 
 
@@ -79,9 +79,11 @@ public:
 			return nullptr;
 		}
 
+		pt_obj->SetPose(_pose);
+
 		if (_layer)
 		{
-			_layer->AddObj(pt_obj);
+			_layer->AddObj(pt_obj, _sort);
 		}
 
 		pt_obj->SetTag(_str_tag);

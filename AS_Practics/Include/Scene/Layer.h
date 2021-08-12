@@ -46,9 +46,10 @@ public:
 	void DeleteObj(float _x, float _y);
 	void DeleteAll();
 	vector<class CObject*>::iterator FindObj(MY_POSE _pose_idx);
+	void SortObjList();
 
 public:
-	void		AddObj(class CObject* obj);
+	void		AddObj(class CObject* obj, bool _sort = false);
 	CObject*	GetObj(int _idx) const;
 	int			GetObjCnt() { return obj_list_.size(); }
 	void		Clear();
