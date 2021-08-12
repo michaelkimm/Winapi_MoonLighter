@@ -2,6 +2,8 @@
 #include "InGameScene.h"
 #include "MapEditScene.h"
 #include "AssistScene.h"
+#include "..\Core\PathManager.h"
+
 
 DEFINE_SINGLETON(CSceneManager)
 
@@ -78,4 +80,86 @@ void CSceneManager::Render(HDC _hdc, float _time)
 	// pt_assist_scene_->Render(_hdc, _time);
 }
 
+void CSceneManager::Save(FILE* _pt_file)
+{
+	pt_map_edit_scene_->Save(_pt_file);
+}
+void CSceneManager::Load(FILE* _pt_file)
+{
+	pt_map_edit_scene_->Load(_pt_file);
+}
 
+void CSceneManager::SaveFromPath(const char * _pt_file_name, const string & _str_path_key, bool _full_path)
+{
+	// 파일 절대경로 가져오기
+	wstring path = CPathManager::Instance()->FindPath(_str_path_key);
+
+	// wstring to string
+	string tmp_str = "";
+	
+	if (!_full_path)
+	{
+		tmp_str.assign(path.begin(), path.end());
+
+		// 절대경로 완성
+		tmp_str += _pt_file_name;
+	}
+	else
+	{
+		tmp_str = _pt_file_name;
+	}
+
+	FILE* pt_file = NULL;
+
+	// 파일 쓰기 설정
+	if (fopen_s(&pt_file, tmp_str.c_str(), "wb"))
+	{
+		cout << "파일 저장중.. 파일 열기 실패!\n";
+		return;
+	}
+
+	// 파일 쓰기
+	if (pt_file)
+	{
+		Save(pt_file);
+
+		fclose(pt_file);
+	}
+}
+
+void CSceneManager::LoadFromPath(const char * _pt_file_name, const string & _str_path_key, bool _full_path)
+{
+	// 파일 절대경로 가져오기
+	wstring path = CPathManager::Instance()->FindPath(_str_path_key);
+
+	// wstring to string
+	string tmp_str = "";
+	if (!_full_path)
+	{
+		tmp_str.assign(path.begin(), path.end());
+
+		// 절대경로 완성
+		tmp_str += _pt_file_name;
+	}
+	else
+	{
+		tmp_str = _pt_file_name;
+	}
+
+	FILE* pt_file = NULL;
+
+	// 파일 불러오기 설정
+	if (fopen_s(&pt_file, tmp_str.c_str(), "rb"))
+	{
+		cout << "파일 로딩중.. 파일 열기 실패!\n";
+		return;
+	}
+
+	// 파일 쓰기
+	if (pt_file)
+	{
+		Load(pt_file);
+
+		fclose(pt_file);
+	}
+}

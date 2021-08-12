@@ -281,36 +281,6 @@ BOOL CCore::Create()
 	float size_x = rectView.right * size_coef;
 	float size_y = rectView.bottom;
 
-	/*ChildHwnd_[0] = CreateWindowEx(
-		WS_EX_CLIENTEDGE,
-		_T("MapEdit"),
-		NULL,
-		WS_CHILD | WS_VISIBLE,
-		0,
-		0,
-		rectView.right - size_x,
-		size_y,
-		hWnd_,
-		NULL,
-		hInst_,
-		NULL
-	);
-
-	ChildHwnd_[1] = CreateWindowEx(
-		WS_EX_CLIENTEDGE,
-		_T("TileSet"),
-		NULL,
-		WS_CHILD | WS_VISIBLE,
-		rectView.right - size_x + dx,
-		0,
-		size_x - dx,
-		size_y,
-		hWnd_,
-		NULL,
-		hInst_,
-		NULL
-	);*/
-
 	CTfManager::Instance()->LoadTf("TileSetProc", MY_POSE{ rectView.right - size_x + dx, 0.f });
 
 	return TRUE;
@@ -357,7 +327,7 @@ LRESULT CCore::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			_T("Child Window"),
 			NULL,
 			WS_OVERLAPPEDWINDOW,
-			0, 0, rect_view.right, rect_view.bottom + 100,
+			0, 0, rect_view.right + 100, rect_view.bottom + 200,
 			hWnd,
 			NULL,
 			CCore::Instance()->GetHInstance(),
@@ -422,6 +392,12 @@ LRESULT CCore::ChildWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 	float size_coef = 0.35;
 	float size_x = 0;
 	float size_y = 0;
+
+	// 파일 I/O 정보
+	OPENFILENAME OFN;
+	OPENFILENAME SFN;
+	TCHAR str[100], lp_str_file[100] = _T("");
+	TCHAR filter[] = _T("Every File(*.*) \0*.*\0Text File\0*.txt;*.doc\0");
 
 	switch (message)
 	{
@@ -489,6 +465,53 @@ LRESULT CCore::ChildWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 
 			ShowWindow(h_tile_setting, SW_SHOW);
 			UpdateWindow(h_tile_setting);
+			break;
+			
+		case ID_SAVE_MAP:
+			memset(&SFN, 0, sizeof(OPENFILENAME));
+			SFN.lStructSize = sizeof(OPENFILENAME);
+			SFN.hwndOwner = hWnd;
+			SFN.lpstrFilter = filter;
+			SFN.lpstrFile = lp_str_file;
+			SFN.nMaxFile = 100;
+			SFN.lpstrInitialDir = _T(".");
+			if (GetSaveFileName(&SFN) != 0)
+			{
+				_stprintf_s(str, _T("%s 파일을 저장하시겠습니까?"), SFN.lpstrFile);
+				MessageBox(hWnd, str, _T("저장하기 선택"), MB_OK);
+				
+				// 문자열 데이터 형변환
+				wstring tmp_wstr = lp_str_file;
+				string tmp_file_path = "";
+				tmp_file_path.assign(tmp_wstr.begin(), tmp_wstr.end());
+
+				// 데이터 저장
+				CSceneManager::Instance()->SaveFromPath(tmp_file_path.c_str());
+			}
+			break;
+
+		case ID_LOAD_MAP:
+			memset(&OFN, 0, sizeof(OPENFILENAME));
+			OFN.lStructSize = sizeof(OPENFILENAME);
+			OFN.hwndOwner = hWnd;
+			OFN.lpstrFilter = filter;
+			OFN.lpstrFile = lp_str_file;
+			OFN.nMaxFile = 100;
+			OFN.lpstrInitialDir = _T(".");
+			if (GetOpenFileName(&OFN) != 0)
+			{
+				_stprintf_s(str, _T("%s 파일을 열겠습니까?"), OFN.lpstrFile);
+				MessageBox(hWnd, str, _T("열기 선택"), MB_OK);
+
+				// 문자열 데이터 형변환
+				wstring tmp_wstr = lp_str_file;
+				string tmp_file_path = "";
+				tmp_file_path.assign(tmp_wstr.begin(), tmp_wstr.end());
+
+				// 데이터 업로드
+				CSceneManager::Instance()->LoadFromPath(tmp_file_path.c_str());
+
+			}
 			break;
 		}
 		break;
@@ -741,7 +764,7 @@ INT_PTR  CALLBACK CCore::Dlg_TSS_Proc(HWND hwnd, UINT message, WPARAM wParam, LP
 
 		case IDC_TSS_COMBO:
 			if (HIWORD(wParam) == CBN_SELCHANGE)
-				selection = SendMessage(hCombo, CB_GETCURSEL, 0, 0);
+				selection = (int)SendMessage(hCombo, CB_GETCURSEL, 0, 0);
 			break;
 
 		case IDCANCEL:

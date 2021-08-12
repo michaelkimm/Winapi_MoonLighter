@@ -42,11 +42,13 @@ void CMapEditScene::UpdateMousePoseWithCam()
 	int mouse_pose_y_idx = floor(mouse_pose_with_cam_.y);
 	mouse_pose_with_cam_.x = mouse_pose_x_idx;
 	mouse_pose_with_cam_.y = mouse_pose_y_idx;
+	mouse_pose_with_cam_idx_ = mouse_pose_with_cam_;
 	mouse_pose_with_cam_ *= TEXTURE_SIZE;
 }
 
 CMapEditScene::CMapEditScene()	:
-	edit_layer_(FLOOR_LAYER)
+	edit_layer_(FLOOR_LAYER),
+	prev_mouse_pose_with_cam_idx_(0, 0)
 {
 }
 
@@ -120,23 +122,19 @@ bool CMapEditScene::Init(HWND _hWnd)
 
 void CMapEditScene::Input(float _time)
 {
-	// cout << "m11\n";
-
 	CMapToolScene::Input(_time);
 	// CCameraManager::Instance()->Input(_time);
 
+	CLayer* pt_layer = FindLayer(MOUSE_RECT_LAYER);
+	if (pt_layer == NULL) return;
+
+	// 레이어에 오브젝트 있으면 삭제
+	pt_layer->Clear();
+
 	// 마우스 위치가 Assist 씬 위일 경우만 실행
 	if (CInputManager::Instance()->GetHwnd() != hWnd_)
-	{
-		// 레이어 찾기
-		CLayer* pt_layer = FindLayer(MOUSE_RECT_LAYER);
-		if (pt_layer == NULL) return;
-
-		// 레이어에 오브젝트 있으면 삭제
-		pt_layer->Clear();
-
 		return;
-	}
+
 
 	// 현재 마우스 위치 get
 	MY_POSE mouse_pos = CInputManager::Instance()->GetMousePose();
@@ -148,8 +146,6 @@ void CMapEditScene::Input(float _time)
 	// mouse_down_pose_ 위치에 마우스 사각형 집합 생성
 	int rect_num_x = rect_num_x_;
 	int rect_num_y = rect_num_y_;
-
-	// cout << "m22\n";
 
 
 	//--------------------------------------------------------------------------------------------//
@@ -168,8 +164,6 @@ void CMapEditScene::Input(float _time)
 	CLayer* pt_layer2 = FindLayer(edit_layer_);
 	if (pt_layer2 == nullptr) return;
 
-	// cout << "백그라운드 타일 갯수: " << pt_layer2->GetObjCnt() << endl;
-	// cout << edit_layer_.c_str() << endl;
 
 	int tileset_x_length = pt_layer2->GetTileXNum();
 	int tileset_y_length = pt_layer2->GetTileYNum();
@@ -183,12 +177,7 @@ void CMapEditScene::Input(float _time)
 	}
 
 	if (rect_num_x <= 0 || rect_num_y <= 0)
-	{
-		// SAFE_RELEASE(pt_stage2);
 		return;
-	}
-
-	// cout << "m33\n";
 
 	//--------------------------------------------------------------------------------------------//
 
@@ -197,22 +186,44 @@ void CMapEditScene::Input(float _time)
 	//--------------------------------------------------------------------------------------------//
 
 
+	// mouse_down_pose_ 위치 조정 (전체 타일 집합에 맞게) 
+	UpdateMousePoseWithCam();
 
 
-	// 레이어 찾기
-	CLayer* pt_layer = FindLayer(MOUSE_RECT_LAYER);
-	if (pt_layer == NULL)
+	//--------------------------------------------------------------------------------------------//
+
+	// Delete 기능 생성
+
+	//--------------------------------------------------------------------------------------------//
+	CLayer* pt_targer_layer = NULL;
+	if (CInputManager::Instance()->GetKeyDel() && CInputManager::Instance()->GetKeyA() && CInputManager::Instance()->GetKeyCtrl())
 	{
-		// SAFE_RELEASE(pt_stage2);
+		// Delete + 마우스 + 스페이스바 다운일 경우 모두 제거
+		cout << "다 지워!\n";
+		pt_layer2->DeleteAll();
+	}
+
+	// Delete 키가 눌러진 상태로 마우스 누르면 발동
+	if (CInputManager::Instance()->GetKeyDel() && CInputManager::Instance()->GetMouseLeftDown())
+	{
+		
+		// 방금 제거했던 위치면
+		if (prev_mouse_pose_with_cam_idx_ == mouse_pose_with_cam_idx_)
+			return;
+
+		// 현재 레이어에서 마우스 좌표쪽에 해당되는 인덱스의 타일 제거
+		pt_layer2->DeleteObj(mouse_pose_with_cam_idx_.x, mouse_pose_with_cam_idx_.y);
+
+		prev_mouse_pose_with_cam_idx_ = mouse_pose_with_cam_idx_;
+
 		return;
 	}
 
-	// 레이어에 오브젝트 있으면 삭제
-	pt_layer->Clear();
+   //--------------------------------------------------------------------------------------------//
 
+   // End
 
-	// 1. mouse_down_pose_ 위치 조정 (전체 타일 집합에 맞게) 
-	UpdateMousePoseWithCam();
+   //--------------------------------------------------------------------------------------------//
 
 
 	// 타일 생성
@@ -220,7 +231,6 @@ void CMapEditScene::Input(float _time)
 	if (!pt_layer->CreateTile(mouse_pose_with_cam_, rect_num_x, rect_num_y, TEXTURE_SIZE, TEXTURE_SIZE, EMPTY_BW_32, TEXTURE_PATH))
 		return;
 
-	// cout << "m44\n";
 
 	//--------------------------------------------------------------------------------------------//
 
@@ -228,26 +238,20 @@ void CMapEditScene::Input(float _time)
 
 	//--------------------------------------------------------------------------------------------//
 
-	// return;
-
 	// 마우스가 눌려진게 아니면 업데이트할 필요 없음!
 	if (!CInputManager::Instance()->GetMouseLeftDown())
-	{
-		// cout << "\nhaha4\n";
 		return;
-	}
-	// cout << "\nhaha5\n";
-	
+
+	static MY_POSE prev_add_pose(0, 0);
+
+	// 방금 추가했던 위치면 다시 추가x
+	if (prev_add_pose == mouse_pose_with_cam_)
+		return;
+
 	// 해당 레이어에 rect_tile_vec_ 내에 저장 돼있던 타일 붙여넣기
 	PaintTiles(pt_layer2, mouse_pose_with_cam_, rect_tile_vec_, rect_num_x_, rect_num_y_);
 
-	// UI 레이어에 페인트 맵하되, 해당 인덱스에 대응하는 텍스쳐 옵션을 가져와서 칠하기.
-	// PaintMap(vector<class CTile*> _vec_tile, int _rect_num_x, int _rect_num_y, const string& _target_layer, MY_SIZE _world_size);
-
-	cout << endl << endl;
-	 // <<
-
-	// cout << "m55\n";
+	prev_add_pose = mouse_pose_with_cam_;
 
 	//--------------------------------------------------------------------------------------------//
 
@@ -274,4 +278,14 @@ void CMapEditScene::Collision(float _time)
 void CMapEditScene::Render(HDC _hdc, float _time)
 {
 	CMapToolScene::Render(_hdc, _time);
+}
+
+void CMapEditScene::Save(FILE * _pt_file)
+{
+	CMapToolScene::Save(_pt_file);
+}
+
+void CMapEditScene::Load(FILE * _pt_file)
+{
+	CMapToolScene::Load(_pt_file);
 }

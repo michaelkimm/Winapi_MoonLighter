@@ -31,6 +31,10 @@ bool CPathManager::Init()
 	if (!CreatePath(TEXTURE_PATH, _T("Texture\\")))
 		return false;
 
+	// 데이터 폴더 위치 생성
+	if (!CreatePath(DATA_PATH, _T("Data\\")))
+		return false;
+
 	return true;
 }
 

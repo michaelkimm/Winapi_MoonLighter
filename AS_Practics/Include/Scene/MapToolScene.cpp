@@ -33,7 +33,6 @@ bool CMapToolScene::ChangeBackTileSheet(HWND _hwnd, const string & _str_key)
 	// 마우스 다운 관련 변수 초기화
 	mouse_down_pose_ = MY_POSE(-1.f, -1.f);
 	past_mouse_down_ = false;
-	mouse_up_ = false;
 
 	CCore::Instance()->SetMapEditMode(true);
 
@@ -148,6 +147,9 @@ void CMapToolScene::PaintTiles(CLayer* _target_layer, MY_POSE _pose, vector<CTil
 			tmp_tile = _rect_tile_vec[cnt++]->Clone();
 			tmp_tile->SetPose(_pose.x + j * TEXTURE_SIZE, _pose.y + i * TEXTURE_SIZE);
 
+			// MY_POSE tmp_pose(_pose.x + j * TEXTURE_SIZE, _pose.y + i * TEXTURE_SIZE);
+			// cout << "붙여 놓는 인덱스: (" << tmp_pose.x / TEXTURE_SIZE << ", " << tmp_pose.y / TEXTURE_SIZE << ")\n";
+
 			_target_layer->AddObj(tmp_tile);
 
 			SAFE_RELEASE(tmp_tile);
@@ -224,4 +226,14 @@ void CMapToolScene::Collision(float _time)
 void CMapToolScene::Render(HDC _hdc, float _time)
 {
 	CScene::Render(_hdc, _time);
+}
+
+void CMapToolScene::Save(FILE * _pt_file)
+{
+	CScene::Save(_pt_file);
+}
+
+void CMapToolScene::Load(FILE * _pt_file)
+{
+	CScene::Load(_pt_file);
 }

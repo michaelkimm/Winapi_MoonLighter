@@ -21,6 +21,10 @@ private:
 	bool key_2_;
 	bool key_3_;
 
+	bool key_del_;
+	bool key_space_;
+	bool key_ctrl_;
+
 	bool past_mouse_left_down_;
 	bool mouse_left_down_;
 	bool mouse_left_up_;
@@ -39,6 +43,10 @@ public:
 	bool GetKey1() const { return key_1_; }
 	bool GetKey2() const { return key_2_; }
 	bool GetKey3() const { return key_3_; }
+
+	bool GetKeyDel() const { return key_del_; }
+	bool GetKeySpace() const { return key_space_; }
+	bool GetKeyCtrl() const { return key_ctrl_; }
 
 	bool GetPastMouseLeftDown() const { return past_mouse_left_down_; }
 	bool GetMouseLeftDown() const	{ return mouse_left_down_; }

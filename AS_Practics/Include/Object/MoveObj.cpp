@@ -110,3 +110,17 @@ void CMoveObj::Render(HDC _hdc, float _time)
 {
 	CObject::Render(_hdc, _time);
 }
+
+void CMoveObj::Save(FILE * _pt_file)
+{
+	CObject::Save(_pt_file);
+
+	// 각속도 & 속도 저장
+	fwrite(&angle_, 4, 1, _pt_file);
+	fwrite(&speed_, 4, 1, _pt_file);
+}
+
+void CMoveObj::Load(FILE * _pt_file)
+{
+	CObject::Load(_pt_file);
+}

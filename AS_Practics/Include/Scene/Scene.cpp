@@ -148,3 +148,28 @@ bool CScene::LayerZComp(CLayer * p1, CLayer * p2)
 {
 	return p1->GetZOrder() < p2->GetZOrder();
 }
+
+void CScene::Save(FILE * _pt_file)
+{
+	list<CLayer*>::iterator iter;
+	list<CLayer*>::iterator iter_end = layer_list_.end();
+
+	for (iter = layer_list_.begin(); iter != iter_end; iter++)
+	{
+		(*iter)->Save(_pt_file);
+	}
+}
+
+void CScene::Load(FILE * _pt_file)
+{
+	list<CLayer*>::iterator iter;
+	list<CLayer*>::iterator iter_end = layer_list_.end();
+
+	for (iter = layer_list_.begin(); iter != iter_end; iter++)
+	{
+		(*iter)->Load(_pt_file);
+	}
+}
+
+
+

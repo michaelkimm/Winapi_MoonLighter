@@ -7,12 +7,14 @@
 class CMapEditScene :
 	public CMapToolScene
 {
+	// ** Load할 변수 없음 ** //
+
 	friend class CSceneManager;
 	friend class CAssistScene;
 	friend class CCore;
 
 private:
-
+	
 	// edit할 레이어 지정. 다이얼로그 박스에서 지정한다.
 	string edit_layer_;
 
@@ -38,7 +40,12 @@ public:
 private:
 	// 카메라 스크롤을 고려한 마우스 위치 in 절대좌표
 	MY_POSE mouse_pose_with_cam_;
+	
 	void UpdateMousePoseWithCam();
+
+	// delete위한 변수
+	MY_POSE prev_mouse_pose_with_cam_idx_;
+	MY_POSE mouse_pose_with_cam_idx_;
 
 private:
 	CMapEditScene();
@@ -51,6 +58,10 @@ public:
 	virtual void LateUpdate(float _time);
 	virtual void Collision(float _time);
 	virtual void Render(HDC _hdc, float _time);
+
+public:
+	virtual void Save(FILE* _pt_file);
+	virtual void Load(FILE* _pt_file);
 
 };
 

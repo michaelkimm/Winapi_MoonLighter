@@ -56,6 +56,9 @@ public:
 	void SafeDeleteList(list<class CLayer*>& obj);
 	static bool LayerZComp(CLayer* p1, CLayer* p2);
 
+public:
+	virtual void Save(FILE* _pt_file);
+	virtual void Load(FILE* _pt_file);
 };
 
 #endif

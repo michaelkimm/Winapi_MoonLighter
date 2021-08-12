@@ -1,6 +1,7 @@
 #include "Texture.h"
 #include "PathManager.h"
 #include "Core.h"
+#include "SourceManager.h"
 
 CTexture::CTexture()	:
 	hMemDC_(NULL),
@@ -27,7 +28,7 @@ void CTexture::SetOptionVec(TILE_OPTION _op, int _x, int _y)
 	option_vec_[_x + _y * (w_ / TEXTURE_SIZE)] = _op;
 }
 
-bool CTexture::SetTexture(HINSTANCE _hInst, HDC& _hdc, const wchar_t * _file_name, const string& _str_path_key, const COLORREF& _color_key)
+bool CTexture::SetTexture(HINSTANCE _hInst, HDC& _hdc, const string& _texture_key, const wchar_t * _file_name, const string& _str_path_key, const COLORREF& _color_key)
 {
 	const wchar_t* texture_path = CPathManager::Instance()->FindPath(_str_path_key);
 
@@ -37,7 +38,13 @@ bool CTexture::SetTexture(HINSTANCE _hInst, HDC& _hdc, const wchar_t * _file_nam
 
 	// 텍스쳐 path, 이름 삽입
 	wstring path_ = texture_path;
+	wstring tmp_path_ = texture_path;
 	path_ += _file_name;
+
+	// Save & Load 위해 텍스쳐 키 & 파일 이름 & 경로 키
+	texture_key_ = _texture_key;
+	file_name_ = _file_name;
+	path_key_ = _str_path_key;
 
 	// 이미지 삽입
 	hBitmap_ = (HBITMAP)LoadImageW(_hInst, path_.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
@@ -74,4 +81,82 @@ bool CTexture::SetTexture(HINSTANCE _hInst, HDC& _hdc, const wchar_t * _file_nam
 
 void CTexture::Render(HDC _hdc, float _time)
 {
+}
+
+void CTexture::Save(FILE * _pt_file)
+{
+	/*
+	
+	// 텍스쳐 키 & 파일 이름 & 경로 키
+	string texture_key_;
+	wstring file_name_;
+	string path_key_;
+	
+	*/
+
+	// 텍스쳐 키 저장
+	int len = texture_key_.length();
+	fwrite(&len, 4, 1, _pt_file);
+	fwrite(texture_key_.c_str(), 1, len, _pt_file);
+
+	// 텍스쳐 파일 이름 저장
+	len = file_name_.length();
+	fwrite(&len, 4, 1, _pt_file);
+	fwrite(file_name_.c_str(), 2, len, _pt_file);
+
+	// 경로 키 저장
+	len = path_key_.length();
+	fwrite(&len, 4, 1, _pt_file);
+	fwrite(path_key_.c_str(), 1, len, _pt_file);
+
+	// 타일 옵션 벡터 저장
+	len = option_vec_.size();
+	fwrite(&len, 4, 1, _pt_file);
+	vector<TILE_OPTION>::iterator iter;
+	vector<TILE_OPTION>::iterator iter_end = option_vec_.end();
+	for (iter = option_vec_.begin(); iter != iter_end; iter++)
+	{
+		fwrite(&(*iter), 4, 1, _pt_file);
+	}
+}
+
+void CTexture::Load(FILE * _pt_file)
+{
+	int len;
+
+	char str_key[MAX_PATH] = {};
+	wchar_t str_filename[MAX_PATH] = {};
+	char str_path[MAX_PATH] = {};
+
+	// 텍스쳐 키 읽기
+	fread(&len, 4, 1, _pt_file);
+	fread(&str_key, 1, len, _pt_file);
+	str_key[len] = '\0';
+
+	// 텍스쳐 파일 이름 읽기
+	fread(&len, 4, 1, _pt_file);
+	fread(&str_filename, 2, len, _pt_file);
+	str_filename[len] = '\0';
+
+	// 경로 키 읽기
+	fread(&len, 4, 1, _pt_file);
+	fread(&str_path, 1, len, _pt_file);
+	str_path[len] = '\0';
+
+	// 타일 옵션 벡터 저장
+	option_vec_.clear();
+	fread(&len, 4, 1, _pt_file);
+	option_vec_.resize(len, TILE_NONE);
+
+	TILE_OPTION tmp_option;
+	vector<TILE_OPTION>::iterator iter;
+	vector<TILE_OPTION>::iterator iter_end = option_vec_.end();
+	for (iter = option_vec_.begin(); iter != iter_end; iter++)
+	{
+		fread(&tmp_option, 4, 1, _pt_file);
+		*iter = tmp_option;
+	}
+	
+	// 자원 관리자에 텍스쳐 업로드
+	CSourceManager::Instance()->LoadTexture(str_key, str_filename, str_path);
 }

@@ -3,8 +3,7 @@
 #include "..\Core\Texture.h"
 #include "..\Core\Core.h"
 
-CTile::CTile()	:
-	option_(TILE_NONE)
+CTile::CTile()
 {
 }
 
@@ -16,6 +15,14 @@ CTile::CTile(const CTile& _tile)	:
 
 CTile::~CTile()
 {
+}
+
+CTile * CTile::Clone()
+{
+	CTile* pt_temp = new CTile(*this);
+	pt_temp->InitRef();
+
+	return pt_temp;
 }
 
 bool CTile::Init()
@@ -67,17 +74,21 @@ void CTile::Render(HDC _hdc, float _time)
 			return;
 
 		TransparentBlt(_hdc, pose_in_cam.x, pose_in_cam.y, size_.x, size_.y, texture_->GetDC(), x, y, size_.x, size_.y, texture_->GetColorKey());
-		// 오브젝트의 카메라 상에서 위치 = 스테이지 위치 - 윈도우 위치
-
-		// cout << "pose_ : (" << pose_.x << ", " << pose_.y << ")\n";
-		// cout << "pose_in_cam : (" << pose_in_cam.x << ", " << pose_in_cam.y << ")\n\n\n";
 	}
 }
 
-CTile * CTile::Clone()
+void CTile::Save(FILE * _pt_file)
 {
-	CTile* pt_temp = new CTile(*this);
-	pt_temp->InitRef();
+	CStaticObj::Save(_pt_file);
 
-	return pt_temp;
+	// 텍스쳐에서 자신의 위치 인덱스 저장
+	fwrite(&idx_int_texture_, sizeof(idx_int_texture_), 1, _pt_file);
+}
+
+void CTile::Load(FILE * _pt_file)
+{
+	CStaticObj::Load(_pt_file);
+
+	// 텍스쳐에서 자신의 위치 인덱스 불러오기
+	fread(&idx_int_texture_, sizeof(idx_int_texture_), 1, _pt_file);
 }

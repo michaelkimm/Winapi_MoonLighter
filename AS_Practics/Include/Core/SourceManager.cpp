@@ -91,6 +91,49 @@ bool CSourceManager::Init(HINSTANCE _hInst, HDC& _hdc)
 	return true;
 }
 
+class CTexture* CSourceManager::LoadTexture(FILE *file)
+{
+	int len;
+
+	char str_key[MAX_PATH] = {};
+	wchar_t str_filename[MAX_PATH] = {};
+	char str_path[MAX_PATH] = {};
+
+	// 텍스쳐 키 읽기
+	fread(&len, 4, 1, file);
+	fread(&str_key, 1, len, file);
+	str_key[len] = '\0';
+
+	// 텍스쳐 파일 이름 읽기
+	fread(&len, 4, 1, file);
+	fread(&str_filename, 2, len, file);
+	str_filename[len] = '\0';
+
+	// 경로 키 읽기
+	fread(&len, 4, 1, file);
+	fread(&str_path, 1, len, file);
+	str_path[len] = '\0';
+
+	// 타일 옵션 벡터 저장
+	fread(&len, 4, 1, file);
+	vector<TILE_OPTION> option_vec(len, TILE_NONE);
+
+	vector<TILE_OPTION>::iterator iter;
+	vector<TILE_OPTION>::iterator iter_end = option_vec.end();
+	for (iter = option_vec.begin(); iter != iter_end; iter++)
+	{
+		fread(&(*iter), 4, 1, file);
+	}
+
+	// 자원 관리자에 텍스쳐 업로드
+	CTexture* tmp_texture = LoadTexture(str_key, str_filename, str_path);
+
+	// option 설정
+	tmp_texture->ChangeOptionVec(option_vec);
+
+	return tmp_texture;
+}
+
 class CTexture* CSourceManager::LoadTexture(const string& _texture_key, const wchar_t* _file_name, const string& _str_path_key, const COLORREF& _color_key, bool _not_load_map)
 {
 	class CTexture* _pt_texture = FindTexture(_texture_key);
@@ -102,7 +145,7 @@ class CTexture* CSourceManager::LoadTexture(const string& _texture_key, const wc
 	_pt_texture = new CTexture;	// ref_cnt = 1;
 
 	// 파일이 없는 경우
-	if (!_pt_texture->SetTexture(hInst_, hdc_, _file_name, _str_path_key, _color_key))
+	if (!_pt_texture->SetTexture(hInst_, hdc_, _texture_key, _file_name, _str_path_key, _color_key))
 	{
 		SAFE_RELEASE(_pt_texture)
 		return NULL;

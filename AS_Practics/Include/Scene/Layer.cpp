@@ -18,6 +18,38 @@ CLayer::~CLayer()
 	SafeReleaseList(obj_list_);
 }
 
+void CLayer::DeleteObj(float _x, float _y)
+{
+	cout << "erase idx: (" << _x << ", " << _y << ")\n";
+
+	vector<class CObject*>::iterator target_iter = FindObj(MY_POSE(_x, _y));
+	if (target_iter == obj_list_.end())
+	{
+		cout << "못 찾음!\n";
+		return;
+	}
+	cout << "남은 갯수: " << obj_list_.size() << endl;
+	obj_list_.erase(target_iter);
+}
+
+void CLayer::DeleteAll()
+{
+	SafeReleaseList(obj_list_);
+}
+
+vector<class CObject*>::iterator CLayer::FindObj(MY_POSE _pose_idx)
+{
+	vector<class CObject*>::iterator iter;
+	vector<class CObject*>::iterator iter_end = obj_list_.end();
+
+	for (iter = obj_list_.begin(); iter != iter_end; iter++)
+	{
+		if (((*iter)->GetPose() / TEXTURE_SIZE) == _pose_idx )
+			break;
+	}
+	return iter;
+}
+
 void CLayer::AddObj(class CObject* _obj)
 {
 	_obj->SetScene(pt_scene_);
@@ -107,6 +139,60 @@ void CLayer::Render(HDC _hdc, float _time)
 	{
 		(*iter)->Render(_hdc, _time);
 	}
+}
+
+void CLayer::Save(FILE * _pt_file)
+{
+	// : >> 레이어 정보 저장
+
+	// 전체 타일 갯수
+	int tile_cnt = obj_list_.size();
+	fwrite(&tile_cnt, 4, 1, _pt_file);
+
+	// 레이어 멤버 변수
+	fwrite(&tile_x_num_, 4, 1, _pt_file);
+	fwrite(&tile_y_num_, 4, 1, _pt_file);
+	fwrite(&tile_width_, 4, 1, _pt_file);
+	fwrite(&tile_height_, 4, 1, _pt_file);
+
+	vector<class CObject*>::iterator iter;
+	vector<class CObject*>::iterator iter_end = obj_list_.end();
+
+	for (iter = obj_list_.begin(); iter != iter_end; iter++)
+	{
+		(*iter)->Save(_pt_file);
+	}
+	// <<
+}
+
+void CLayer::Load(FILE * _pt_file)
+{
+	// : >> 레이어 정보 불러오기
+
+	// 전체 타일 갯수
+	int tile_cnt;
+	fread(&tile_cnt, 4, 1, _pt_file);
+
+	// 레이어 멤버 변수
+	fread(&tile_x_num_, 4, 1, _pt_file);
+	fread(&tile_y_num_, 4, 1, _pt_file);
+	fread(&tile_width_, 4, 1, _pt_file);
+	fread(&tile_height_, 4, 1, _pt_file);
+
+	// 기존 벡터 제거
+	SafeReleaseList(obj_list_);
+
+	for (int i = 0; i < tile_cnt; i++)
+	{
+		// 타일 동적할당
+		CTile* pt_tile = CObject::CreateObj<CTile>("Tile", this);
+
+		// 타일 정보 로드
+		pt_tile->Load(_pt_file);
+
+		SAFE_RELEASE(pt_tile);
+	}
+	// <<
 }
 
 bool CLayer::CreateTile(const MY_POSE& _start_pose, int _num_x, int _num_y, int _size_x, int _size_y,

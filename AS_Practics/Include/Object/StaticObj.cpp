@@ -43,3 +43,13 @@ void CStaticObj::Render(HDC _hdc, float _time)
 {
 	CObject::Render(_hdc, _time);
 }
+
+void CStaticObj::Save(FILE * _pt_file)
+{
+	CObject::Save(_pt_file);
+}
+
+void CStaticObj::Load(FILE * _pt_file)
+{
+	CObject::Load(_pt_file);
+}

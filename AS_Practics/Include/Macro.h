@@ -10,6 +10,7 @@
 
 #define ROOT_PATH "root_path"
 #define TEXTURE_PATH "texture_path"
+#define DATA_PATH "data_path"
 #define PLAYER_TAG "player"
 
 // : >> Scene name

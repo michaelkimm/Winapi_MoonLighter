@@ -23,6 +23,8 @@ public:
 	virtual void Render(HDC _hdc, float _time);
 
 public:
+	virtual void Save(FILE* _pt_file);
+	virtual void Load(FILE* _pt_file);
 };
 
 #endif

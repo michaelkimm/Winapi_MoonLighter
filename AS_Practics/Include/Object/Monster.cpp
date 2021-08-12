@@ -58,3 +58,16 @@ void CMonster::Render(HDC _hdc, float _time)
 	CMoveObj::Render(_hdc, _time);
 	Rectangle(_hdc, pose_.x, pose_.y, pose_.x + size_.x, pose_.y + size_.y);
 }
+
+void CMonster::Save(FILE * _pt_file)
+{
+	CMoveObj::Save(_pt_file);
+
+	// 방향 값(enum) 저장
+	fwrite(&dir_, 4, 1, _pt_file);
+}
+
+void CMonster::Load(FILE * _pt_file)
+{
+	CMoveObj::Load(_pt_file);
+}

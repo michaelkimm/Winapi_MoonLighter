@@ -60,10 +60,7 @@ void CAssistScene::Input(float _time)
 	}
 
 	if (CInputManager::Instance()->GetMouseLeftUp())
-	{
-		mouse_up_ = true;
 		return;
-	}
 
 
 	// 과거에 마우스 다운 한 적 없으면 아웃
@@ -212,4 +209,14 @@ void CAssistScene::Collision(float _time)
 void CAssistScene::Render(HDC _hdc, float _time)
 {
 	CMapToolScene::Render(_hdc, _time);
+}
+
+void CAssistScene::Save(FILE * _pt_file)
+{
+	CMapToolScene::Save(_pt_file);
+}
+
+void CAssistScene::Load(FILE * _pt_file)
+{
+	CMapToolScene::Load(_pt_file);
 }

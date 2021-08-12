@@ -36,6 +36,13 @@ public:
 	void Render(HDC _hdc, float _time);
 
 public:
+	void Save(FILE* _pt_file);
+	void Load(FILE* _pt_file);
+
+	void SaveFromPath(const char* _pt_file_name, const string& _str_path_key = DATA_PATH, bool _full_path = true);
+	void LoadFromPath(const char* _pt_file_name, const string& _str_path_key = DATA_PATH, bool _full_path = true);
+
+public:
 	// 씬 종류에 따라 다르게 생성해야하기 때문에 템플릿으로 생성
 	template <typename T>
 	T* CreateScene(SCENE_CREATE _sc, HWND _hWnd)

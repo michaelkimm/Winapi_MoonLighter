@@ -21,6 +21,7 @@ public:
 	int					GetHeight()		const	{ return h_; }
 	vector<TILE_OPTION> GetOptionVec()	const	{ return option_vec_; }
 	TILE_OPTION			GetOptionVec(int _x, int _y) const;
+	void				ChangeOptionVec(vector<TILE_OPTION> _option_vec) { option_vec_ = _option_vec; }
 
 	void SetOptionVec(TILE_OPTION _op, int _x, int _y);
 
@@ -43,9 +44,17 @@ private:
 	~CTexture();	
 
 public:
-	bool SetTexture(HINSTANCE _hInst, HDC& _hdc, const wchar_t* _file_name, const string& _str_path_key = TEXTURE_PATH,
+	bool SetTexture(HINSTANCE _hInst, HDC& _hdc, const string& _texture_key, const wchar_t* _file_name, const string& _str_path_key = TEXTURE_PATH,
 							const COLORREF& _color_key = RGB(255, 0, 255));
 	void Render(HDC _hdc, float _time);
+
+	// 텍스쳐 키 & 파일 이름 & 경로 키
+	string texture_key_;
+	wstring file_name_;
+	string path_key_;
+
+	void Save(FILE* _pt_file);
+	void Load(FILE* _pt_file);
 };
 
 

@@ -117,3 +117,13 @@ void CInGameScene::Render(HDC _hdc, float _time)
 {
 	// CScene::Render(_hdc, _time);
 }
+
+void CInGameScene::Save(FILE * _pt_file)
+{
+	CScene::Save(_pt_file);
+}
+
+void CInGameScene::Load(FILE * _pt_file)
+{
+	CScene::Load(_pt_file);
+}

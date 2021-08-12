@@ -28,9 +28,6 @@
     <Filter Include="Object\MoveObject">
       <UniqueIdentifier>{772ed643-e39d-4dad-91cd-970253f26067}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Object\StaticObject">
-      <UniqueIdentifier>{7deaa539-2ecb-40ae-95ba-33aea86d9f05}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Object\MoveObject\Player">
       <UniqueIdentifier>{dc792751-9e11-47ca-9b74-313e00670b5d}</UniqueIdentifier>
     </Filter>
@@ -45,6 +42,12 @@
     </Filter>
     <Filter Include="Scene\MapTool">
       <UniqueIdentifier>{d6edff9b-1c5f-484d-9c44-6c1098b6dc3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\MapTool\MapToolChild">
+      <UniqueIdentifier>{efdf1206-1bcb-493e-8ef9-e8edfbc33190}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Layer\StaticObject">
+      <UniqueIdentifier>{7deaa539-2ecb-40ae-95ba-33aea86d9f05}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -76,7 +79,7 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Object\StaticObj.cpp">
-      <Filter>Object\StaticObject</Filter>
+      <Filter>Scene\Layer\StaticObject</Filter>
     </ClCompile>
     <ClCompile Include="Object\Player.cpp">
       <Filter>Object\MoveObject\Player</Filter>
@@ -97,7 +100,7 @@
       <Filter>Core\Source</Filter>
     </ClCompile>
     <ClCompile Include="Object\Tile.cpp">
-      <Filter>Object\StaticObject</Filter>
+      <Filter>Scene\Layer\StaticObject</Filter>
     </ClCompile>
     <ClCompile Include="Core\InputManager.cpp">
       <Filter>Core</Filter>
@@ -108,17 +111,17 @@
     <ClCompile Include="Core\TfManager.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\AssistScene.cpp">
-      <Filter>Scene\MapTool</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\MapEditScene.cpp">
-      <Filter>Scene\MapTool</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\MapToolScene.cpp">
       <Filter>Scene\MapTool</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\AssistScene.cpp">
+      <Filter>Scene\MapTool\MapToolChild</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\MapEditScene.cpp">
+      <Filter>Scene\MapTool\MapToolChild</Filter>
+    </ClCompile>
     <ClCompile Include="Scene\TileSetSettingScene.cpp">
-      <Filter>Scene\MapTool</Filter>
+      <Filter>Scene\MapTool\MapToolChild</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -162,13 +165,10 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Object\StaticObj.h">
-      <Filter>Object\StaticObject</Filter>
+      <Filter>Scene\Layer\StaticObject</Filter>
     </ClInclude>
     <ClInclude Include="Object\Player.h">
       <Filter>Object\MoveObject\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Object\MoveObj.h">
-      <Filter>Object\MoveObject</Filter>
     </ClInclude>
     <ClInclude Include="Object\Monster.h">
       <Filter>Object\MoveObject\Monster</Filter>
@@ -183,7 +183,7 @@
       <Filter>Core\Source</Filter>
     </ClInclude>
     <ClInclude Include="Object\Tile.h">
-      <Filter>Object\StaticObject</Filter>
+      <Filter>Scene\Layer\StaticObject</Filter>
     </ClInclude>
     <ClInclude Include="Core\InputManager.h">
       <Filter>Core</Filter>
@@ -194,17 +194,20 @@
     <ClInclude Include="Core\TfManager.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\AssistScene.h">
-      <Filter>Scene\MapTool</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene\MapEditScene.h">
-      <Filter>Scene\MapTool</Filter>
-    </ClInclude>
     <ClInclude Include="Scene\MapToolScene.h">
       <Filter>Scene\MapTool</Filter>
     </ClInclude>
+    <ClInclude Include="Scene\MapEditScene.h">
+      <Filter>Scene\MapTool\MapToolChild</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\AssistScene.h">
+      <Filter>Scene\MapTool\MapToolChild</Filter>
+    </ClInclude>
     <ClInclude Include="Scene\TileSetSettingScene.h">
-      <Filter>Scene\MapTool</Filter>
+      <Filter>Scene\MapTool\MapToolChild</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\MoveObj.h">
+      <Filter>Object</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

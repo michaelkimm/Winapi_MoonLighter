@@ -13,7 +13,8 @@ class CObject
 
 protected:
 	string	str_tag_;
-	MY_POSE pose_;	// Àý´ë ÁÂÇ¥
+	MY_POSE pose_;		// Àý´ë ÁÂÇ¥
+	// MY_POSE pose_idx;	// ¸Ê¿¡¼­ ÀÎµ¦½º À§Ä¡
 	MY_SIZE size_;
 	MY_POSE pivot_;
 
@@ -63,10 +64,14 @@ public:
 	virtual void Render(HDC _hdc, float _time);
 
 public:
+	virtual void Save(FILE* _pt_file);
+	virtual void Load(FILE* _pt_file);
+
+public:
 	template <typename T>
 	static T* CreateObj(const string& _str_tag, CLayer* _layer)
 	{
-		T* pt_obj = new T;
+		T* pt_obj = new T; 
 
 		if (!pt_obj->Init())
 		{

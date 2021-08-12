@@ -237,6 +237,13 @@ typedef struct _POSITION
 		y = y / num;
 	}
 
+	// ---------------------------------------- ºñ±³
+
+	bool operator==(const _POSITION& p)
+	{
+		return ((int)x == (int)p.x) && ((int)y == (int)p.y);
+	}
+
 }MY_POSE, *MY_PT_POSE, MY_SIZE, *MY_PT_SIZE;
 
 #endif

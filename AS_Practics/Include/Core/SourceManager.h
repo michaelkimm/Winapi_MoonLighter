@@ -21,6 +21,8 @@ public:
 public:
 	bool Init(HINSTANCE _hInst, HDC& _hdc);
 
+	class CTexture* LoadTexture(FILE *file);
+
 	// 저장할 텍스처 키, 텍스처 클래스, 텍스처 위치
 	class CTexture* LoadTexture(const string& _texture_key, const wchar_t* _file_name, const string& _str_path_key = TEXTURE_PATH,
 									const COLORREF& _color_key = RGB(255, 0, 255), bool _not_load_map = false);

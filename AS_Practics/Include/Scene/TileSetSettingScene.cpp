@@ -157,3 +157,13 @@ void CTileSetSettingScene::Render(HDC _hdc, float _time)
 {
 	CMapToolScene::Render(_hdc, _time);
 }
+
+void CTileSetSettingScene::Save(FILE * _pt_file)
+{
+	CMapToolScene::Save(_pt_file);
+}
+
+void CTileSetSettingScene::Load(FILE * _pt_file)
+{
+	CMapToolScene::Save(_pt_file);
+}

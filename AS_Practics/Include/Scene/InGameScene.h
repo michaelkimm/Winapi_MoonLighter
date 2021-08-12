@@ -8,7 +8,8 @@
 class CInGameScene : 
 	public  CScene
 {
-private:
+	// ** Load할 변수 없음 ** //
+
 	// 씬 매니저는 생성 & 소멸자를 쓸 수 있어야함
 	friend class CSceneManager;
 
@@ -24,6 +25,10 @@ public:
 	virtual void LateUpdate(float _time);
 	virtual void Collision(float _time);
 	virtual void Render(HDC _hdc, float _time);
+
+public:
+	virtual void Save(FILE* _pt_file);
+	virtual void Load(FILE* _pt_file);
 };
 
 #endif

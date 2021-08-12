@@ -39,6 +39,10 @@ void CInputManager::KeyBoardInput(float _time)
 	key_1_ = (GetAsyncKeyState(0x31) & 0x8000);
 	key_2_ = (GetAsyncKeyState(0x32) & 0x8000);
 	key_3_ = (GetAsyncKeyState(0x33) & 0x8000);
+
+	key_del_ = (GetAsyncKeyState(0x2E) & 0x8000);
+	key_space_ = (GetAsyncKeyState(VK_SPACE) & 0x8000);
+	key_ctrl_ = (GetAsyncKeyState(VK_CONTROL) & 0x8000);
 }
 
 void CInputManager::KeyBoardStateReset()
@@ -52,6 +56,10 @@ void CInputManager::KeyBoardStateReset()
 	key_1_ = false;
 	key_2_ = false;
 	key_3_ = false;
+
+	key_del_ = false;
+	key_space_ = false;
+	key_ctrl_ = false;
 }
 
 void CInputManager::MouseInput(float _time)

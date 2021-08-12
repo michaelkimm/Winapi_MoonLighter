@@ -72,3 +72,13 @@ void CPlayer::Render(HDC _hdc, float _time)
 	//Rectangle(_hdc, pose_.x, pose_.y, pose_.x + size_.x, pose_.y + size_.y);
 	
 }
+
+void CPlayer::Save(FILE * _pt_file)
+{
+	CMoveObj::Save(_pt_file);
+}
+
+void CPlayer::Load(FILE * _pt_file)
+{
+	CMoveObj::Load(_pt_file);
+}

@@ -43,6 +43,10 @@ public:
 	int		GetZOrder() { return z_order_; }
 	string	GetTag() { return str_tag_; }
 
+	void DeleteObj(float _x, float _y);
+	void DeleteAll();
+	vector<class CObject*>::iterator FindObj(MY_POSE _pose_idx);
+
 public:
 	void		AddObj(class CObject* obj);
 	CObject*	GetObj(int _idx) const;
@@ -60,6 +64,10 @@ public:
 	void LateUpdate(float _time);
 	void Collision(float _time);
 	void Render(HDC _hdc, float _time);
+
+public:
+	virtual void Save(FILE* _pt_file);
+	virtual void Load(FILE* _pt_file);
 
 public:
 	template <typename T>

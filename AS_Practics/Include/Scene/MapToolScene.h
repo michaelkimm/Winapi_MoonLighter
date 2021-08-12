@@ -9,6 +9,8 @@
 class CMapToolScene :
 	public CScene
 {
+	// ** Load할 변수 없음 ** //
+
 	friend class CSceneManager;
 
 protected:
@@ -16,23 +18,10 @@ protected:
 	virtual ~CMapToolScene() = 0;
 
 protected:
-	MY_POSE pose_;	// 절대 좌표
-	MY_SIZE size_;
 
 	// 마우스 상태
 	MY_SIZE mouse_down_pose_;
 	bool past_mouse_down_;
-	bool mouse_up_;
-
-public:
-	void SetPose(MY_POSE& _pose) { pose_ = _pose; }
-	void SetPose(float _x, float _y) { pose_ = MY_POSE(_x, _y); }
-	void SetSize(MY_SIZE& _size) { size_ = _size; }
-	void SetSize(float _x, float _y) { size_ = MY_SIZE(_x, _y); }
-
-	MY_POSE GetPose() const { return pose_; }
-	MY_SIZE GetSize() const { return size_; }
-
 
 protected:
 	// 타일셋 백그라운드 레이어의 텍스처 이름
@@ -65,6 +54,10 @@ public:
 	virtual void LateUpdate(float _time);
 	virtual void Collision(float _time);
 	virtual void Render(HDC _hdc, float _time);
+
+public:
+	virtual void Save(FILE* _pt_file);
+	virtual void Load(FILE* _pt_file);
 };
 
 #endif
