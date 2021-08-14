@@ -88,6 +88,11 @@ bool CSourceManager::Init(HINSTANCE _hInst, HDC& _hdc)
 		return false;
 	SAFE_RELEASE(tmp_pt);
 
+	tmp_pt = LoadTexture(OXT_32, _T("OXT_32.bmp"));
+	if (tmp_pt == NULL)
+		return false;
+	SAFE_RELEASE(tmp_pt);
+
 	return true;
 }
 

@@ -38,6 +38,7 @@ public:
 	void SetScene(class CScene* _scene) { pt_scene_ = _scene; }
 	void SetTag(const string& _str_tag) { str_tag_ = _str_tag; }
 	void SetZOrder(int _z_order) { z_order_ = _z_order; }
+	void PushObj(class CObject*);
 
 	CScene* GetScene() { return pt_scene_; }
 	int		GetZOrder() { return z_order_; }
@@ -46,13 +47,13 @@ public:
 	void DeleteObj(float _x, float _y);
 	void DeleteAll();
 	vector<class CObject*>::iterator FindObj(MY_POSE _pose_idx);
-	void SortObjList();
 
-public:
-	void		AddObj(class CObject* obj, bool _sort = false);
+	void		AddObj(class CObject* obj, bool _do_sort = false);
 	CObject*	GetObj(int _idx) const;
+	CObject*	GetObj(const string& _name_tag);
 	int			GetObjCnt() { return obj_list_.size(); }
 	void		Clear();
+	void		SortObjListZOrder();
 
 private:
 	CLayer();

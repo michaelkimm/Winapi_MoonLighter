@@ -46,7 +46,7 @@
     <Filter Include="Scene\MapTool\MapToolChild">
       <UniqueIdentifier>{efdf1206-1bcb-493e-8ef9-e8edfbc33190}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Scene\Layer\StaticObject">
+    <Filter Include="Object\StaticObject">
       <UniqueIdentifier>{7deaa539-2ecb-40ae-95ba-33aea86d9f05}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -79,13 +79,10 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Object\StaticObj.cpp">
-      <Filter>Scene\Layer\StaticObject</Filter>
+      <Filter>Object\StaticObject</Filter>
     </ClCompile>
     <ClCompile Include="Object\Player.cpp">
       <Filter>Object\MoveObject\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Object\MoveObj.cpp">
-      <Filter>Object\MoveObject</Filter>
     </ClCompile>
     <ClCompile Include="Object\Monster.cpp">
       <Filter>Object\MoveObject\Monster</Filter>
@@ -100,7 +97,7 @@
       <Filter>Core\Source</Filter>
     </ClCompile>
     <ClCompile Include="Object\Tile.cpp">
-      <Filter>Scene\Layer\StaticObject</Filter>
+      <Filter>Object\StaticObject</Filter>
     </ClCompile>
     <ClCompile Include="Core\InputManager.cpp">
       <Filter>Core</Filter>
@@ -122,6 +119,24 @@
     </ClCompile>
     <ClCompile Include="Scene\TileSetSettingScene.cpp">
       <Filter>Scene\MapTool\MapToolChild</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\Stage.cpp">
+      <Filter>Object\StaticObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\MoveObj.cpp">
+      <Filter>Object\MoveObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\UIObj.cpp">
+      <Filter>Object\StaticObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\NatureObj.cpp">
+      <Filter>Object\StaticObject</Filter>
+    </ClCompile>
+    <ClCompile Include="MyFunctions.cpp">
+      <Filter>MyFunc</Filter>
+    </ClCompile>
+    <ClCompile Include="figureDraw.cpp">
+      <Filter>MyFunc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -165,7 +180,7 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Object\StaticObj.h">
-      <Filter>Scene\Layer\StaticObject</Filter>
+      <Filter>Object\StaticObject</Filter>
     </ClInclude>
     <ClInclude Include="Object\Player.h">
       <Filter>Object\MoveObject\Player</Filter>
@@ -183,7 +198,7 @@
       <Filter>Core\Source</Filter>
     </ClInclude>
     <ClInclude Include="Object\Tile.h">
-      <Filter>Scene\Layer\StaticObject</Filter>
+      <Filter>Object\StaticObject</Filter>
     </ClInclude>
     <ClInclude Include="Core\InputManager.h">
       <Filter>Core</Filter>
@@ -208,6 +223,21 @@
     </ClInclude>
     <ClInclude Include="Object\MoveObj.h">
       <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Stage.h">
+      <Filter>Object\StaticObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\UIObj.h">
+      <Filter>Object\StaticObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\NatureObj.h">
+      <Filter>Object\StaticObject</Filter>
+    </ClInclude>
+    <ClInclude Include="MyFunctions.h">
+      <Filter>MyFunc</Filter>
+    </ClInclude>
+    <ClInclude Include="figureDraw.h">
+      <Filter>MyFunc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

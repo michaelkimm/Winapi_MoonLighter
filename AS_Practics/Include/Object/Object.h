@@ -18,19 +18,44 @@ protected:
 	MY_SIZE size_;
 	MY_POSE pivot_;
 
+	// 텍스쳐
 	class CTexture* texture_;
+
+	// 타일 벡터
+	vector<class CObject*> tile_vec_;
+
+	// 부모 오브젝트
+	CObject* parent_obj_;
+
+public:
+	void AddObjToTileVec(CObject* _add_obj, bool _do_sort = false);
+
+	// 타일 벡터 추가 함수. 벡터<타일>을 이용
+	void AddTiles(vector<class CTile*> _rect_tile_vec, int _x_length, int _y_length, MY_POSE _to_idx = MY_POSE(0, 0), bool _initialize = false, bool _do_sort = false);
+	
+	// 타일 벡터 추가 함수. 단일 텍스쳐 이용
+	bool AddTiles(const MY_POSE& _start_pose, int _num_x, int _num_y, int _size_x, int _size_y,
+						const string& _texture_key, const string& _root_str = TEXTURE_PATH, bool _tile_one_type = false);
+
+	// 타일 벡터 추가 함수. 단일 텍스쳐 이용
+	bool AddTiles2(const MY_POSE& _start_pose, int _num_x, int _num_y, int _size_x, int _size_y,
+						const string& _org_key, const string& _target_key, const string& _root_str = TEXTURE_PATH, bool _tile_one_type = false);
+
+	void		SetParentObj(CObject* _obj);
+	CObject*	GetParentObj() const;
+	CObject*	GetTileFromVec(int _idx) const;
 
 public:
 	void SetTag(const string& _str_tag) { str_tag_ = _str_tag; }
-	void SetPose(MY_POSE& _pose)		{ pose_ = _pose; }
+	void SetPose(const MY_POSE& _pose)		{ pose_ = _pose; }
 	void SetPose(float _x, float _y)	{ pose_ = MY_POSE(_x, _y); }
 	void SetPose(int _x, int _y)		{ pose_ = MY_POSE(_x, _y); }
-	void SetSize(MY_SIZE& _size)		{ size_ = _size; }
+	void SetSize(const MY_SIZE& _size)		{ size_ = _size; }
 	void SetSize(float _x, float _y)	{ size_ = MY_SIZE(_x, _y); }
 	void SetSize(int _x, int _y)		{ size_ = MY_SIZE(_x, _y); }
-	void SetPivot(MY_POSE& _pivot)		{ pivot_ = _pivot; }
+	void SetPivot(const MY_POSE& _pivot)		{ pivot_ = _pivot; }
 	bool SetTexture(class CTexture* _t);
-	bool SetTexture(const string& _texture_key, const wchar_t* _pFileName = NULL, const string& _str_path_key = TEXTURE_PATH,
+	bool SetTexture(const string& _texture_key, const string& _str_path_key = TEXTURE_PATH,
 							const Color& _color_key = Color(255, 0, 255));
 
 
@@ -69,7 +94,7 @@ public:
 
 public:
 	template <typename T>
-	static T* CreateObj(const string& _str_tag, CLayer* _layer, MY_POSE _pose = MY_POSE(0, 0), bool _sort = false)
+	static T* CreateObj(const string& _str_tag, CLayer* _layer, MY_POSE _pose = MY_POSE(0, 0), bool _do_sort = false)
 	{
 		T* pt_obj = new T; 
 
@@ -79,25 +104,18 @@ public:
 			return nullptr;
 		}
 
-		pt_obj->SetPose(_pose);
-
 		if (_layer)
 		{
-			_layer->AddObj(pt_obj, _sort);
+			_layer->AddObj(pt_obj, _do_sort);
 		}
+
+		pt_obj->SetPose(_pose);
 
 		pt_obj->SetTag(_str_tag);
 
 		return pt_obj;
 	}
 
-	static bool CmpObjY(class CObject* a, class CObject *b)
-	{
-		float y1 = a->GetPose().y;
-		float y2 = b->GetPose().y;
-		bool result = y1 < y2;
-		return !result;
-	}
 };
 
 

@@ -3,7 +3,9 @@
 #include "..\Core\Texture.h"
 #include "..\Core\Core.h"
 
-CTile::CTile()
+CTile::CTile()	:
+	idx_pose_(0, 0),
+	idx_int_texture_(0, 0)
 {
 }
 
@@ -58,8 +60,27 @@ void CTile::Render(HDC _hdc, float _time)
 		if (texture_->GetDC() == NULL)
 			return;
 
-		// MY_POSE pose_in_cam = pose_ - CCameraManager::Instance()->GetPose();	 // 카메라 기준 상대 좌표
-		MY_POSE pose_in_cam = pose_ - scene_->camera_->GetPose();	 // 카메라 기준 상대 좌표
+
+		// 부모 위치(pivot 적용된)를 고려하여 나의 위치(pivot 적용 안됨)을 구한다.
+		MY_POSE parent_pose = parent_obj_->GetPose();
+		MY_POSE parent_size = parent_obj_->GetSize() / TEXTURE_SIZE;
+		pose_ = MY_POSE(parent_pose.x - (parent_size.x / 2.f - idx_pose_.x - 0.5) * size_.x,
+							parent_pose.y - (parent_size.y - idx_pose_.y - 1) * size_.y);
+
+		MY_POSE pose_in_cam(0, 0);
+		MY_POSE cir_pose;
+
+		// 씬이 있으면 씬기준, 씬 없으면 부모 씬 기준
+		if (scene_)
+		{
+			cir_pose = pose_ - scene_->camera_->GetPose();
+			pose_in_cam = pose_ - scene_->camera_->GetPose() -size_ * pivot_;	// 카메라 기준 상대 좌표
+		}
+		else
+		{
+			cir_pose = pose_ - parent_obj_->GetScene()->camera_->GetPose();
+			pose_in_cam = pose_ - (parent_obj_->GetScene()->camera_->GetPose()) -size_ * pivot_;
+		}
 
 		// texture 내 인덱스 위치를 텍스처 내 좌표로 변환
 		MY_POSE tmp_pose = idx_int_texture_ * size_;
@@ -74,6 +95,7 @@ void CTile::Render(HDC _hdc, float _time)
 			return;
 
 		TransparentBlt(_hdc, pose_in_cam.x, pose_in_cam.y, size_.x, size_.y, texture_->GetDC(), x, y, size_.x, size_.y, texture_->GetColorKey());
+		DrawEllipse(_hdc, POINT{ (int)cir_pose.x, (int)cir_pose.y }, 3);
 	}
 }
 

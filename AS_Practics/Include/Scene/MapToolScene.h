@@ -18,10 +18,22 @@ protected:
 	virtual ~CMapToolScene() = 0;
 
 protected:
+	// 카메라 스크롤을 고려한 마우스 위치 in 절대좌표
+	MY_POSE mouse_pose_with_cam_;
+
+	// void UpdateMousePoseWithCam();
+
+	// delete위한 변수
+	MY_POSE prev_mouse_pose_with_cam_idx_;
+	MY_POSE mouse_pose_with_cam_idx_;
+
 
 	// 마우스 상태
 	MY_SIZE mouse_down_pose_;
 	bool past_mouse_down_;
+	
+	void UpdateMousePoseWithCam();
+	MY_POSE ChangeMousePoseWithCam(MY_POSE);
 
 protected:
 	// 타일셋 백그라운드 레이어의 텍스처 이름

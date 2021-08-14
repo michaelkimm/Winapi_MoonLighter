@@ -14,11 +14,15 @@ private:
 
 private:
 	MY_POSE idx_int_texture_;
+	MY_POSE idx_pose_;
 	// TILE_OPTION option_;
 
 public:
 	void	SetIdxInTexture(float _x, float _y) { idx_int_texture_ = MY_POSE{ _x, _y }; }
+	void	SetIdxPose(float _x, float _y) { idx_pose_ = MY_POSE{ _x, _y }; }
+
 	MY_POSE	GetIdxInTexture() const { return idx_int_texture_; }
+	MY_POSE	GetIdxPose() const { return idx_pose_; }
 
 	CTile* Clone();
 

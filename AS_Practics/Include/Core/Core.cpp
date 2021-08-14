@@ -11,6 +11,7 @@
 #include "..\Scene\TileSetSettingScene.h"
 #include "..\Object\Object.h"
 #include "..\Object\Tile.h"
+#include "..\Object\Stage.h"
 
 DEFINE_SINGLETON(CCore)
 bool CCore::loop_ = true;
@@ -952,13 +953,16 @@ LRESULT CCore::TileSettingInnerProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
 	static RECT	rect_view;
 
 	// 세팅 씬 포인터
-	CTileSetSettingScene* pt_setting;
+	// CTileSetSettingScene* pt_setting;
 
 	// 타일 저장한 벡터
-	vector<CTile*> vec_tile;
+	// vector<CTile*> vec_tile;
 
+	// 타일 저장한 오브젝트(stage)
+	// CStage* pt_stage;
+	
 	// 타일 포인터
-	CTile* pt_tile;
+	// CTile* pt_tile;
 
 	switch (message)
 	{
@@ -974,16 +978,13 @@ LRESULT CCore::TileSettingInnerProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
 		CSceneManager::Instance()->CreateScene<CTileSetSettingScene>(SC_TILESET_SETTING, hWnd);
 		
 		// 세팅 씬 불러오기
-		pt_setting = static_cast<CTileSetSettingScene*>(CSceneManager::Instance()->pt_tileset_setting_scene_);
+		// pt_setting = static_cast<CTileSetSettingScene*>(CSceneManager::Instance()->pt_tileset_setting_scene_);
 
-		// vec_tile에 push_back할 것이기 때문에 pt_tile 참조카운트 고려 x
-		pt_tile = CObject::CreateObj<CTile>("gray_empty", NULL);
-		pt_tile->SetTexture(EMPTY_GRAY_32);
-		vec_tile.push_back(pt_tile);
+		// 스테이지 오브젝트 초기화
+		// pt_stage->AddTiles(MY_POSE(0, 0), pt_setting->GetWorldSize().x / TEXTURE_SIZE, pt_setting->GetWorldSize().y / TEXTURE_SIZE, TEXTURE_SIZE, TEXTURE_SIZE,
+		// 					EMPTY_GRAY_32, TEXTURE_PATH, true);
 
-		pt_setting->PaintMap(vec_tile, 1, 1, MOUSE_RECT_LAYER, pt_setting->GetWorldSize());
-
-		SafeReleaseList(vec_tile);
+		// SAFE_RELEASE(pt_stage);
 
 		break;
 

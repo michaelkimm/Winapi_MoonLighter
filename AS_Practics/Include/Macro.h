@@ -43,6 +43,7 @@
 #define O_32 "O_32"
 #define X_32 "X_32"
 #define T_32 "T_32"
+#define OXT_32 "OXT_32"
 #define SV_BEACH_SUMMER "SV_Beach_Summer"
 #define SV_BEACH_WINTER "SV_Beach_Winter"
 

@@ -22,6 +22,8 @@ using namespace std;
 #include "Macro.h"
 #include "Type.h"
 #include "Flag.h"
+#include "MyFunctions.h"
+#include "figureDraw.h"
 
 // use transparentblt
 #pragma comment(lib, "msimg32.lib")

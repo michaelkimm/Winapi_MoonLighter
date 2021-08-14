@@ -1,22 +1,20 @@
 #pragma once
-#ifndef CSTAGE_H_
-#define CSTAGE_H_
-
-#include "..\Game.h"
+#ifndef CUIOBJ_H_
+#define CUIOBJ_H_
 
 #include "StaticObj.h"
-#include "..\Core\SourceManager.h"
-#include"Tile.h"
+#include "..\Game.h"
 
-class CStage :
+
+class CUIObj :
 	public CStaticObj
 {
 	friend class CObject;
-	
+
 private:
-	CStage();
-	CStage(const CStage& obj);
-	~CStage();
+	CUIObj();
+	CUIObj(const CUIObj& obj);
+	~CUIObj();
 
 public:
 	virtual bool Init();

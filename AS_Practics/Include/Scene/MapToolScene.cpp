@@ -8,6 +8,7 @@
 #include "..\Object\Player.h"
 #include "..\Object\Monster.h"
 #include "..\Object\Tile.h"
+#include "..\Object\Stage.h"
 
 #include "..\Core\Core.h"
 #include "..\Core\SourceManager.h"
@@ -17,12 +18,59 @@
 
 
 
-CMapToolScene::CMapToolScene()
+CMapToolScene::CMapToolScene()	:
+	prev_mouse_pose_with_cam_idx_(0, 0)
 {
 }
 
 CMapToolScene::~CMapToolScene()
 {
+}
+
+void CMapToolScene::UpdateMousePoseWithCam()
+{
+	// 현재 마우스 위치 get
+	mouse_pose_with_cam_ = CInputManager::Instance()->GetMousePose();
+
+	// : >> 값 조정
+	// 1. mouse_down_pose_ 위치 조정 (전체 타일 집합에 맞게) 
+
+	mouse_pose_with_cam_ += camera_->GetPose();
+
+	mouse_pose_with_cam_ /= TEXTURE_SIZE;
+	int mouse_pose_x_idx = floor(mouse_pose_with_cam_.x);
+	int mouse_pose_y_idx = floor(mouse_pose_with_cam_.y);
+	mouse_pose_with_cam_.x = mouse_pose_x_idx;
+	mouse_pose_with_cam_.y = mouse_pose_y_idx;
+	mouse_pose_with_cam_idx_ = mouse_pose_with_cam_;
+	mouse_pose_with_cam_ *= TEXTURE_SIZE;
+
+	// mouse_pose_with_cam_.x += TEXTURE_SIZE * 0.5;
+	// mouse_pose_with_cam_.y += TEXTURE_SIZE * 1;
+
+	// 피봇으로 위치 조정
+	// mouse_pose_with_cam_.x -= TEXTURE_SIZE * 0.5;
+	// mouse_pose_with_cam_.y -= TEXTURE_SIZE * 1;
+}
+
+MY_POSE CMapToolScene::ChangeMousePoseWithCam(MY_POSE _pose)
+{
+	// : >> 값 조정
+	// 1. _pose 위치 조정 (전체 타일 집합에 맞게 & pivot 고려) 
+
+	_pose += camera_->GetPose();
+
+	_pose /= TEXTURE_SIZE;
+	int mouse_pose_x_idx = floor(_pose.x);
+	int mouse_pose_y_idx = floor(_pose.y);
+	_pose.x = mouse_pose_x_idx;
+	_pose.y = mouse_pose_y_idx;
+	_pose *= TEXTURE_SIZE;
+
+	// _pose.x += TEXTURE_SIZE * 0.5;
+	// _pose.y += TEXTURE_SIZE * 1;
+
+	return _pose;
 }
 
 bool CMapToolScene::ChangeBackTileSheet(HWND _hwnd, const string & _str_key)
@@ -61,7 +109,13 @@ bool CMapToolScene::ChangeBackTileSheet(HWND _hwnd, const string & _str_key)
 	cout << "ChangeBackTileSheet 3\n";
 
 	// 레이어 내 크기, 갯수, 텍스처 종류로 타일 생성
-	pt_layer->CreateTileSpriteSheet(pose_, tile_width_, tile_height_, texture_key, TEXTURE_PATH);
+	CStage* tile_sheet = CObject::CreateObj<CStage>("tileset", pt_layer);
+
+	tile_sheet->AddTiles(pose_, world_size_.x / TEXTURE_SIZE, world_size_.y / TEXTURE_SIZE, TEXTURE_SIZE, TEXTURE_SIZE, texture_key);
+
+	SAFE_RELEASE(tile_sheet);
+
+	// pt_layer->CreateTileSpriteSheet(pose_, tile_width_, tile_height_, texture_key, TEXTURE_PATH);
 
 	cout << "ChangeBackTileSheet 4\n";
 
@@ -147,7 +201,10 @@ void CMapToolScene::PaintTiles(CLayer* _target_layer, MY_POSE _pose, vector<CTil
 			tmp_tile = _rect_tile_vec[cnt++]->Clone();
 			tmp_tile->SetPose(_pose.x + j * TEXTURE_SIZE, _pose.y + i * TEXTURE_SIZE);
 
-			_target_layer->AddObj(tmp_tile, true);
+			// MY_POSE tmp_pose(_pose.x + j * TEXTURE_SIZE, _pose.y + i * TEXTURE_SIZE);
+			// cout << "붙여 놓는 인덱스: (" << tmp_pose.x / TEXTURE_SIZE << ", " << tmp_pose.y / TEXTURE_SIZE << ")\n";
+
+			_target_layer->AddObj(tmp_tile);
 
 			SAFE_RELEASE(tmp_tile);
 		}

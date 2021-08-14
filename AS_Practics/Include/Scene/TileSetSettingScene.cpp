@@ -10,6 +10,7 @@
 #include "..\Object\Player.h"
 #include "..\Object\Monster.h"
 #include "..\Object\Tile.h"
+#include "..\Object\Stage.h"
 
 #include "..\Core\Core.h"
 #include "..\Core\SourceManager.h"
@@ -43,9 +44,34 @@ bool CTileSetSettingScene::Init(HWND _hWnd)
 	ChangeBackTileSheet(_hWnd, texture_tag_);
 
 	// UI 레이어를 깐다
-	vector<CTile*> vec_tile;
+	// vector<CTile*> vec_tile;
 
-	CTile* pt_tile = CObject::CreateObj<CTile>("O_32", NULL);
+	// 스테이지 오브젝트 초기화
+	CLayer* pt_floor_layer = FindLayer(FLOOR_LAYER);
+
+	CStage* pt_stage = CObject::CreateObj<CStage>("gray_frame", pt_floor_layer, MY_POSE(0, 0));
+	pt_stage->AddTiles(MY_POSE(0, 0), world_size_.x / TEXTURE_SIZE, world_size_.y / TEXTURE_SIZE,
+						TEXTURE_SIZE, TEXTURE_SIZE, EMPTY_GRAY_32, TEXTURE_PATH, true);
+
+	pt_floor_layer->PushObj(pt_stage);
+
+	SAFE_RELEASE(pt_stage);
+
+	// : >> OXU 만들기
+	CLayer* pt_ui_layer = FindLayer(UI_LAYER);
+
+	// 타일의 특성에 따라 다른 텍스쳐를 적용한 오브젝트를 만들고 싶다.
+	pt_stage = CObject::CreateObj<CStage>("OXT", pt_ui_layer, MY_POSE(0, 0));
+	pt_stage->AddTiles2(MY_POSE(0, 0), world_size_.x / TEXTURE_SIZE, world_size_.y / TEXTURE_SIZE,
+		TEXTURE_SIZE, TEXTURE_SIZE, texture_tag_, OXT_32, TEXTURE_PATH, true);
+
+
+
+	pt_floor_layer->PushObj(pt_stage);
+
+	SAFE_RELEASE(pt_stage);
+
+	/*CTile* pt_tile = CObject::CreateObj<CTile>("O_32", NULL);
 	pt_tile->SetTexture(O_32);
 	pt_tile->AddRef();
 	vec_tile.push_back(pt_tile);
@@ -61,13 +87,14 @@ bool CTileSetSettingScene::Init(HWND _hWnd)
 	pt_tile->SetTexture(T_32);
 	pt_tile->AddRef();
 	vec_tile.push_back(pt_tile);
-	SAFE_RELEASE(pt_tile);
+	SAFE_RELEASE(pt_tile);*/
 
 	// texture_tag_ 텍스쳐의 정보를 참조하여 UI_LAYER에 O/X/T 표시한다.
-	PaintMap2(vec_tile, 1, 1, UI_LAYER, world_size_, texture_tag_);
+	// PaintMap2(vec_tile, 1, 1, UI_LAYER, world_size_, texture_tag_);
 
-	SafeReleaseList(vec_tile);
+	// SafeReleaseList(vec_tile);
 	return true;
+	// <<
 }
 
 void CTileSetSettingScene::Input(float _time)
@@ -122,20 +149,27 @@ void CTileSetSettingScene::Input(float _time)
 			}
 
 			// 텍스쳐 바꾸기
+			// UI 레이어에서
 			CLayer* pt_layer = FindLayer(UI_LAYER);
-			CObject* pt_obj = pt_layer->GetObj(mouse_down_pose_x_idx + mouse_down_pose_y_idx * (world_size_.x / TEXTURE_SIZE));
-			pt_obj->SetTexture(texture_str);
+			if (pt_layer == NULL) return;
+
+			// 오브젝트를 얻고
+			CObject* pt_obj = pt_layer->GetObj("OXT");
+			if (pt_obj == NULL) return;
+
+			// 오브젝트 내 타일에서
+			CObject* pt_tile = pt_obj->GetTileFromVec(mouse_down_pose_x_idx + mouse_down_pose_y_idx * (world_size_.x / TEXTURE_SIZE));
+			if (pt_tile == NULL) return;
+			pt_tile->SetTexture(texture_str);
 
 			// 정한 타일 옵션으로 해당 위치 특성 변경
 			pt_texture->SetOptionVec(tile_option, mouse_down_pose_x_idx, mouse_down_pose_y_idx);
 
+			SAFE_RELEASE(pt_tile);
 			SAFE_RELEASE(pt_obj);
 			SAFE_RELEASE(pt_texture);
 		}
 	}
-
-	
-
 }
 
 void CTileSetSettingScene::Update(float _time)

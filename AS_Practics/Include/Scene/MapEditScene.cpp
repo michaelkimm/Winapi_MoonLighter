@@ -5,6 +5,9 @@
 #include "..\Object\Player.h"
 #include "..\Object\Monster.h"
 #include "..\Object\Tile.h"
+#include "..\Object\Stage.h"
+#include "..\Object\UIObj.h"
+#include "..\Object\NatureObj.h"
 #include "..\Core\Core.h"
 #include "..\Core\SourceManager.h"
 #include "..\Core\InputManager.h"
@@ -29,26 +32,8 @@ void CMapEditScene::ClearTile()
 	SafeReleaseList(rect_tile_vec_);
 }
 
-void CMapEditScene::UpdateMousePoseWithCam()
-{
-	// 현재 마우스 위치 get
-	mouse_pose_with_cam_ = CInputManager::Instance()->GetMousePose();
-
-	// : >> 값 조정
-	// 1. mouse_down_pose_ 위치 조정 (전체 타일 집합에 맞게) 
-	mouse_pose_with_cam_ += camera_->GetPose();
-	mouse_pose_with_cam_ /= TEXTURE_SIZE;
-	int mouse_pose_x_idx = floor(mouse_pose_with_cam_.x);
-	int mouse_pose_y_idx = floor(mouse_pose_with_cam_.y);
-	mouse_pose_with_cam_.x = mouse_pose_x_idx;
-	mouse_pose_with_cam_.y = mouse_pose_y_idx;
-	mouse_pose_with_cam_idx_ = mouse_pose_with_cam_;
-	mouse_pose_with_cam_ *= TEXTURE_SIZE;
-}
-
 CMapEditScene::CMapEditScene()	:
-	edit_layer_(FLOOR_LAYER),
-	prev_mouse_pose_with_cam_idx_(0, 0)
+	edit_layer_(FLOOR_LAYER)
 {
 }
 
@@ -80,30 +65,51 @@ bool CMapEditScene::Init(HWND _hWnd)
 	// : >> 바닥 레이어 텍스쳐 있는 상태로 초기화 하고 싶은 경우 사용
 
 	// 첫번째 레이어 찾기
-	CLayer* pt_layer = FindLayer(FLOOR_LAYER);
-	if (pt_layer == nullptr) return false;
+	CLayer* pt_mouse_rect_layer = FindLayer(FLOOR_LAYER);
+	if (pt_mouse_rect_layer == nullptr) return false;
+
+	//--------------------------------------------------------------------------------------------//
+
+	// 레이어에 스테이지 생성 및 레이어 크기 등 특성 설정
+
+	//--------------------------------------------------------------------------------------------//
+
 
 	// 레이어 내 크기, 갯수, 텍스처 종류로 타일 생성
-	pt_layer->CreateTile(pose_, tile_x_num_, tile_y_num_, tile_width_, tile_height_, texture_key, TEXTURE_PATH);
+	// pt_mouse_rect_layer->CreateTile(pose_, tile_x_num_, tile_y_num_, tile_width_, tile_height_, texture_key, TEXTURE_PATH);
 
-	// <<
+	// 레이어에서 오브젝트를 만들고
+	CObject* stage = CObject::CreateObj<CStage>("stage1", pt_mouse_rect_layer);
+
+	// 오브젝트를 만들 때, 정해진 타일 종류와 갯수를 가지고 타일 벡터 생성
+	stage->AddTiles(pose_, tile_x_num_, tile_y_num_, tile_width_, tile_height_, texture_key, TEXTURE_PATH, true);
+
+
+	SAFE_RELEASE(stage);
+
 
 	// : >> 모든 레이어 빈 상태로 초기화 (크기 등 내부 상태 설정)
-	pt_layer = NULL;
+	pt_mouse_rect_layer = NULL;
 
 	list<class CLayer*>::iterator iter;
 	list<class CLayer*>::iterator iter_end = layer_list_.end();
 	for (iter = layer_list_.begin(); iter != iter_end; iter++)
 	{
 		// 모든 레이어 빈 상태로 초기화
-		pt_layer = FindLayer((*iter)->GetTag());
-		if (pt_layer == nullptr) return false;
+		pt_mouse_rect_layer = FindLayer((*iter)->GetTag());
+		if (pt_mouse_rect_layer == nullptr) return false;
 
 		// 레이어 내 크기, 갯수 설정
-		pt_layer->CreateTile(pose_, tile_x_num_, tile_y_num_, tile_width_, tile_height_, texture_key, TEXTURE_PATH, true);
-
+		pt_mouse_rect_layer->CreateTile(pose_, tile_x_num_, tile_y_num_, tile_width_, tile_height_, texture_key, TEXTURE_PATH, true);
 	}
+	
 	// <<
+
+	//--------------------------------------------------------------------------------------------//
+
+	// End
+
+	//--------------------------------------------------------------------------------------------//
 
 	// 씬의 카메라 초기화
 	hWnd_ = _hWnd;
@@ -125,11 +131,11 @@ void CMapEditScene::Input(float _time)
 	CMapToolScene::Input(_time);
 	// CCameraManager::Instance()->Input(_time);
 
-	CLayer* pt_layer = FindLayer(MOUSE_RECT_LAYER);
-	if (pt_layer == NULL) return;
+	CLayer* pt_mouse_rect_layer = FindLayer(MOUSE_RECT_LAYER);
+	if (pt_mouse_rect_layer == NULL) return;
 
 	// 레이어에 오브젝트 있으면 삭제
-	pt_layer->Clear();
+	pt_mouse_rect_layer->Clear();
 
 	// 마우스 위치가 Assist 씬 위일 경우만 실행
 	if (CInputManager::Instance()->GetHwnd() != hWnd_)
@@ -161,12 +167,12 @@ void CMapEditScene::Input(float _time)
 
 	// 2. rect_num_x_ & rect_num_y_ 조정 (전체 타일 집합 크기에 맞게) 
 	// 레이어 찾기
-	CLayer* pt_layer2 = FindLayer(edit_layer_);
-	if (pt_layer2 == nullptr) return;
+	CLayer* pt_edit_layer = FindLayer(edit_layer_);
+	if (pt_edit_layer == nullptr) return;
 
 
-	int tileset_x_length = pt_layer2->GetTileXNum();
-	int tileset_y_length = pt_layer2->GetTileYNum();
+	int tileset_x_length = pt_edit_layer->GetTileXNum();
+	int tileset_y_length = pt_edit_layer->GetTileYNum();
 	if (tileset_x_length < tmp_mouse_pose_x_idx + rect_num_x)
 	{
 		rect_num_x = tileset_x_length - tmp_mouse_pose_x_idx;
@@ -200,7 +206,7 @@ void CMapEditScene::Input(float _time)
 	{
 		// Delete + 마우스 + 스페이스바 다운일 경우 모두 제거
 		cout << "다 지워!\n";
-		pt_layer2->DeleteAll();
+		pt_edit_layer->DeleteAll();
 	}
 
 	// Delete 키가 눌러진 상태로 마우스 누르면 발동
@@ -212,12 +218,13 @@ void CMapEditScene::Input(float _time)
 			return;
 
 		// 현재 레이어에서 마우스 좌표쪽에 해당되는 인덱스의 타일 제거
-		pt_layer2->DeleteObj(mouse_pose_with_cam_idx_.x, mouse_pose_with_cam_idx_.y);
+		pt_edit_layer->DeleteObj(mouse_pose_with_cam_idx_.x, mouse_pose_with_cam_idx_.y);
 
 		prev_mouse_pose_with_cam_idx_ = mouse_pose_with_cam_idx_;
 
 		return;
 	}
+
 
    //--------------------------------------------------------------------------------------------//
 
@@ -226,11 +233,19 @@ void CMapEditScene::Input(float _time)
    //--------------------------------------------------------------------------------------------//
 
 
-	// 타일 생성
-	// 실패 시, 리턴
-	if (!pt_layer->CreateTile(mouse_pose_with_cam_, rect_num_x, rect_num_y, TEXTURE_SIZE, TEXTURE_SIZE, EMPTY_BW_32, TEXTURE_PATH))
-		return;
+	//// 타일 생성
+	//// 실패 시, 리턴
+	//if (!pt_mouse_rect_layer->CreateTile(mouse_pose_with_cam_, rect_num_x, rect_num_y, TEXTURE_SIZE, TEXTURE_SIZE, EMPTY_BW_32, TEXTURE_PATH))
+	//	return;
 
+
+	// 레이어에서 오브젝트를 만들고
+	CObject* ui_obj = CObject::CreateObj<CUIObj>("user_rect", pt_mouse_rect_layer);
+
+	// 오브젝트를 만들 때, 정해진 타일 종류와 갯수를 가지고 타일 벡터 생성
+	ui_obj->AddTiles(mouse_pose_with_cam_, rect_num_x, rect_num_y, TEXTURE_SIZE, TEXTURE_SIZE, EMPTY_BW_32, TEXTURE_PATH, true);
+
+	SAFE_RELEASE(ui_obj);
 
 	//--------------------------------------------------------------------------------------------//
 
@@ -249,8 +264,30 @@ void CMapEditScene::Input(float _time)
 		return;
 
 	// 해당 레이어에 rect_tile_vec_ 내에 저장 돼있던 타일 붙여넣기
-	PaintTiles(pt_layer2, mouse_pose_with_cam_, rect_tile_vec_, rect_num_x_, rect_num_y_);
+	if (pt_edit_layer->GetTag() == FLOOR_LAYER)
+	{
+		// 레이어에서 오브젝트 찾는다
+		CObject* tmp_obj = pt_edit_layer->GetObj("stage1");
+		if (tmp_obj == NULL) return;
 
+		tmp_obj->AddTiles(rect_tile_vec_, rect_num_x, rect_num_y, mouse_pose_with_cam_idx_, false);
+
+		SAFE_RELEASE(tmp_obj);
+	}
+	else if (pt_edit_layer->GetTag() == MAP_OBJ_LAYER)
+	{
+		// 레이어에서 오브젝트를 만들고
+		CNatureObj* nature_obj = CObject::CreateObj<CNatureObj>("user_rect", pt_edit_layer, mouse_pose_with_cam_);
+
+		// 오브젝트를 만들 때, 정해진 타일 종류와 갯수를 가지고 타일 벡터 생성
+		// 넣을 때 마다 소트!
+		nature_obj->AddTiles(rect_tile_vec_, rect_num_x, rect_num_y, MY_POSE(0, 0), true, true);
+		
+
+		pt_edit_layer->SortObjListZOrder();
+		SAFE_RELEASE(nature_obj);
+	}
+	
 	prev_add_pose = mouse_pose_with_cam_;
 
 	//--------------------------------------------------------------------------------------------//

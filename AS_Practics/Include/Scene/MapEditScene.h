@@ -38,16 +38,6 @@ public:
 	void ClearTile();
 
 private:
-	// 카메라 스크롤을 고려한 마우스 위치 in 절대좌표
-	MY_POSE mouse_pose_with_cam_;
-	
-	void UpdateMousePoseWithCam();
-
-	// delete위한 변수
-	MY_POSE prev_mouse_pose_with_cam_idx_;
-	MY_POSE mouse_pose_with_cam_idx_;
-
-private:
 	CMapEditScene();
 	~CMapEditScene();
 

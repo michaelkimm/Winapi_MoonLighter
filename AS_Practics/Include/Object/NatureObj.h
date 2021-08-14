@@ -1,22 +1,19 @@
 #pragma once
-#ifndef CSTAGE_H_
-#define CSTAGE_H_
-
-#include "..\Game.h"
+#ifndef CNATUREOBJ_H_
+#define CNATUREOBJ_H_
 
 #include "StaticObj.h"
-#include "..\Core\SourceManager.h"
-#include"Tile.h"
+#include "..\Game.h"
 
-class CStage :
+class CNatureObj :
 	public CStaticObj
 {
 	friend class CObject;
-	
+
 private:
-	CStage();
-	CStage(const CStage& obj);
-	~CStage();
+	CNatureObj();
+	CNatureObj(const CNatureObj& obj);
+	~CNatureObj();
 
 public:
 	virtual bool Init();
