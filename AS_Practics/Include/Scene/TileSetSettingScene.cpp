@@ -71,28 +71,6 @@ bool CTileSetSettingScene::Init(HWND _hWnd)
 
 	SAFE_RELEASE(pt_stage);
 
-	/*CTile* pt_tile = CObject::CreateObj<CTile>("O_32", NULL);
-	pt_tile->SetTexture(O_32);
-	pt_tile->AddRef();
-	vec_tile.push_back(pt_tile);
-	SAFE_RELEASE(pt_tile);
-
-	pt_tile = CObject::CreateObj<CTile>("X_32", NULL);
-	pt_tile->SetTexture(X_32);
-	pt_tile->AddRef();
-	vec_tile.push_back(pt_tile);
-	SAFE_RELEASE(pt_tile);
-
-	pt_tile = CObject::CreateObj<CTile>("T_32", NULL);
-	pt_tile->SetTexture(T_32);
-	pt_tile->AddRef();
-	vec_tile.push_back(pt_tile);
-	SAFE_RELEASE(pt_tile);*/
-
-	// texture_tag_ 텍스쳐의 정보를 참조하여 UI_LAYER에 O/X/T 표시한다.
-	// PaintMap2(vec_tile, 1, 1, UI_LAYER, world_size_, texture_tag_);
-
-	// SafeReleaseList(vec_tile);
 	return true;
 	// <<
 }

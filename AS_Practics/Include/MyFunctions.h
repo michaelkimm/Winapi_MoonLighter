@@ -37,3 +37,7 @@ float PtDot(int x1, int y1, float vx, float vy);
 bool CirclePoly(int cx, int cy, int r, std::vector<POINT>& polygon);
 bool CircleLine(int cx, int cy, int r, int x1, int y1, int x2, int y2);
 bool PointInCircle(int px, int py, int cx, int cy, int r);
+
+
+// 사각형 충돌 함수
+bool PtInRect(const RECT& _rect, const POINT& _pt);

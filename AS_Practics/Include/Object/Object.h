@@ -41,6 +41,8 @@ public:
 	bool AddTiles2(const MY_POSE& _start_pose, int _num_x, int _num_y, int _size_x, int _size_y,
 						const string& _org_key, const string& _target_key, const string& _root_str = TEXTURE_PATH, bool _tile_one_type = false);
 
+	void DeleteTileInVec(float _x, float _y);
+
 	void		SetParentObj(CObject* _obj);
 	CObject*	GetParentObj() const;
 	CObject*	GetTileFromVec(int _idx) const;
@@ -64,6 +66,9 @@ public:
 	MY_SIZE GetSize() const { return size_; }
 	MY_POSE GetPivot() const { return pivot_; }
 	CTexture* GetTexture() const;
+
+public:
+	bool CollidePt(MY_POSE _pose);
 
 protected:
 	class CScene* scene_;

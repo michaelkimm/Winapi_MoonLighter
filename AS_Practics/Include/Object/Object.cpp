@@ -200,6 +200,27 @@ bool CObject::AddTiles2(const MY_POSE& _start_pose, int _num_x, int _num_y, int 
 	return true;
 }
 
+void CObject::DeleteTileInVec(float _x, float _y)
+{
+	cout << "erase idx: (" << _x << ", " << _y << ")\n";
+
+	CTile* tmp_tile = NULL;
+
+	vector<class CObject*>::iterator target_iter = tile_vec_.begin();//  + _x + _y * (size_.x / TEXTURE_SIZE);
+	for (target_iter; target_iter != tile_vec_.end(); target_iter++)
+	{
+		tmp_tile = static_cast<CTile*>(*target_iter);
+		if (tmp_tile->GetIdxPose() == MY_POSE(_x, _y))
+			break;
+	}
+	if (target_iter == tile_vec_.end())
+	{
+		cout << " 지울 것 못찾음!\n";
+		return;
+	}
+	tile_vec_.erase(target_iter);
+}
+
 void CObject::SetParentObj(CObject * _obj)
 {
 	SAFE_RELEASE(parent_obj_);
@@ -254,6 +275,19 @@ CTexture * CObject::GetTexture() const
 {
 	texture_->AddRef();
 	return texture_;
+}
+
+bool CObject::CollidePt(MY_POSE _pose)
+{
+	RECT tmp_rect{ (int)(pose_.x - size_.x / 2), (int)(pose_.y - size_.y), (int)(pose_.x + size_.x / 2), (int)pose_.y };
+	POINT tmp_pt{ (int)_pose.x, (int)_pose.y };
+	if (PtInRect(tmp_rect, tmp_pt))
+	{
+		cout << "tmp_pt: " << tmp_pt.x << ", " << tmp_pt.y << ")\n";
+		cout << "안!\n\n";
+		return true;
+	}
+	return false;
 }
 
 CObject::CObject()	:

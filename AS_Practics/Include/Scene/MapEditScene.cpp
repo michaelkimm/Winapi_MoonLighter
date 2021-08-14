@@ -212,13 +212,25 @@ void CMapEditScene::Input(float _time)
 	// Delete 키가 눌러진 상태로 마우스 누르면 발동
 	if (CInputManager::Instance()->GetKeyDel() && CInputManager::Instance()->GetMouseLeftDown())
 	{
-		
 		// 방금 제거했던 위치면
 		if (prev_mouse_pose_with_cam_idx_ == mouse_pose_with_cam_idx_)
 			return;
 
+
+		if (pt_edit_layer->GetTag() == FLOOR_LAYER)
+		{
+			CObject* tmp_obj_stage = pt_edit_layer->GetObj("stage1");
+			if (tmp_obj_stage == NULL) return;
+			tmp_obj_stage->DeleteTileInVec(mouse_pose_with_cam_idx_.x, mouse_pose_with_cam_idx_.y);
+			SAFE_RELEASE(tmp_obj_stage);
+		}
+		else if (pt_edit_layer->GetTag() == MAP_OBJ_LAYER)
+		{
+			pt_edit_layer->DeleteObj(mouse_pose_with_cam_ + MY_POSE(0.5f, 0.5f) * TEXTURE_SIZE);
+		}
+		
 		// 현재 레이어에서 마우스 좌표쪽에 해당되는 인덱스의 타일 제거
-		pt_edit_layer->DeleteObj(mouse_pose_with_cam_idx_.x, mouse_pose_with_cam_idx_.y);
+		// pt_edit_layer->DeleteObj(mouse_pose_with_cam_idx_.x, mouse_pose_with_cam_idx_.y);
 
 		prev_mouse_pose_with_cam_idx_ = mouse_pose_with_cam_idx_;
 

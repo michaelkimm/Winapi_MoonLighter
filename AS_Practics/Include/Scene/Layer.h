@@ -45,6 +45,10 @@ public:
 	string	GetTag() { return str_tag_; }
 
 	void DeleteObj(float _x, float _y);
+
+	// _pose가 오브젝트와 겹치면 오브젝트 제거
+	void DeleteObj(MY_POSE _pose);
+
 	void DeleteAll();
 	vector<class CObject*>::iterator FindObj(MY_POSE _pose_idx);
 

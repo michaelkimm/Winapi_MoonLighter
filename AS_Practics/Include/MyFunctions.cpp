@@ -218,3 +218,9 @@ bool PointInCircle(int px, int py, int cx, int cy, int r)
 {
 	return ((px - cx) * (px - cx) + (py - cy) * (py - cy)) <= (r * r);
 }
+
+
+bool PtInRect(const RECT& _rect, const POINT& _pt)
+{
+	return (_pt.x <= _rect.right && _pt.x >= _rect.left) && (_pt.y <= _rect.bottom && _pt.y >= _rect.top);
+}

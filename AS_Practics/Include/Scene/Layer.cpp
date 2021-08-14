@@ -39,6 +39,22 @@ void CLayer::DeleteObj(float _x, float _y)
 	obj_list_.erase(target_iter);
 }
 
+void CLayer::DeleteObj(MY_POSE _pose)
+{
+	vector<class CObject*>::iterator iter;
+	vector<class CObject*>::iterator iter_end = obj_list_.end();
+
+	for (iter = obj_list_.begin(); iter != iter_end; iter++)
+	{
+		if ((*iter)->CollidePt(_pose))
+			break;
+	}
+	if (iter == iter_end)
+		return;
+
+	obj_list_.erase(iter);
+}
+
 void CLayer::DeleteAll()
 {
 	SafeReleaseList(obj_list_);
