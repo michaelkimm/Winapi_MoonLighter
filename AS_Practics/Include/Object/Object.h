@@ -6,6 +6,8 @@
 #include "..\Core\Ref.h"
 #include "..\Scene\Layer.h"
 
+
+
 class CObject
 	: public CRef
 {
@@ -13,6 +15,7 @@ class CObject
 
 protected:
 	string	str_tag_;
+	string class_tag_;
 	MY_POSE pose_;		// Àý´ë ÁÂÇ¥
 	// MY_POSE pose_idx;	// ¸Ê¿¡¼­ ÀÎµ¦½º À§Ä¡
 	MY_SIZE size_;
@@ -49,6 +52,7 @@ public:
 
 public:
 	void SetTag(const string& _str_tag) { str_tag_ = _str_tag; }
+	void SetClassTag(const string& _str_tag) { class_tag_ = _str_tag; }
 	void SetPose(const MY_POSE& _pose)		{ pose_ = _pose; }
 	void SetPose(float _x, float _y)	{ pose_ = MY_POSE(_x, _y); }
 	void SetPose(int _x, int _y)		{ pose_ = MY_POSE(_x, _y); }
@@ -99,7 +103,7 @@ public:
 
 public:
 	template <typename T>
-	static T* CreateObj(const string& _str_tag, CLayer* _layer, MY_POSE _pose = MY_POSE(0, 0), bool _do_sort = false)
+	static T* CreateObj(const string& _name_tag, const string& _class_tag, CLayer* _layer, MY_POSE _pose = MY_POSE(0, 0), bool _do_sort = false)
 	{
 		T* pt_obj = new T; 
 
@@ -116,11 +120,14 @@ public:
 
 		pt_obj->SetPose(_pose);
 
-		pt_obj->SetTag(_str_tag);
+		pt_obj->SetTag(_name_tag);
+
+		pt_obj->SetClassTag(_class_tag);
 
 		return pt_obj;
 	}
 
+	static void LoadObjectVec(vector<CObject*>& _obj_vec, FILE* _pt_file, CLayer* _layer, CObject* _parent = NULL);
 };
 
 

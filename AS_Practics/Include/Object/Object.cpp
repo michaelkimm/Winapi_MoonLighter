@@ -7,6 +7,13 @@
 #include "..\Core\CameraManager.h"
 #include "..\Core\PathManager.h"
 
+#include "Tile.h"
+#include "Player.h"
+#include "Monster.h"
+#include "NatureObj.h"
+#include "Stage.h"
+#include "UIObj.h"
+
 void CObject::AddObjToTileVec(CObject* _add_obj, bool _do_sort)
 {
 	_add_obj->AddRef();
@@ -84,7 +91,7 @@ bool CObject::AddTiles(const MY_POSE& _start_pose, int _num_x, int _num_y, int _
 	{
 		for (int j = 0; j < _num_x; j++)
 		{
-			CTile* pt_tile = CObject::CreateObj<CTile>(_texture_key, NULL);
+			CTile* pt_tile = CObject::CreateObj<CTile>(_texture_key, TILE_CLASS, NULL);
 			if (pt_tile == NULL) return false;
 
 			// 텍스처 설정
@@ -134,7 +141,7 @@ bool CObject::AddTiles2(const MY_POSE& _start_pose, int _num_x, int _num_y, int 
 		for (int j = 0; j < _num_x; j++)
 		{
 			// 삽입할 타일 만들기
-			CTile* pt_tile = CObject::CreateObj<CTile>(_target_key, NULL);
+			CTile* pt_tile = CObject::CreateObj<CTile>(_target_key, TILE_CLASS, NULL);
 			if (pt_tile == NULL)
 			{
 				SAFE_RELEASE(org_texture);
@@ -377,13 +384,25 @@ void CObject::Save(FILE * _pt_file)
 	MY_SIZE size_;
 	MY_POSE pivot_;
 
+	// 텍스쳐
 	class CTexture* texture_;
+
+	// 타일 벡터
+	vector<class CObject*> tile_vec_;
+
+	// 부모 오브젝트
+	CObject* parent_obj_;
 
 	// CreateObj 하면서 자동으로 저장되는거라 안해도 될것으로 우선 예상
 	class CScene* scene_;
 	class CLayer* layer_;
 	
 	*/
+
+	// 클래스 이름 저장
+	int len = class_tag_.size();
+	fwrite(&len, 4, 1, _pt_file);
+	fwrite(class_tag_.c_str(), 1, len, _pt_file);
 
 	// Tag 길이 정보 설정
 	int str_tag_length = str_tag_.length();
@@ -414,6 +433,40 @@ void CObject::Save(FILE * _pt_file)
 	}
 	else
 		fwrite(&texture_exist, 1, 1, _pt_file);
+
+	// tile_vec_ 저장
+	bool tile_vec_exist = false;
+	if (tile_vec_.size())
+	{
+		// 타일 벡터 존재 여부 저장
+		tile_vec_exist = true;
+		fwrite(&tile_vec_exist, 1, 1, _pt_file);
+
+		// 타일 벡터 길이 저장
+		len = tile_vec_.size();
+		fwrite(&len, 4, 1, _pt_file);
+
+		// 타일 벡터 저장
+		vector<CObject*>::iterator iter;
+		vector<CObject*>::iterator iter_end = tile_vec_.end();
+		for (iter = tile_vec_.begin(); iter != iter_end; iter++)
+		{
+			(*iter)->Save(_pt_file);
+		}
+	}
+	else
+		fwrite(&tile_vec_exist, 1, 1, _pt_file);
+
+	// 부모 객체 저장
+	/*bool parent_exist = false;
+	if (parent_obj_)
+	{
+		parent_exist = true;
+		fwrite(&parent_exist, 1, 1, _pt_file);
+		parent_obj_->Save(_pt_file);
+	}
+	else
+		fwrite(&parent_exist, 1, 1, _pt_file);*/
 }
 
 
@@ -449,4 +502,119 @@ void CObject::Load(FILE * _pt_file)
 
 	if (texture_exist)
 		texture_ = CSourceManager::Instance()->LoadTexture(_pt_file);
+
+	// Tile vec 읽기
+	bool tile_vec_exist = false;
+	fread(&tile_vec_exist, 1, 1, _pt_file);
+
+	if (tile_vec_exist)
+	{
+		// 저장됬던 타일 벡터 크기 읽기
+		fread(&len, 4, 1, _pt_file);
+		SafeReleaseList(tile_vec_);
+
+		// 타일 벡터 크기 선정
+		tile_vec_.resize(len, NULL);
+
+		// 타일 벡터 만들기
+		LoadObjectVec(tile_vec_, _pt_file, NULL, this);
+	}
+
+	// 부모 객체 읽기(부모 객체는 설정되어 들어옴)
+}
+
+
+void CObject::LoadObjectVec(vector<CObject*>& _obj_vec, FILE* _pt_file, CLayer* _layer, CObject* _parent)
+{
+	int obj_cnt = _obj_vec.size();
+
+	// 기존 벡터 제거
+	SafeReleaseList(_obj_vec);
+
+	for (int i = 0; i < obj_cnt; i++)
+	{
+		// 객체 동적할당
+		// string class_name;
+		char class_name_char[MAX_PATH];
+		int len;
+		fread(&len, 4, 1, _pt_file);
+		fread(&class_name_char, 1, len, _pt_file);
+		class_name_char[len] = '\0';
+		string class_name = class_name_char;
+
+		if (class_name == TILE_CLASS)
+		{
+			// 객체 생성
+			CTile* pt_tile = CObject::CreateObj<CTile>("Tile", TILE_CLASS, _layer);
+
+			// 객체 부모 지정
+			if (_parent)
+				pt_tile->SetParentObj(_parent);
+
+			// 객체 내용 불러오기
+			pt_tile->Load(_pt_file);
+
+			// 객체 벡터에 삽입
+			pt_tile->AddRef();
+			_obj_vec.push_back(pt_tile);
+
+			SAFE_RELEASE(pt_tile);
+		}
+		else if (class_name == PLAYER_CLASS)
+		{
+			CPlayer* pt_player = CObject::CreateObj<CPlayer>("player", PLAYER_CLASS, _layer);
+
+			if (_parent)
+				pt_player->SetParentObj(_parent);
+
+			pt_player->Load(_pt_file);
+
+			pt_player->AddRef();
+			_obj_vec.push_back(pt_player);
+
+			SAFE_RELEASE(pt_player);
+		}
+		else if (class_name == UI_OBJ_CLASS)
+		{
+			CUIObj* pt_ui = CObject::CreateObj<CUIObj>("ui_obj", UI_OBJ_CLASS, _layer);
+
+			if (_parent)
+				pt_ui->SetParentObj(_parent);
+
+			pt_ui->Load(_pt_file);
+
+			pt_ui->AddRef();
+			_obj_vec.push_back(pt_ui);
+
+			SAFE_RELEASE(pt_ui);
+		}
+		else if (class_name == STAGE_CLASS)
+		{
+			CStage* pt_stage = CObject::CreateObj<CStage>("stage", STAGE_CLASS, _layer);
+
+			if (_parent)
+				pt_stage->SetParentObj(_parent);
+
+			pt_stage->Load(_pt_file);
+
+			pt_stage->AddRef();
+			_obj_vec.push_back(pt_stage);
+
+			SAFE_RELEASE(pt_stage);
+		}
+		else if (class_name == NATURE_OBJ_CLASS)
+		{
+			CNatureObj* pt_nature = CObject::CreateObj<CNatureObj>("obj", NATURE_OBJ_CLASS, _layer);
+
+			if (_parent)
+				pt_nature->SetParentObj(_parent);
+
+			pt_nature->Load(_pt_file);
+
+			pt_nature->AddRef();
+			_obj_vec.push_back(pt_nature);
+
+			SAFE_RELEASE(pt_nature);
+		}
+	}
 }

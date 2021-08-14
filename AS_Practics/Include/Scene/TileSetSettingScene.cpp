@@ -49,7 +49,7 @@ bool CTileSetSettingScene::Init(HWND _hWnd)
 	// 스테이지 오브젝트 초기화
 	CLayer* pt_floor_layer = FindLayer(FLOOR_LAYER);
 
-	CStage* pt_stage = CObject::CreateObj<CStage>("gray_frame", pt_floor_layer, MY_POSE(0, 0));
+	CStage* pt_stage = CObject::CreateObj<CStage>("gray_frame", STAGE_CLASS, pt_floor_layer, MY_POSE(0, 0));
 	pt_stage->AddTiles(MY_POSE(0, 0), world_size_.x / TEXTURE_SIZE, world_size_.y / TEXTURE_SIZE,
 						TEXTURE_SIZE, TEXTURE_SIZE, EMPTY_GRAY_32, TEXTURE_PATH, true);
 
@@ -61,7 +61,7 @@ bool CTileSetSettingScene::Init(HWND _hWnd)
 	CLayer* pt_ui_layer = FindLayer(UI_LAYER);
 
 	// 타일의 특성에 따라 다른 텍스쳐를 적용한 오브젝트를 만들고 싶다.
-	pt_stage = CObject::CreateObj<CStage>("OXT", pt_ui_layer, MY_POSE(0, 0));
+	pt_stage = CObject::CreateObj<CStage>("OXT", STAGE_CLASS, pt_ui_layer, MY_POSE(0, 0));
 	pt_stage->AddTiles2(MY_POSE(0, 0), world_size_.x / TEXTURE_SIZE, world_size_.y / TEXTURE_SIZE,
 		TEXTURE_SIZE, TEXTURE_SIZE, texture_tag_, OXT_32, TEXTURE_PATH, true);
 

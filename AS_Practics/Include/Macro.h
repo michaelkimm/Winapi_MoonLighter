@@ -13,6 +13,14 @@
 #define DATA_PATH "data_path"
 #define PLAYER_TAG "player"
 
+// : >> Object class tag
+#define PLAYER_CLASS "player_class"
+#define STAGE_CLASS "stage_class"
+#define NATURE_OBJ_CLASS "map_obj_class"
+#define UI_OBJ_CLASS "ui_obj_class"
+#define TILE_CLASS "tile_class"
+// <<
+
 // : >> Scene name
 #define MAP_EDIT_SCENE "MapEditScene"
 #define INGAME_SCENE "InGameScene"

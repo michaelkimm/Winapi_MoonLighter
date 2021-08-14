@@ -2,6 +2,12 @@
 
 #include "..\Object\Object.h"
 #include "..\Object\Tile.h"
+#include "..\Object\Player.h"
+#include "..\Object\Monster.h"
+#include "..\Object\NatureObj.h"
+#include "..\Object\Stage.h"
+#include "..\Object\UIObj.h"
+
 #include "..\Core\SourceManager.h"
 #include "..\Core\Texture.h"
 #include <algorithm>
@@ -197,9 +203,9 @@ void CLayer::Save(FILE * _pt_file)
 {
 	// : >> 레이어 정보 저장
 
-	// 전체 타일 갯수
-	int tile_cnt = obj_list_.size();
-	fwrite(&tile_cnt, 4, 1, _pt_file);
+	// 전체 객체 갯수
+	int obj_cnt = obj_list_.size();
+	fwrite(&obj_cnt, 4, 1, _pt_file);
 
 	// 레이어 멤버 변수
 	fwrite(&tile_x_num_, 4, 1, _pt_file);
@@ -207,6 +213,8 @@ void CLayer::Save(FILE * _pt_file)
 	fwrite(&tile_width_, 4, 1, _pt_file);
 	fwrite(&tile_height_, 4, 1, _pt_file);
 
+
+	// vector<CObject*> 저장
 	vector<class CObject*>::iterator iter;
 	vector<class CObject*>::iterator iter_end = obj_list_.end();
 
@@ -222,8 +230,8 @@ void CLayer::Load(FILE * _pt_file)
 	// : >> 레이어 정보 불러오기
 
 	// 전체 타일 갯수
-	int tile_cnt;
-	fread(&tile_cnt, 4, 1, _pt_file);
+	int obj_cnt;
+	fread(&obj_cnt, 4, 1, _pt_file);
 
 	// 레이어 멤버 변수
 	fread(&tile_x_num_, 4, 1, _pt_file);
@@ -231,20 +239,11 @@ void CLayer::Load(FILE * _pt_file)
 	fread(&tile_width_, 4, 1, _pt_file);
 	fread(&tile_height_, 4, 1, _pt_file);
 
-	// 기존 벡터 제거
+	// vector<CObject*> 불러오기
 	SafeReleaseList(obj_list_);
+	obj_list_.resize(obj_cnt, NULL);
+	CObject::LoadObjectVec(obj_list_, _pt_file, this, NULL);
 
-	for (int i = 0; i < tile_cnt; i++)
-	{
-		// 타일 동적할당
-		CTile* pt_tile = CObject::CreateObj<CTile>("Tile", this);
-
-		// 타일 정보 로드
-		pt_tile->Load(_pt_file);
-
-		SAFE_RELEASE(pt_tile);
-	}
-	// <<
 }
 
 bool CLayer::CreateTile(const MY_POSE& _start_pose, int _num_x, int _num_y, int _size_x, int _size_y,
@@ -269,7 +268,7 @@ bool CLayer::CreateTile(const MY_POSE& _start_pose, int _num_x, int _num_y, int 
 		for (int j = 0; j < _num_x; j++)
 		{
 			// 타일 이름과 속한 레이어 넘겨서 타일 생성
-			CTile* pt_tile = CObject::CreateObj<CTile>(_texture_key, this);
+			CTile* pt_tile = CObject::CreateObj<CTile>(_texture_key, TILE_CLASS, this);
 			if (pt_tile == NULL) return false;
 
 			// 텍스처 설정
@@ -318,7 +317,7 @@ bool CLayer::CreateTileSpriteSheet(const MY_POSE& _start_pose, int _size_x, int 
 		for (int j = 0; j < tile_x_num_; j++)
 		{
 			// 타일 이름과 속한 레이어 넘겨서 타일 생성
-			CTile* pt_tile = CObject::CreateObj<CTile>(_texture_key, this);
+			CTile* pt_tile = CObject::CreateObj<CTile>(_texture_key, TILE_CLASS, this);
 			if (pt_tile == NULL) return false;
 
 			// 텍스처 설정

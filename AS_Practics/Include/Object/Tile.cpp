@@ -105,6 +105,7 @@ void CTile::Save(FILE * _pt_file)
 
 	// 텍스쳐에서 자신의 위치 인덱스 저장
 	fwrite(&idx_int_texture_, sizeof(idx_int_texture_), 1, _pt_file);
+	fwrite(&idx_pose_, sizeof(idx_pose_), 1, _pt_file);
 }
 
 void CTile::Load(FILE * _pt_file)
@@ -113,4 +114,5 @@ void CTile::Load(FILE * _pt_file)
 
 	// 텍스쳐에서 자신의 위치 인덱스 불러오기
 	fread(&idx_int_texture_, sizeof(idx_int_texture_), 1, _pt_file);
+	fread(&idx_pose_, sizeof(idx_pose_), 1, _pt_file);
 }

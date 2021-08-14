@@ -109,7 +109,7 @@ bool CMapToolScene::ChangeBackTileSheet(HWND _hwnd, const string & _str_key)
 	cout << "ChangeBackTileSheet 3\n";
 
 	// 레이어 내 크기, 갯수, 텍스처 종류로 타일 생성
-	CStage* tile_sheet = CObject::CreateObj<CStage>("tileset", pt_layer);
+	CStage* tile_sheet = CObject::CreateObj<CStage>("tileset", STAGE_CLASS, pt_layer);
 
 	tile_sheet->AddTiles(pose_, world_size_.x / TEXTURE_SIZE, world_size_.y / TEXTURE_SIZE, TEXTURE_SIZE, TEXTURE_SIZE, texture_key);
 

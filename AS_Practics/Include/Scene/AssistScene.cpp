@@ -199,7 +199,7 @@ void CAssistScene::Input(float _time)
 
 	// 타일 생성
 	// 실패 시, 리턴
-	CStage* pt_user_rect = CObject::CreateObj<CStage>("user_rect", mouse_rect_layer);
+	CStage* pt_user_rect = CObject::CreateObj<CStage>("user_rect", STAGE_CLASS, mouse_rect_layer);
 	pt_user_rect->AddTiles(mouse_down_pose_cam, rect_num_x_, rect_num_y_, TEXTURE_SIZE, TEXTURE_SIZE, EMPTY_BW_32, TEXTURE_PATH, true);
 	SAFE_RELEASE(pt_user_rect);
 	// if (!mouse_rect_layer->CreateTile(mouse_down_pose_cam, rect_num_x_, rect_num_y_, TEXTURE_SIZE, TEXTURE_SIZE, EMPTY_BW_32, TEXTURE_PATH))

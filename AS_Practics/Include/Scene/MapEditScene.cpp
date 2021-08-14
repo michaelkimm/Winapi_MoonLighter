@@ -79,7 +79,7 @@ bool CMapEditScene::Init(HWND _hWnd)
 	// pt_mouse_rect_layer->CreateTile(pose_, tile_x_num_, tile_y_num_, tile_width_, tile_height_, texture_key, TEXTURE_PATH);
 
 	// 레이어에서 오브젝트를 만들고
-	CObject* stage = CObject::CreateObj<CStage>("stage1", pt_mouse_rect_layer);
+	CObject* stage = CObject::CreateObj<CStage>("stage1", STAGE_CLASS, pt_mouse_rect_layer);
 
 	// 오브젝트를 만들 때, 정해진 타일 종류와 갯수를 가지고 타일 벡터 생성
 	stage->AddTiles(pose_, tile_x_num_, tile_y_num_, tile_width_, tile_height_, texture_key, TEXTURE_PATH, true);
@@ -252,7 +252,7 @@ void CMapEditScene::Input(float _time)
 
 
 	// 레이어에서 오브젝트를 만들고
-	CObject* ui_obj = CObject::CreateObj<CUIObj>("user_rect", pt_mouse_rect_layer);
+	CObject* ui_obj = CObject::CreateObj<CUIObj>("user_rect", UI_OBJ_CLASS, pt_mouse_rect_layer);
 
 	// 오브젝트를 만들 때, 정해진 타일 종류와 갯수를 가지고 타일 벡터 생성
 	ui_obj->AddTiles(mouse_pose_with_cam_, rect_num_x, rect_num_y, TEXTURE_SIZE, TEXTURE_SIZE, EMPTY_BW_32, TEXTURE_PATH, true);
@@ -289,7 +289,7 @@ void CMapEditScene::Input(float _time)
 	else if (pt_edit_layer->GetTag() == MAP_OBJ_LAYER)
 	{
 		// 레이어에서 오브젝트를 만들고
-		CNatureObj* nature_obj = CObject::CreateObj<CNatureObj>("user_rect", pt_edit_layer, mouse_pose_with_cam_);
+		CNatureObj* nature_obj = CObject::CreateObj<CNatureObj>("user_rect", NATURE_OBJ_CLASS, pt_edit_layer, mouse_pose_with_cam_);
 
 		// 오브젝트를 만들 때, 정해진 타일 종류와 갯수를 가지고 타일 벡터 생성
 		// 넣을 때 마다 소트!
