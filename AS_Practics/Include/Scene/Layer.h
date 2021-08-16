@@ -40,9 +40,9 @@ public:
 	void SetZOrder(int _z_order) { z_order_ = _z_order; }
 	void PushObj(class CObject*);
 
-	CScene* GetScene() { return pt_scene_; }
-	int		GetZOrder() { return z_order_; }
-	string	GetTag() { return str_tag_; }
+	CScene* GetScene() const { return pt_scene_; }
+	int		GetZOrder() const { return z_order_; }
+	string	GetTag() const { return str_tag_; }
 
 	void DeleteObj(float _x, float _y);
 

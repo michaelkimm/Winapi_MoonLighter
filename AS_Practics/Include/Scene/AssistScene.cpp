@@ -167,6 +167,7 @@ void CAssistScene::Input(float _time)
 
 	// MapEditScene 정적 변수 변경
 	CMapEditScene* pt_map_edit_scene = static_cast<CMapEditScene*>(CSceneManager::Instance()->pt_map_edit_scene_);
+	if (pt_map_edit_scene) return;
 	pt_map_edit_scene->SetRectNumX(rect_num_x_);
 	pt_map_edit_scene->SetRectNumY(rect_num_y_);
 
@@ -188,9 +189,13 @@ void CAssistScene::Input(float _time)
 			if (pt_tile)
 				pt_map_edit_scene->AddTile(pt_tile);
 			else
+			{
+				SAFE_RELEASE(tmp_obj);
 				return;
+			}
 
 			SAFE_RELEASE(pt_tile);
+			SAFE_RELEASE(tmp_obj);
 		}
 	}
 	// <<

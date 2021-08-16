@@ -47,6 +47,8 @@ public:
 	virtual void Collision(float _time);
 	virtual void Render(HDC _hdc, float _time);
 
+	virtual CMoveObj* Clone() = 0;
+
 public:
 	virtual void Save(FILE* _pt_file);
 	virtual void Load(FILE* _pt_file);

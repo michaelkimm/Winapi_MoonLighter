@@ -22,7 +22,7 @@ CCore::CCore()
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
 	// 메모리 릭 일어난 곳으로 이동 시켜주는 함수
-	// _CrtSetBreakAlloc(215);
+	_CrtSetBreakAlloc(401805);
 }
 CCore::~CCore()
 {

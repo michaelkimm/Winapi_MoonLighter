@@ -65,8 +65,8 @@ bool CMapEditScene::Init(HWND _hWnd)
 	// : >> 바닥 레이어 텍스쳐 있는 상태로 초기화 하고 싶은 경우 사용
 
 	// 첫번째 레이어 찾기
-	CLayer* pt_mouse_rect_layer = FindLayer(FLOOR_LAYER);
-	if (pt_mouse_rect_layer == nullptr) return false;
+	CLayer* pt_layer = FindLayer(FLOOR_LAYER);
+	if (pt_layer == nullptr) return false;
 
 	//--------------------------------------------------------------------------------------------//
 
@@ -79,7 +79,7 @@ bool CMapEditScene::Init(HWND _hWnd)
 	// pt_mouse_rect_layer->CreateTile(pose_, tile_x_num_, tile_y_num_, tile_width_, tile_height_, texture_key, TEXTURE_PATH);
 
 	// 레이어에서 오브젝트를 만들고
-	CObject* stage = CObject::CreateObj<CStage>("stage1", STAGE_CLASS, pt_mouse_rect_layer);
+	CObject* stage = CObject::CreateObj<CStage>("stage1", STAGE_CLASS, pt_layer);
 
 	// 오브젝트를 만들 때, 정해진 타일 종류와 갯수를 가지고 타일 벡터 생성
 	stage->AddTiles(pose_, tile_x_num_, tile_y_num_, tile_width_, tile_height_, texture_key, TEXTURE_PATH, true);
@@ -89,18 +89,18 @@ bool CMapEditScene::Init(HWND _hWnd)
 
 
 	// : >> 모든 레이어 빈 상태로 초기화 (크기 등 내부 상태 설정)
-	pt_mouse_rect_layer = NULL;
+	pt_layer = NULL;
 
 	list<class CLayer*>::iterator iter;
 	list<class CLayer*>::iterator iter_end = layer_list_.end();
 	for (iter = layer_list_.begin(); iter != iter_end; iter++)
 	{
 		// 모든 레이어 빈 상태로 초기화
-		pt_mouse_rect_layer = FindLayer((*iter)->GetTag());
-		if (pt_mouse_rect_layer == nullptr) return false;
+		pt_layer = FindLayer((*iter)->GetTag());
+		if (pt_layer == nullptr) return false;
 
 		// 레이어 내 크기, 갯수 설정
-		pt_mouse_rect_layer->CreateTile(pose_, tile_x_num_, tile_y_num_, tile_width_, tile_height_, texture_key, TEXTURE_PATH, true);
+		pt_layer->CreateTile(pose_, tile_x_num_, tile_y_num_, tile_width_, tile_height_, texture_key, TEXTURE_PATH, true);
 	}
 	
 	// <<
@@ -283,6 +283,8 @@ void CMapEditScene::Input(float _time)
 		if (tmp_obj == NULL) return;
 
 		tmp_obj->AddTiles(rect_tile_vec_, rect_num_x, rect_num_y, mouse_pose_with_cam_idx_, false);
+
+		cout << "tmp_obj size: " << tmp_obj->GetTileVecCnt() << endl << endl;
 
 		SAFE_RELEASE(tmp_obj);
 	}

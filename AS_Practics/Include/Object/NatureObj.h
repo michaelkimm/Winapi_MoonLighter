@@ -15,6 +15,8 @@ private:
 	CNatureObj(const CNatureObj& obj);
 	~CNatureObj();
 
+	CNatureObj* Clone();
+
 public:
 	virtual bool Init();
 	virtual void Input(float _time);

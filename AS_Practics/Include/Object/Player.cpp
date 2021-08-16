@@ -21,6 +21,13 @@ CPlayer::~CPlayer()
 {
 }
 
+CPlayer* CPlayer::Clone()
+{
+	CPlayer* pt_player = new CPlayer(*this);
+	pt_player->InitRef();
+	return pt_player;
+}
+
 bool CPlayer::Init()
 {
 	return true;

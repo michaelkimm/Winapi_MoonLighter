@@ -16,6 +16,8 @@ private:
 	CUIObj(const CUIObj& obj);
 	~CUIObj();
 
+	CUIObj* Clone();
+
 public:
 	virtual bool Init();
 	virtual void Input(float _time);

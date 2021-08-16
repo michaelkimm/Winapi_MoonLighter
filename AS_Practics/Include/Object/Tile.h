@@ -24,7 +24,7 @@ public:
 	MY_POSE	GetIdxInTexture() const { return idx_int_texture_; }
 	MY_POSE	GetIdxPose() const { return idx_pose_; }
 
-	CTile* Clone();
+	virtual CTile* Clone();
 
 private:
 	CTile();

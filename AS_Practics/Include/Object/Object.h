@@ -49,6 +49,7 @@ public:
 	void		SetParentObj(CObject* _obj);
 	CObject*	GetParentObj() const;
 	CObject*	GetTileFromVec(int _idx) const;
+	int			GetTileVecCnt() const { return tile_vec_.size(); }
 
 public:
 	void SetTag(const string& _str_tag) { str_tag_ = _str_tag; }
@@ -89,6 +90,8 @@ protected:
 	CObject(const CObject& _obj);
 	virtual ~CObject();
 	 
+	virtual CObject* Clone() = 0;
+
 public:
 	virtual bool Init() = 0;
 	virtual void Input(float _time);

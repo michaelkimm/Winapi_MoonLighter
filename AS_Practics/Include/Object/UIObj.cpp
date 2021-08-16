@@ -15,6 +15,13 @@ CUIObj::~CUIObj()
 	SafeReleaseList(tile_vec_);
 }
 
+CUIObj* CUIObj::Clone()
+{
+	CUIObj* pt_ui = new CUIObj(*this);
+	pt_ui->InitRef();
+	return pt_ui;
+}
+
 bool CUIObj::Init()
 {
 	return true;

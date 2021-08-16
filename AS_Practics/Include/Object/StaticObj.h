@@ -12,6 +12,7 @@ protected:
 	CStaticObj(const CStaticObj& obj);
 	virtual ~CStaticObj() = 0;
 
+	virtual CStaticObj* Clone() = 0;
 
 public:
 	virtual bool Init() = 0;

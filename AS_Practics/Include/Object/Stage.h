@@ -18,6 +18,8 @@ private:
 	CStage(const CStage& obj);
 	~CStage();
 
+	virtual CStage* Clone();
+
 public:
 	virtual bool Init();
 	virtual void Input(float _time);

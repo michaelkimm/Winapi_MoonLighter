@@ -221,9 +221,6 @@
     <ClInclude Include="Scene\TileSetSettingScene.h">
       <Filter>Scene\MapTool\MapToolChild</Filter>
     </ClInclude>
-    <ClInclude Include="Object\MoveObj.h">
-      <Filter>Object</Filter>
-    </ClInclude>
     <ClInclude Include="Object\Stage.h">
       <Filter>Object\StaticObject</Filter>
     </ClInclude>
@@ -238,6 +235,9 @@
     </ClInclude>
     <ClInclude Include="figureDraw.h">
       <Filter>MyFunc</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\MoveObj.h">
+      <Filter>Object\MoveObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

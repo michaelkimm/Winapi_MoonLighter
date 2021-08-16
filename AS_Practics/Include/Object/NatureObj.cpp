@@ -14,6 +14,13 @@ CNatureObj::~CNatureObj()
 {
 }
 
+CNatureObj * CNatureObj::Clone()
+{
+	CNatureObj* pt_nature = new CNatureObj(*this);
+	pt_nature->InitRef();
+	return pt_nature;
+}
+
 bool CNatureObj::Init()
 {
 	return true;

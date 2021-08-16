@@ -20,6 +20,13 @@ CStage::~CStage()
 {
 }
 
+CStage * CStage::Clone()
+{
+	CStage* pt_stage = new CStage(*this);
+	pt_stage->InitRef();
+	return pt_stage;
+}
+
 bool CStage::Init()
 {
 	return true;

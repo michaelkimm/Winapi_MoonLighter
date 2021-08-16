@@ -52,6 +52,7 @@ void CObject::AddTiles(vector<CTile*> _rect_tile_vec, int _x_length, int _y_leng
 
 			tmp_tile->SetScene(NULL);
 			tmp_tile->SetLayer(NULL);
+
 			tmp_tile->SetParentObj(this);
 
 			AddObjToTileVec(tmp_tile, _do_sort);
@@ -311,6 +312,28 @@ CObject::CObject(const CObject& _obj)
 	*this = _obj;
 	if (texture_)
 		texture_->AddRef();
+
+	if (parent_obj_)
+		parent_obj_->AddRef();
+	/*
+	vector<class CObject*>::const_iterator iter;
+	vector<class CObject*>::const_iterator iter_end = _obj.tile_vec_.end();
+
+	SafeReleaseList(tile_vec_);
+
+	if (_obj.GetTileVecCnt())
+	{
+		for (iter = _obj.tile_vec_.begin(); iter != iter_end; iter++)
+		{
+			CObject* pt_obj =(*iter)->Clone();
+
+			pt_obj->AddRef();
+			tile_vec_.push_back(pt_obj);
+
+			SAFE_RELEASE(pt_obj);
+		}
+	}*/
+	
 }
 
 CObject::~CObject()
@@ -549,7 +572,9 @@ void CObject::LoadObjectVec(vector<CObject*>& _obj_vec, FILE* _pt_file, CLayer* 
 
 			// 객체 부모 지정
 			if (_parent)
+			{
 				pt_tile->SetParentObj(_parent);
+			}
 
 			// 객체 내용 불러오기
 			pt_tile->Load(_pt_file);
@@ -565,7 +590,9 @@ void CObject::LoadObjectVec(vector<CObject*>& _obj_vec, FILE* _pt_file, CLayer* 
 			CPlayer* pt_player = CObject::CreateObj<CPlayer>("player", PLAYER_CLASS, _layer);
 
 			if (_parent)
+			{
 				pt_player->SetParentObj(_parent);
+			}
 
 			pt_player->Load(_pt_file);
 
@@ -579,7 +606,9 @@ void CObject::LoadObjectVec(vector<CObject*>& _obj_vec, FILE* _pt_file, CLayer* 
 			CUIObj* pt_ui = CObject::CreateObj<CUIObj>("ui_obj", UI_OBJ_CLASS, _layer);
 
 			if (_parent)
+			{
 				pt_ui->SetParentObj(_parent);
+			}
 
 			pt_ui->Load(_pt_file);
 
@@ -593,7 +622,9 @@ void CObject::LoadObjectVec(vector<CObject*>& _obj_vec, FILE* _pt_file, CLayer* 
 			CStage* pt_stage = CObject::CreateObj<CStage>("stage", STAGE_CLASS, _layer);
 
 			if (_parent)
+			{
 				pt_stage->SetParentObj(_parent);
+			}
 
 			pt_stage->Load(_pt_file);
 
@@ -607,7 +638,9 @@ void CObject::LoadObjectVec(vector<CObject*>& _obj_vec, FILE* _pt_file, CLayer* 
 			CNatureObj* pt_nature = CObject::CreateObj<CNatureObj>("obj", NATURE_OBJ_CLASS, _layer);
 
 			if (_parent)
+			{
 				pt_nature->SetParentObj(_parent);
+			}
 
 			pt_nature->Load(_pt_file);
 

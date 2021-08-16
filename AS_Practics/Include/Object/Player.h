@@ -16,6 +16,8 @@ private:
 	CPlayer(const CPlayer& obj);
 	~CPlayer();
 
+	virtual CPlayer* Clone();
+
 public:
 	virtual bool Init();
 	virtual void Input(float _time);
